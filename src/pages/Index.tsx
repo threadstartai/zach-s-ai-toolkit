@@ -12,10 +12,10 @@ const Index = () => {
       <article className="mx-auto max-w-[760px] px-6">
         {/* Hero */}
         <section className="pt-24 pb-28 md:pt-32 md:pb-32">
-          <h1 className="text-5xl md:text-6xl font-extrabold text-navy">
+          <h1 className="text-5xl md:text-6xl font-extrabold text-navy tracking-[-0.02em]">
             Zach's AI Stack.
           </h1>
-          <p className="mt-6 text-xl md:text-2xl font-normal text-navy leading-snug">
+          <p className="mt-6 text-xl md:text-2xl font-normal text-navy leading-snug max-w-[600px]">
             A guide to every AI tool worth using, written for the people I care about.
           </p>
           <p className="mt-6 text-foreground/80">
@@ -100,7 +100,7 @@ const Index = () => {
         {/* Chrome Consulting quiet line */}
         <section className="pt-20 pb-8">
           <hr className="border-border mb-16" />
-          <h3 className="text-2xl text-navy">
+          <h3 className="text-xl text-navy font-semibold">
             If you want help getting this set up properly
           </h3>
           <p className="mt-5 text-foreground/90 text-[17px] leading-[1.7]">
