@@ -99,7 +99,7 @@ const Index = () => {
 
         {/* Chrome Consulting quiet line */}
         <section className="pt-20 pb-8">
-          <hr className="border-border mb-16" />
+          <hr className="border-0 border-t border-[hsl(var(--border))]/50 mb-16" />
           <h3 className="text-xl text-navy font-semibold">
             If you want help getting this set up properly
           </h3>
