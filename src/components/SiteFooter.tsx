@@ -2,7 +2,7 @@ const SiteFooter = () => {
   return (
     <footer className="mt-32">
       <div className="mx-auto max-w-[760px] px-6">
-        <hr className="border-border" />
+        <hr className="border-0 border-t border-[hsl(var(--border))]/50" />
         <div className="py-12 text-[14px] leading-relaxed text-foreground/70">
           <p className="italic">Made by Zach Z. Made for friends &amp; family.</p>
           <p className="mt-4">

@@ -2,9 +2,9 @@ import { Link } from "react-router-dom";
 import SiteLayout from "@/components/SiteLayout";
 
 const primaryBtn =
-  "inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-sm text-[15px] font-medium hover:bg-navy/90 transition-colors";
+  "inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150";
 const outlineBtn =
-  "inline-flex items-center justify-center border border-navy text-navy px-5 py-3 rounded-sm text-[15px] font-medium hover:bg-navy-light transition-colors";
+  "inline-flex items-center justify-center border border-navy text-navy px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy-light transition-colors duration-150";
 
 const Index = () => {
   return (
@@ -99,7 +99,7 @@ const Index = () => {
 
         {/* Chrome Consulting quiet line */}
         <section className="pt-20 pb-8">
-          <hr className="border-border mb-16" />
+          <hr className="border-0 border-t border-[hsl(var(--border))]/50 mb-16" />
           <h3 className="text-xl text-navy font-semibold">
             If you want help getting this set up properly
           </h3>
