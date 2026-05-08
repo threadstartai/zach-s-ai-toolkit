@@ -1,0 +1,15 @@
+import { ReactNode } from "react";
+import SiteNav from "./SiteNav";
+import SiteFooter from "./SiteFooter";
+
+const SiteLayout = ({ children }: { children: ReactNode }) => {
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      <SiteNav />
+      <main className="flex-1">{children}</main>
+      <SiteFooter />
+    </div>
+  );
+};
+
+export default SiteLayout;
