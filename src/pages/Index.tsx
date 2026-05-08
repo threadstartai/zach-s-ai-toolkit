@@ -2,9 +2,9 @@ import { Link } from "react-router-dom";
 import SiteLayout from "@/components/SiteLayout";
 
 const primaryBtn =
-  "inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-lg text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150";
+  "inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150";
 const outlineBtn =
-  "inline-flex items-center justify-center border border-navy text-navy px-5 py-3 rounded-lg text-[15px] font-medium hover:bg-navy-light transition-colors duration-150";
+  "inline-flex items-center justify-center border border-navy text-navy px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy-light transition-colors duration-150";
 
 const Index = () => {
   return (
