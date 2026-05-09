@@ -358,6 +358,13 @@ const LADDER = [
   { name: "Automate the boring bits.", desc: "Once you've got patterns that work, get them running on autopilot." },
 ];
 
+const ladderLine = (c4: Q4Code): string => {
+  if (c4 === "never") return "You're at Stage 1. That's where everyone starts.";
+  if (c4 === "tried") return "You're between Stage 1 and 2. The next move is adding context.";
+  if (c4 === "weekly") return "You're around Stage 2 or 3. The next move is checking what AI tells you.";
+  return "You're past Stage 3. The next moves are reuse and automation — most people never get here.";
+};
+
 const Q5_EDGE_MAP: Record<Q5Code, string> = {
   prompt: "prompt",
   video: "video",
