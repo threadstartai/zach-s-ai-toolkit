@@ -287,8 +287,10 @@ export type Database = {
           name: string
           slug: string
           source_doc: string | null
+          status: string
           tagline: string | null
           tool_number: string | null
+          update_message: string | null
           updated_at: string
         }
         Insert: {
@@ -298,8 +300,10 @@ export type Database = {
           name: string
           slug: string
           source_doc?: string | null
+          status?: string
           tagline?: string | null
           tool_number?: string | null
+          update_message?: string | null
           updated_at?: string
         }
         Update: {
@@ -309,8 +313,10 @@ export type Database = {
           name?: string
           slug?: string
           source_doc?: string | null
+          status?: string
           tagline?: string | null
           tool_number?: string | null
+          update_message?: string | null
           updated_at?: string
         }
         Relationships: []

@@ -517,6 +517,7 @@ const Result = ({
 }) => {
   const [saved, setSaved] = useState(false);
   const [chunksByTool, setChunksByTool] = useState<Record<string, Chunk[]>>({});
+  const [statusByTool, setStatusByTool] = useState<Record<string, { status: string; update_message: string | null }>>({});
   const [showSlowMessage, setShowSlowMessage] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(initialSessionId ?? null);
   const [linkCopied, setLinkCopied] = useState(false);
@@ -571,11 +572,14 @@ const Result = ({
     (async () => {
       const { data: tools } = await supabase
         .from("tools")
-        .select("id, slug")
+        .select("id, slug, status, update_message")
         .in("slug", pickSlugs);
 
       if (!tools || cancelled) return;
       const slugToId = new Map(tools.map((t) => [t.slug, t.id]));
+      const slugToStatus = new Map(
+        tools.map((t) => [t.slug, { status: t.status, update_message: t.update_message }])
+      );
 
       const result: Record<string, Chunk[]> = {};
       await Promise.all(
@@ -616,6 +620,12 @@ const Result = ({
       );
       if (!cancelled) {
         setChunksByTool(result);
+        const statusResult: Record<string, { status: string; update_message: string | null }> = {};
+        for (const slug of pickSlugs) {
+          const s = slugToStatus.get(slug);
+          if (s) statusResult[slug] = s;
+        }
+        setStatusByTool(statusResult);
         setShowSlowMessage(false);
       }
     })();
@@ -718,6 +728,16 @@ const Result = ({
                 <span className="font-mono text-[15px] text-navy/70 mr-2.5">{t.num}</span>
                 {t.name}
               </h4>
+              {statusByTool[t.slug]?.status === "update" && statusByTool[t.slug]?.update_message && (
+                <div className="mt-4 bg-navy text-primary-foreground rounded-[8px] px-4 py-3 text-[14px] leading-[1.55]">
+                  <span className="font-semibold">Update:</span> {statusByTool[t.slug]?.update_message}
+                </div>
+              )}
+              {statusByTool[t.slug]?.status === "deprecated" && (
+                <div className="mt-4 bg-navy text-primary-foreground rounded-[8px] px-4 py-3 text-[14px] leading-[1.55]">
+                  <span className="font-semibold">Heads up:</span> I wouldn't start here anymore. {statusByTool[t.slug]?.update_message ?? "There's a better tool for this now — check the others in your stack."}
+                </div>
+              )}
               <p className="mt-3 text-navy text-[16px] leading-[1.65]">{why(k)}</p>
               <p className="mt-3 mb-1 text-[13px] italic text-navy/65 leading-[1.55]">
                 {whyThisTool(t.slug, c2, c3, c4, c3 === "other" ? (q3 ?? "") : "")}
