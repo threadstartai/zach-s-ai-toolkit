@@ -908,144 +908,190 @@ const Stack = () => {
           </p>
         </header>
 
-        {/* Build My Stack quiz */}
+        {/* Build My Stack quiz / shared result */}
         <section id="build-my-stack" className="mt-24 mb-24 scroll-mt-20">
-          <h2 className="text-[28px] font-bold text-navy">Build My Stack</h2>
-          <p className="mt-3 text-navy/85 text-[17px] leading-[1.7]">
-            I'll build your first AI Stack in under two minutes. No jargon. No spam. Just the tools I'd start with if you were sat across from me.
-          </p>
-
-          <div className="mt-8 transition-all duration-200">
-            {step === "intro" && (
-              <button
-                onClick={() => setStep("q1")}
-                className="inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150"
-              >
-                Start →
-              </button>
-            )}
-
-            {step === "q1" && (
-              <div>
-                <h3 className={qHeading}>What should I call you?</h3>
-                <p className={microcopy}>
-                  Just a first name. Makes the result feel personal.
+          {sharedMode ? (
+            <div>
+              {sharedLoading && (
+                <p className="text-[14px] text-foreground/60 italic">
+                  One moment — loading this Stack.
                 </p>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Sarah"
-                  autoFocus
-                  className="mt-5 w-full max-w-[360px] rounded-[8px] border border-navy bg-navy-light px-4 py-3 text-[15px] text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-navy/30"
-                />
-                <div className="mt-5">
+              )}
+              {!sharedLoading && sharedError && (
+                <div>
+                  <h2 className="text-[28px] font-bold text-navy">This Stack isn't here.</h2>
+                  <p className="mt-3 text-navy/85 text-[17px] leading-[1.7]">
+                    Either the link's expired or the URL got mangled in transit.{" "}
+                    <Link to="/stack" className="text-navy underline underline-offset-2 hover:opacity-80">
+                      Build your own Stack →
+                    </Link>
+                  </p>
+                </div>
+              )}
+              {!sharedLoading && !sharedError && sharedSession && (
+                <>
+                  <div className="mb-6 text-[14px]">
+                    <Link to="/stack" className="text-navy hover:underline underline-offset-2">
+                      Build your own Stack →
+                    </Link>
+                  </div>
+                  <Result
+                    name={sharedSession.name ?? ""}
+                    q2={Q2_FROM_CODE[sharedSession.q2_audience ?? ""] ?? null}
+                    q3={
+                      sharedSession.q3_use_case === "other"
+                        ? (sharedSession.q3_other_text ?? "Other")
+                        : (Q3_FROM_CODE[sharedSession.q3_use_case ?? ""] ?? null)
+                    }
+                    q4={Q4_FROM_CODE[sharedSession.q4_confidence ?? ""] ?? null}
+                    q5={Q5_FROM_CODE[sharedSession.q5_learning_style ?? ""] ?? null}
+                    onReset={reset}
+                    initialSessionId={routeSessionId}
+                    sharedMode
+                  />
+                </>
+              )}
+            </div>
+          ) : (
+            <>
+              <h2 className="text-[28px] font-bold text-navy">Build My Stack</h2>
+              <p className="mt-3 text-navy/85 text-[17px] leading-[1.7]">
+                I'll build your first AI Stack in under two minutes. No jargon. No spam. Just the tools I'd start with if you were sat across from me.
+              </p>
+
+              <div className="mt-8 transition-all duration-200">
+                {step === "intro" && (
                   <button
-                    onClick={() => name.trim() && setStep("q2")}
-                    disabled={!name.trim()}
-                    className="inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150 disabled:opacity-40 disabled:hover:bg-navy disabled:cursor-not-allowed"
+                    onClick={() => setStep("q1")}
+                    className="inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150"
                   >
-                    Continue →
+                    Start →
                   </button>
-                </div>
-              </div>
-            )}
+                )}
 
-            {step === "q2" && (
-              <div>
-                <h3 className={qHeading}>What are you using AI for first?</h3>
-                <p className={microcopy}>This routes which tools I recommend.</p>
-                <div className="mt-5 flex flex-col items-start gap-2.5">
-                  {Q2_OPTIONS.map((o) => (
-                    <button key={o} onClick={() => selectQ2(o)} className={pill(q2 === o)}>
-                      {o}
-                    </button>
-                  ))}
-                </div>
-                <div className="mt-6">
-                  <button onClick={() => setStep("q1")} className={backLink}>← back</button>
-                </div>
-              </div>
-            )}
-
-            {step === "q3" && (
-              <div>
-                <h3 className={qHeading}>What's one thing you want help with this week?</h3>
-                <p className={microcopy}>This makes the recommendation specific.</p>
-                <div className="mt-5 flex flex-col items-start gap-2.5">
-                  {Q3_OPTIONS.map((o) => (
-                    <button key={o} onClick={() => selectQ3(o)} className={pill(q3 === o && !q3OtherSelected)}>
-                      {o}
-                    </button>
-                  ))}
-                  <button onClick={selectQ3Other} className={pill(q3OtherSelected)}>
-                    Other
-                  </button>
-                  {q3OtherSelected && (
-                    <div className="mt-2 flex flex-col sm:flex-row gap-2.5 w-full max-w-[480px]">
-                      <input
-                        type="text"
-                        value={q3Other}
-                        onChange={(e) => setQ3Other(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === "Enter") submitQ3Other(); }}
-                        placeholder="Tell me what you'd like help with"
-                        autoFocus
-                        className="flex-1 rounded-[8px] border border-navy bg-navy-light px-4 py-2.5 text-[15px] text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-navy/30"
-                      />
+                {step === "q1" && (
+                  <div>
+                    <h3 className={qHeading}>What should I call you?</h3>
+                    <p className={microcopy}>
+                      Just a first name. Makes the result feel personal.
+                    </p>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="e.g. Sarah"
+                      autoFocus
+                      className="mt-5 w-full max-w-[360px] rounded-[8px] border border-navy bg-navy-light px-4 py-3 text-[15px] text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-navy/30"
+                    />
+                    <div className="mt-5">
                       <button
-                        onClick={submitQ3Other}
-                        disabled={!q3Other.trim()}
-                        className="inline-flex items-center justify-center bg-navy text-primary-foreground px-4 py-2.5 rounded-[8px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150 disabled:opacity-40 disabled:hover:bg-navy disabled:cursor-not-allowed"
+                        onClick={() => name.trim() && setStep("q2")}
+                        disabled={!name.trim()}
+                        className="inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150 disabled:opacity-40 disabled:hover:bg-navy disabled:cursor-not-allowed"
                       >
                         Continue →
                       </button>
                     </div>
-                  )}
-                </div>
-                <div className="mt-6">
-                  <button onClick={() => setStep("q2")} className={backLink}>← back</button>
-                </div>
-              </div>
-            )}
+                  </div>
+                )}
 
-            {step === "q4" && (
-              <div>
-                <h3 className={qHeading}>How confident are you with AI right now?</h3>
-                <p className={microcopy}>This sets how much I explain.</p>
-                <div className="mt-5 flex flex-col items-start gap-2.5">
-                  {Q4_OPTIONS.map((o) => (
-                    <button key={o} onClick={() => selectQ4(o)} className={pill(q4 === o)}>
-                      {o}
-                    </button>
-                  ))}
-                </div>
-                <div className="mt-6">
-                  <button onClick={() => setStep("q3")} className={backLink}>← back</button>
-                </div>
-              </div>
-            )}
+                {step === "q2" && (
+                  <div>
+                    <h3 className={qHeading}>What are you using AI for first?</h3>
+                    <p className={microcopy}>This routes which tools I recommend.</p>
+                    <div className="mt-5 flex flex-col items-start gap-2.5">
+                      {Q2_OPTIONS.map((o) => (
+                        <button key={o} onClick={() => selectQ2(o)} className={pill(q2 === o)}>
+                          {o}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-6">
+                      <button onClick={() => setStep("q1")} className={backLink}>← back</button>
+                    </div>
+                  </div>
+                )}
 
-            {step === "q5" && (
-              <div>
-                <h3 className={qHeading}>How do you prefer to learn something new?</h3>
-                <p className={microcopy}>This changes the format of your first task.</p>
-                <div className="mt-5 flex flex-col items-start gap-2.5">
-                  {Q5_OPTIONS.map((o) => (
-                    <button key={o} onClick={() => selectQ5(o)} className={pill(q5 === o)}>
-                      {o}
-                    </button>
-                  ))}
-                </div>
-                <div className="mt-6">
-                  <button onClick={() => setStep("q4")} className={backLink}>← back</button>
-                </div>
-              </div>
-            )}
+                {step === "q3" && (
+                  <div>
+                    <h3 className={qHeading}>What's one thing you want help with this week?</h3>
+                    <p className={microcopy}>This makes the recommendation specific.</p>
+                    <div className="mt-5 flex flex-col items-start gap-2.5">
+                      {Q3_OPTIONS.map((o) => (
+                        <button key={o} onClick={() => selectQ3(o)} className={pill(q3 === o && !q3OtherSelected)}>
+                          {o}
+                        </button>
+                      ))}
+                      <button onClick={selectQ3Other} className={pill(q3OtherSelected)}>
+                        Other
+                      </button>
+                      {q3OtherSelected && (
+                        <div className="mt-2 flex flex-col sm:flex-row gap-2.5 w-full max-w-[480px]">
+                          <input
+                            type="text"
+                            value={q3Other}
+                            onChange={(e) => setQ3Other(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === "Enter") submitQ3Other(); }}
+                            placeholder="Tell me what you'd like help with"
+                            autoFocus
+                            className="flex-1 rounded-[8px] border border-navy bg-navy-light px-4 py-2.5 text-[15px] text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-navy/30"
+                          />
+                          <button
+                            onClick={submitQ3Other}
+                            disabled={!q3Other.trim()}
+                            className="inline-flex items-center justify-center bg-navy text-primary-foreground px-4 py-2.5 rounded-[8px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150 disabled:opacity-40 disabled:hover:bg-navy disabled:cursor-not-allowed"
+                          >
+                            Continue →
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div className="mt-6">
+                      <button onClick={() => setStep("q2")} className={backLink}>← back</button>
+                    </div>
+                  </div>
+                )}
 
-            {step === "done" && (
-              <Result name={name} q2={q2} q3={q3} q4={q4} q5={q5} onReset={reset} />
-            )}
-          </div>
+                {step === "q4" && (
+                  <div>
+                    <h3 className={qHeading}>How confident are you with AI right now?</h3>
+                    <p className={microcopy}>This sets how much I explain.</p>
+                    <div className="mt-5 flex flex-col items-start gap-2.5">
+                      {Q4_OPTIONS.map((o) => (
+                        <button key={o} onClick={() => selectQ4(o)} className={pill(q4 === o)}>
+                          {o}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-6">
+                      <button onClick={() => setStep("q3")} className={backLink}>← back</button>
+                    </div>
+                  </div>
+                )}
+
+                {step === "q5" && (
+                  <div>
+                    <h3 className={qHeading}>How do you prefer to learn something new?</h3>
+                    <p className={microcopy}>This changes the format of your first task.</p>
+                    <div className="mt-5 flex flex-col items-start gap-2.5">
+                      {Q5_OPTIONS.map((o) => (
+                        <button key={o} onClick={() => selectQ5(o)} className={pill(q5 === o)}>
+                          {o}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-6">
+                      <button onClick={() => setStep("q4")} className={backLink}>← back</button>
+                    </div>
+                  </div>
+                )}
+
+                {step === "done" && (
+                  <Result name={name} q2={q2} q3={q3} q4={q4} q5={q5} onReset={reset} />
+                )}
+              </div>
+            </>
+          )}
         </section>
 
 
