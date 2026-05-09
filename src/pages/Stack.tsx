@@ -707,6 +707,9 @@ const Result = ({
                 {t.name}
               </h4>
               <p className="mt-3 text-navy text-[16px] leading-[1.65]">{why(k)}</p>
+              <p className="mt-3 mb-1 text-[13px] italic text-navy/65 leading-[1.55]">
+                {whyThisTool(t.slug, c2, c3, c4, c3 === "other" ? (q3 ?? "") : "")}
+              </p>
 
               {hasAnyChunks && (
                 <div className="mt-5 flex flex-col gap-6">
