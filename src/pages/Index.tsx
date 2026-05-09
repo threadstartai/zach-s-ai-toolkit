@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import SiteLayout from "@/components/SiteLayout";
+import { useAuth } from "@/contexts/AuthContext";
 
 const primaryBtn =
   "inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150";
@@ -7,6 +8,8 @@ const outlineBtn =
   "inline-flex items-center justify-center border border-navy text-navy px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy-light transition-colors duration-150";
 
 const Index = () => {
+  const { user } = useAuth();
+  const startHref = user ? "/dashboard" : "/signup";
   return (
     <SiteLayout>
       <article className="mx-auto max-w-[760px] px-6">
@@ -22,7 +25,7 @@ const Index = () => {
             Free. Mine to keep updated. No course at the end.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-3">
-            <Link to="/stack#start-here" className={primaryBtn}>
+            <Link to={startHref} className={primaryBtn}>
               Start Here →
             </Link>
             <Link to="/stack#tools" className={outlineBtn}>

@@ -3,12 +3,21 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index.tsx";
 import Stack from "./pages/Stack.tsx";
 import WorkWithMe from "./pages/WorkWithMe.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ResultLayout from "./pages/result/ResultLayout.tsx";
 import MyStack from "./pages/result/surfaces/MyStack.tsx";
+import Login from "./pages/auth/Login.tsx";
+import Signup from "./pages/auth/Signup.tsx";
+import ForgotPassword from "./pages/auth/ForgotPassword.tsx";
+import ResetPassword from "./pages/auth/ResetPassword.tsx";
+import Onboarding from "./pages/Onboarding.tsx";
+import DashboardShell from "./pages/dashboard/DashboardShell.tsx";
+import DashboardIndex from "./pages/dashboard/DashboardIndex.tsx";
 
 const queryClient = new QueryClient();
 
@@ -18,17 +27,55 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/stack" element={<Stack />} />
-          <Route path="/stack/result/:sessionId" element={<ResultLayout />}>
-            <Route index element={<Navigate to="my-stack" replace />} />
-            <Route path="my-stack" element={<MyStack />} />
-          </Route>
-          <Route path="/work-with-me" element={<WorkWithMe />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            {/* Public marketing */}
+            <Route path="/" element={<Index />} />
+            <Route path="/stack" element={<Stack />} />
+            <Route path="/work-with-me" element={<WorkWithMe />} />
+
+            {/* Public anonymous result (legacy share links) */}
+            <Route path="/stack/result/:sessionId" element={<ResultLayout />}>
+              <Route index element={<Navigate to="my-stack" replace />} />
+              <Route path="my-stack" element={<MyStack />} />
+            </Route>
+
+            {/* Auth */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+
+            {/* Protected onboarding */}
+            <Route
+              path="/onboarding"
+              element={
+                <ProtectedRoute>
+                  <Onboarding />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Protected dashboard */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardShell />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<DashboardIndex />} />
+              <Route path="stacks/:sessionId" element={<ResultLayout chrome="dashboard" />}>
+                <Route index element={<Navigate to="my-stack" replace />} />
+                <Route path="my-stack" element={<MyStack />} />
+              </Route>
+            </Route>
+
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

@@ -9,16 +9,30 @@ import {
   sanitiseString,
 } from "../_shared/validation.ts";
 
-const supabase = createClient(
-  Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-);
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
+}
+
+async function userIdFromAuthHeader(req: Request): Promise<string | null> {
+  const auth = req.headers.get("Authorization");
+  if (!auth?.startsWith("Bearer ")) return null;
+  const token = auth.slice("Bearer ".length).trim();
+  if (!token) return null;
+  try {
+    const { data, error } = await admin.auth.getUser(token);
+    if (error || !data?.user) return null;
+    return data.user.id;
+  } catch {
+    return null;
+  }
 }
 
 Deno.serve(async (req) => {
@@ -34,7 +48,7 @@ Deno.serve(async (req) => {
 
   const ip = getClientIP(req);
 
-  const { data: allowed, error: rlErr } = await supabase.rpc("check_rate_limit", {
+  const { data: allowed, error: rlErr } = await admin.rpc("check_rate_limit", {
     p_identifier: ip,
     p_action: "quiz_submit",
     p_max_count: 10,
@@ -59,7 +73,10 @@ Deno.serve(async (req) => {
     return json({ error: "Invalid learning style" }, 400);
   }
 
-  const { data, error } = await supabase
+  // Derive user_id from JWT only — never trust client-supplied user_id.
+  const userId = await userIdFromAuthHeader(req);
+
+  const { data, error } = await admin
     .from("sessions")
     .insert({
       name,
@@ -68,6 +85,7 @@ Deno.serve(async (req) => {
       q3_other_text: q3 === "other" ? q3Other : null,
       q4_confidence: q4,
       q5_learning_style: q5 ?? null,
+      user_id: userId,
     })
     .select("id")
     .single();

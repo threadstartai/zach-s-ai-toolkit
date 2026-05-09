@@ -12,7 +12,7 @@ import { SECTION_LABELS } from "./shared/chunks";
 import type { Chunk, LoadedSession, ToolStatus } from "./shared/types";
 import type { ResultContext } from "./shared/useResultContext";
 
-const ResultLayout = () => {
+const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" } = {}) => {
   const { sessionId: routeSessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
 
@@ -202,39 +202,40 @@ const ResultLayout = () => {
     submitFeedback,
   };
 
-  return (
-    <SiteLayout>
-      <div className="mx-auto max-w-[1100px] px-6 pt-10 pb-24">
-        <div className="flex flex-col md:flex-row gap-10 md:gap-14">
-          <aside className="md:w-[200px] md:shrink-0">
-            <div className="md:sticky md:top-10">
-              <ResultSidebar />
-            </div>
-          </aside>
+  const inner = (
+    <div className="mx-auto max-w-[1100px] px-6 pt-10 pb-24">
+      <div className="flex flex-col md:flex-row gap-10 md:gap-14">
+        <aside className="md:w-[200px] md:shrink-0">
+          <div className="md:sticky md:top-10">
+            <ResultSidebar />
+          </div>
+        </aside>
 
-          <main className="flex-1 min-w-0 max-w-[760px]">
-            {loading && (
-              <p className="text-[14px] text-foreground/60 italic">
-                One moment — loading this Stack.
+        <main className="flex-1 min-w-0 max-w-[760px]">
+          {loading && (
+            <p className="text-[14px] text-foreground/60 italic">
+              One moment — loading this Stack.
+            </p>
+          )}
+          {!loading && error && (
+            <div>
+              <h2 className="text-[28px] font-bold text-navy">This Stack isn't here.</h2>
+              <p className="mt-3 text-navy/85 text-[17px] leading-[1.7]">
+                Either the link's expired or the URL got mangled in transit.{" "}
+                <Link to="/stack" className="text-navy underline underline-offset-2 hover:opacity-80">
+                  Build your own Stack →
+                </Link>
               </p>
-            )}
-            {!loading && error && (
-              <div>
-                <h2 className="text-[28px] font-bold text-navy">This Stack isn't here.</h2>
-                <p className="mt-3 text-navy/85 text-[17px] leading-[1.7]">
-                  Either the link's expired or the URL got mangled in transit.{" "}
-                  <Link to="/stack" className="text-navy underline underline-offset-2 hover:opacity-80">
-                    Build your own Stack →
-                  </Link>
-                </p>
-              </div>
-            )}
-            {!loading && !error && session && <Outlet context={ctx} />}
-          </main>
-        </div>
+            </div>
+          )}
+          {!loading && !error && session && <Outlet context={ctx} />}
+        </main>
       </div>
-    </SiteLayout>
+    </div>
   );
+
+  if (chrome === "dashboard") return inner;
+  return <SiteLayout>{inner}</SiteLayout>;
 };
 
 export default ResultLayout;
