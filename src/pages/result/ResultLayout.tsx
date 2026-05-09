@@ -202,16 +202,24 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
     submitFeedback,
   };
 
+  const isDashboard = chrome === "dashboard";
+
   const inner = (
-    <div className="mx-auto max-w-[1100px] px-6 pt-10 pb-24">
-      <div className="flex flex-col md:flex-row gap-10 md:gap-14">
-        <aside className="md:w-[200px] md:shrink-0">
-          <div className="md:sticky md:top-10">
+    <div
+      className={
+        isDashboard
+          ? "mx-auto max-w-[1180px] px-5 sm:px-8 pt-8 md:pt-10 pb-20"
+          : "mx-auto max-w-[1100px] px-6 pt-10 pb-24"
+      }
+    >
+      <div className="flex flex-col md:flex-row gap-8 md:gap-10">
+        <aside className="md:w-[220px] md:shrink-0">
+          <div className="md:sticky md:top-24">
             <ResultSidebar />
           </div>
         </aside>
 
-        <main className="flex-1 min-w-0 max-w-[760px]">
+        <main className={`flex-1 min-w-0 ${isDashboard ? "max-w-[820px] md:px-2 md:py-2" : "max-w-[760px]"}`}>
           {loading && (
             <p className="text-[14px] text-foreground/60 italic">
               One moment — loading this Stack.
@@ -234,7 +242,7 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
     </div>
   );
 
-  if (chrome === "dashboard") return inner;
+  if (isDashboard) return inner;
   return <SiteLayout>{inner}</SiteLayout>;
 };
 
