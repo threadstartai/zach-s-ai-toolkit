@@ -572,11 +572,14 @@ const Result = ({
     (async () => {
       const { data: tools } = await supabase
         .from("tools")
-        .select("id, slug")
+        .select("id, slug, status, update_message")
         .in("slug", pickSlugs);
 
       if (!tools || cancelled) return;
       const slugToId = new Map(tools.map((t) => [t.slug, t.id]));
+      const slugToStatus = new Map(
+        tools.map((t) => [t.slug, { status: t.status, update_message: t.update_message }])
+      );
 
       const result: Record<string, Chunk[]> = {};
       await Promise.all(
