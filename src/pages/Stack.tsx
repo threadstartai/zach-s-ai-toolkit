@@ -740,13 +740,6 @@ const Result = ({
                   })}
                 </div>
               )}
-
-              <a
-                href={`/pdfs/${t.slug}.pdf`}
-                className="mt-6 inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150"
-              >
-                Read the full guide →
-              </a>
             </div>
             </Fragment>
           );
