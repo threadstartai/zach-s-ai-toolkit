@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import SiteLayout from "@/components/SiteLayout";
+import { useAuth } from "@/contexts/AuthContext";
 
 const primaryBtn =
   "inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150";
