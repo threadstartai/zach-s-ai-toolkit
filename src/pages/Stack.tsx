@@ -388,12 +388,12 @@ const ChunkBlock = ({ chunk }: { chunk: Chunk }) => {
               {split.before}
             </ReactMarkdown>
           )}
-          <div className="my-3 bg-background/60 border border-navy/15 rounded-[8px] px-5 py-4">
+          <div className="my-3 bg-background border-l-[3px] border-navy border-y border-r border-y-navy/12 border-r-navy/12 rounded-[8px] px-5 py-4">
             <pre className="whitespace-pre-wrap font-mono text-[13.5px] leading-[1.7] text-foreground/90">{split.prompt}</pre>
           </div>
           <button
             onClick={() => handleCopy(split.prompt!)}
-            className="inline-flex items-center justify-center border border-navy text-navy px-3.5 py-1.5 rounded-[8px] text-[13px] font-medium hover:bg-background/60 transition-colors duration-150"
+            className="mt-4 inline-flex items-center justify-center border border-navy text-navy px-3.5 py-1.5 rounded-[8px] text-[13px] font-medium hover:bg-background/60 transition-colors duration-150"
           >
             {copied ? "Copied" : "Copy prompt"}
           </button>
