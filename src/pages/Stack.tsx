@@ -747,6 +747,7 @@ const Result = ({
                 Read the full guide →
               </a>
             </div>
+            </Fragment>
           );
         })}
       </div>
