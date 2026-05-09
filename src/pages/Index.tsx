@@ -8,6 +8,8 @@ const outlineBtn =
   "inline-flex items-center justify-center border border-navy text-navy px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy-light transition-colors duration-150";
 
 const Index = () => {
+  const { user } = useAuth();
+  const startHref = user ? "/dashboard" : "/signup";
   return (
     <SiteLayout>
       <article className="mx-auto max-w-[760px] px-6">
