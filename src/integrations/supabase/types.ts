@@ -14,7 +14,169 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chunks: {
+        Row: {
+          chunk_type: string
+          content: string
+          created_at: string
+          id: string
+          priority: number
+          tags_audience: string[]
+          tags_confidence: string[]
+          tags_ladder_stage: number | null
+          tags_use_case: string[]
+          title: string | null
+          tool_id: string
+          updated_at: string
+        }
+        Insert: {
+          chunk_type: string
+          content: string
+          created_at?: string
+          id?: string
+          priority?: number
+          tags_audience?: string[]
+          tags_confidence?: string[]
+          tags_ladder_stage?: number | null
+          tags_use_case?: string[]
+          title?: string | null
+          tool_id: string
+          updated_at?: string
+        }
+        Update: {
+          chunk_type?: string
+          content?: string
+          created_at?: string
+          id?: string
+          priority?: number
+          tags_audience?: string[]
+          tags_confidence?: string[]
+          tags_ladder_stage?: number | null
+          tags_use_case?: string[]
+          title?: string | null
+          tool_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chunks_tool_id_fkey"
+            columns: ["tool_id"]
+            isOneToOne: false
+            referencedRelation: "tools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_captures: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string | null
+          session_id: string | null
+          subscribed: boolean
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name?: string | null
+          session_id?: string | null
+          subscribed?: boolean
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string | null
+          session_id?: string | null
+          subscribed?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_captures_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sessions: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+          q2_audience: string | null
+          q3_other_text: string | null
+          q3_use_case: string | null
+          q4_confidence: string | null
+          q5_learning_style: string | null
+          result_payload: Json | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          q2_audience?: string | null
+          q3_other_text?: string | null
+          q3_use_case?: string | null
+          q4_confidence?: string | null
+          q5_learning_style?: string | null
+          result_payload?: Json | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          q2_audience?: string | null
+          q3_other_text?: string | null
+          q3_use_case?: string | null
+          q4_confidence?: string | null
+          q5_learning_style?: string | null
+          result_payload?: Json | null
+        }
+        Relationships: []
+      }
+      tools: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          source_doc: string | null
+          tagline: string | null
+          tool_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          source_doc?: string | null
+          tagline?: string | null
+          tool_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          source_doc?: string | null
+          tagline?: string | null
+          tool_number?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
