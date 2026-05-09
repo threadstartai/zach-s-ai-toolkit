@@ -551,24 +551,7 @@ const Stack = () => {
             )}
 
             {step === "done" && (
-              <div>
-                <h3 className={qHeading}>Hi {name.trim()}.</h3>
-                <ul className="mt-5 space-y-2 text-foreground/85 text-[16px] leading-[1.7]">
-                  <li><span className="text-navy font-semibold">Using AI for:</span> {q2}</li>
-                  <li><span className="text-navy font-semibold">This week:</span> {q3}</li>
-                  <li><span className="text-navy font-semibold">Confidence:</span> {q4}</li>
-                  <li><span className="text-navy font-semibold">Learning style:</span> {q5}</li>
-                </ul>
-                <p className="mt-5 italic text-foreground/70 text-[14px]">
-                  Placeholder — the real result page lands next.
-                </p>
-                <button
-                  onClick={reset}
-                  className="mt-5 text-[14px] text-navy hover:underline"
-                >
-                  Start over
-                </button>
-              </div>
+              <Result name={name} q2={q2} q3={q3} q4={q4} q5={q5} onReset={reset} />
             )}
           </div>
         </section>
