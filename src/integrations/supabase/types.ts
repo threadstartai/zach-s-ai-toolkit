@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      chunk_feedback: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string
+          session_id: string | null
+          tool_slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason: string
+          session_id?: string | null
+          tool_slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string
+          session_id?: string | null
+          tool_slug?: string
+        }
+        Relationships: []
+      }
       chunks: {
         Row: {
           chunk_type: string
