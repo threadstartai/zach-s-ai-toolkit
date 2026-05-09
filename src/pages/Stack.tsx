@@ -779,7 +779,7 @@ const Result = ({
           ))}
         </ol>
         <p className="mt-7 italic text-navy text-[15px]">
-          You're starting at Stage 1. That's where everyone starts.
+          {ladderLine(c4)}
         </p>
       </div>
 
