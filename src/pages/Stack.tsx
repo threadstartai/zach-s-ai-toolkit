@@ -85,12 +85,6 @@ const ToolRow = ({ tool }: { tool: Tool }) => (
       <span className="font-semibold text-navy">{tool.name}</span>
     </div>
     <p className="flex-1 text-[15px] text-foreground/80">{tool.tagline}</p>
-    <a
-      href={`/pdfs/${tool.slug}.pdf`}
-      className="inline-flex items-center justify-center self-start sm:self-auto rounded-[8px] border border-navy text-navy px-3 py-1.5 text-[13px] font-medium transition-colors duration-150 hover:bg-navy-light shrink-0"
-    >
-      Download PDF
-    </a>
   </div>
 );
 
@@ -746,13 +740,6 @@ const Result = ({
                   })}
                 </div>
               )}
-
-              <a
-                href={`/pdfs/${t.slug}.pdf`}
-                className="mt-6 inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150"
-              >
-                Read the full guide →
-              </a>
             </div>
             </Fragment>
           );
