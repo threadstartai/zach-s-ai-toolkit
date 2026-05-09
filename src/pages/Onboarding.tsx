@@ -88,7 +88,6 @@ const Onboarding = () => {
   const qHeading = "text-[22px] font-bold text-navy";
 
   const stepIndex = STEPS.indexOf(step);
-  const progress = Math.max(0, Math.min(1, (stepIndex - 1) / (STEPS.length - 2))) * 100;
 
   const segmentCount = 4; // q1..q4
   const segmentIndex = Math.max(0, stepIndex - 1); // 0..3
