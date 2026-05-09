@@ -1,0 +1,240 @@
+import { useEffect, useMemo, useState } from "react";
+import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
+import SiteLayout from "@/components/SiteLayout";
+import { supabase } from "@/integrations/supabase/client";
+import { ResultSidebar } from "./ResultSidebar";
+import { TOOLS, recommend } from "./shared/tools";
+import {
+  Q2_FROM_CODE, Q3_FROM_CODE, Q4_FROM_CODE,
+  codeQ2, codeQ3, codeQ4, isMeaningfulName, UUID_RE,
+} from "./shared/codes";
+import { SECTION_LABELS } from "./shared/chunks";
+import type { Chunk, LoadedSession, ToolStatus } from "./shared/types";
+import type { ResultContext } from "./shared/useResultContext";
+
+const ResultLayout = () => {
+  const { sessionId: routeSessionId } = useParams<{ sessionId: string }>();
+  const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [session, setSession] = useState<LoadedSession | null>(null);
+
+  // Load the session from the URL.
+  useEffect(() => {
+    if (!routeSessionId || !UUID_RE.test(routeSessionId)) {
+      setError(true);
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error: fnError } = await supabase.functions.invoke("get-session", {
+          body: { session_id: routeSessionId },
+        });
+        if (cancelled) return;
+        if (fnError || !data?.session) {
+          setError(true);
+        } else {
+          setSession(data.session as LoadedSession);
+        }
+      } catch {
+        if (!cancelled) setError(true);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [routeSessionId]);
+
+  // Derive raw question strings (Result-component shape).
+  const name = session?.name ?? "";
+  const q2 = session ? (Q2_FROM_CODE[session.q2_audience ?? ""] ?? null) : null;
+  const q3 = session
+    ? (session.q3_use_case === "other"
+        ? (session.q3_other_text ?? "Other")
+        : (Q3_FROM_CODE[session.q3_use_case ?? ""] ?? null))
+    : null;
+  const q4 = session ? (Q4_FROM_CODE[session.q4_confidence ?? ""] ?? null) : null;
+  const q3OtherText = session?.q3_use_case === "other" ? (session.q3_other_text ?? "") : "";
+
+  const c2 = codeQ2(q2);
+  const c3 = codeQ3(q3);
+  const c4 = codeQ4(q4);
+
+  const displayName = isMeaningfulName(name) ? name.trim() : null;
+  const title = displayName ? `${displayName}'s AI Stack` : "My AI Stack";
+
+  const picks = useMemo(() => recommend(c2, c3, c4), [c2, c3, c4]);
+  const pickSlugs = useMemo(() => picks.map((k) => TOOLS[k].slug), [picks]);
+
+  // Chunks + status state.
+  const [chunksByTool, setChunksByTool] = useState<Record<string, Chunk[]>>({});
+  const [statusByTool, setStatusByTool] = useState<Record<string, ToolStatus>>({});
+  const [showSlowMessage, setShowSlowMessage] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState<Record<string, boolean>>({});
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState<Record<string, boolean>>({});
+  const [saved, setSaved] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  useEffect(() => {
+    if (!session || pickSlugs.length === 0) return;
+    let cancelled = false;
+    const slowTimer = setTimeout(() => { if (!cancelled) setShowSlowMessage(true); }, 300);
+
+    (async () => {
+      const { data: tools } = await supabase
+        .from("tools")
+        .select("id, slug, status, update_message")
+        .in("slug", pickSlugs);
+
+      if (!tools || cancelled) return;
+      const slugToId = new Map(tools.map((t) => [t.slug, t.id]));
+      const slugToStatus = new Map(
+        tools.map((t) => [t.slug, { status: t.status, update_message: t.update_message }])
+      );
+
+      const result: Record<string, Chunk[]> = {};
+      await Promise.all(
+        pickSlugs.map(async (slug) => {
+          const toolId = slugToId.get(slug);
+          if (!toolId) { result[slug] = []; return; }
+          const { data: rows } = await supabase
+            .from("chunks")
+            .select("id, tool_id, chunk_type, title, content, priority, tags_audience, tags_use_case, tags_confidence")
+            .eq("tool_id", toolId);
+
+          const filtered = (rows ?? []).filter((r: any) => {
+            const a: string[] = r.tags_audience ?? [];
+            const u: string[] = r.tags_use_case ?? [];
+            const co: string[] = r.tags_confidence ?? [];
+            const audOk = a.length === 0 || a.includes(c2) || a.includes("all");
+            const useOk = c3 === "other" || u.length === 0 || u.includes(c3) || u.includes("all");
+            const confOk = co.length === 0 || co.includes(c4) || co.includes("all");
+            return audOk && useOk && confOk;
+          });
+          filtered.sort((a: any, b: any) => (b.priority ?? 0) - (a.priority ?? 0));
+
+          const grouped: Record<string, Chunk[]> = { why: [], tonight: [], worth: [] };
+          for (const ch of filtered as Chunk[]) {
+            for (const s of SECTION_LABELS) {
+              if (s.types.includes(ch.chunk_type)) { grouped[s.key].push(ch); break; }
+            }
+          }
+          const picked: Chunk[] = [];
+          for (const s of SECTION_LABELS) {
+            const top = grouped[s.key][0];
+            if (top) picked.push(top);
+          }
+          result[slug] = picked;
+        }),
+      );
+      if (!cancelled) {
+        setChunksByTool(result);
+        const statusResult: Record<string, ToolStatus> = {};
+        for (const slug of pickSlugs) {
+          const s = slugToStatus.get(slug);
+          if (s) statusResult[slug] = s;
+        }
+        setStatusByTool(statusResult);
+        setShowSlowMessage(false);
+      }
+    })();
+
+    return () => { cancelled = true; clearTimeout(slowTimer); };
+  }, [session, pickSlugs.join("|"), c2, c3, c4]);
+
+  const handleStartOver = () => {
+    navigate("/stack");
+    setTimeout(() => {
+      document.getElementById("build-my-stack")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+  };
+
+  const handleCopyShareLink = async () => {
+    if (!routeSessionId || typeof window === "undefined") return;
+    const url = `${window.location.origin}/stack/result/${routeSessionId}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 1500);
+    } catch {
+      // ignore
+    }
+  };
+
+  const submitFeedback = async (toolSlug: string, reason: string) => {
+    try {
+      await supabase.from("chunk_feedback").insert({
+        session_id: routeSessionId ?? null,
+        tool_slug: toolSlug,
+        reason,
+      });
+    } catch {
+      // non-fatal
+    }
+    setFeedbackOpen((prev) => ({ ...prev, [toolSlug]: false }));
+    setFeedbackSubmitted((prev) => ({ ...prev, [toolSlug]: true }));
+  };
+
+  const ctx: ResultContext = {
+    sessionId: routeSessionId ?? "",
+    name,
+    q2, q3, q4,
+    c2, c3, c4,
+    q3OtherText,
+    displayName,
+    title,
+    picks,
+    pickSlugs,
+    chunksByTool,
+    statusByTool,
+    showSlowMessage,
+    feedbackOpen,
+    feedbackSubmitted,
+    saved,
+    setSaved,
+    linkCopied,
+    handleStartOver,
+    handleCopyShareLink,
+    setFeedbackOpen,
+    submitFeedback,
+  };
+
+  return (
+    <SiteLayout>
+      <div className="mx-auto max-w-[1100px] px-6 pt-10 pb-24">
+        <div className="flex flex-col md:flex-row gap-10 md:gap-14">
+          <aside className="md:w-[200px] md:shrink-0">
+            <div className="md:sticky md:top-10">
+              <ResultSidebar />
+            </div>
+          </aside>
+
+          <main className="flex-1 min-w-0 max-w-[760px]">
+            {loading && (
+              <p className="text-[14px] text-foreground/60 italic">
+                One moment — loading this Stack.
+              </p>
+            )}
+            {!loading && error && (
+              <div>
+                <h2 className="text-[28px] font-bold text-navy">This Stack isn't here.</h2>
+                <p className="mt-3 text-navy/85 text-[17px] leading-[1.7]">
+                  Either the link's expired or the URL got mangled in transit.{" "}
+                  <Link to="/stack" className="text-navy underline underline-offset-2 hover:opacity-80">
+                    Build your own Stack →
+                  </Link>
+                </p>
+              </div>
+            )}
+            {!loading && !error && session && <Outlet context={ctx} />}
+          </main>
+        </div>
+      </div>
+    </SiteLayout>
+  );
+};
+
+export default ResultLayout;
