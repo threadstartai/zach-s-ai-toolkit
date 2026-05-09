@@ -15,6 +15,9 @@ const CATEGORIES = [
   { num: "04", name: "Daily Life" },
 ];
 
+const processCardCls =
+  "bg-background border border-[hsl(var(--border))] rounded-[12px] p-6 hover:border-navy/40 transition-colors duration-150";
+
 const PROCESS = [
   {
     lead: "Dump the messy version.",
