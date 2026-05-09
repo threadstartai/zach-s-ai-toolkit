@@ -89,19 +89,17 @@ const Index = () => {
                 </p>
               </div>
             </div>
-            <Card className="self-start">
-              <p className="text-[12px] uppercase tracking-wider text-navy/60 font-medium">
-                The four categories
-              </p>
-              <ul className="mt-4 flex flex-col divide-y divide-[hsl(var(--border))]/70">
+            <div className="self-start bg-navy-light/40 border border-navy-light rounded-[16px] p-8">
+              <p className="text-[15px] font-bold text-navy">Four ways AI shows up.</p>
+              <ul className="mt-4 flex flex-col gap-2.5">
                 {CATEGORIES.map((c) => (
-                  <li key={c.num} className="flex items-baseline gap-4 py-3 first:pt-0 last:pb-0">
-                    <span className="font-mono text-[13px] text-navy/55 w-6">{c.num}</span>
-                    <span className="text-[15px] text-navy font-medium">{c.name}</span>
+                  <li key={c.num} className="flex items-baseline gap-3 text-[15px] text-navy">
+                    <span className="font-mono text-[13px] text-navy/60">{c.num}</span>
+                    <span>— {c.name}</span>
                   </li>
                 ))}
               </ul>
-            </Card>
+            </div>
           </div>
         </section>
 
