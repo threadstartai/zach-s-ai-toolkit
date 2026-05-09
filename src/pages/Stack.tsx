@@ -100,7 +100,7 @@ const Category = ({ data }: { data: CategoryData }) => (
   </section>
 );
 
-type QuizStep = "intro" | "q1" | "q2" | "q3" | "q4" | "q5" | "done";
+type QuizStep = "intro" | "q1" | "q2" | "q3" | "q4" | "done";
 
 // ---------- Result engine ----------
 
