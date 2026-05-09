@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import SiteLayout from "@/components/SiteLayout";
-import { Card } from "@/components/ui-primitives/Card";
 import { useAuth } from "@/contexts/AuthContext";
 
 const primaryBtn =
