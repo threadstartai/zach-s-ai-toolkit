@@ -416,8 +416,30 @@ const ChunkBlock = ({ chunk }: { chunk: Chunk }) => {
 
 // ---------- Result component ----------
 
+const SECTION_LABELS: { key: "why" | "tonight" | "worth"; label: string; types: string[] }[] = [
+  { key: "why", label: "WHY", types: ["intro", "why-it-matters"] },
+  { key: "tonight", label: "TONIGHT", types: ["setup", "first-prompt", "workflow-example"] },
+  { key: "worth", label: "WORTH KNOWING", types: ["advanced", "common-mistake"] },
+];
+
+const groupChunks = (chunks: Chunk[]) => {
+  const groups: Record<string, Chunk[]> = { why: [], tonight: [], worth: [] };
+  for (const c of chunks) {
+    for (const s of SECTION_LABELS) {
+      if (s.types.includes(c.chunk_type)) {
+        groups[s.key].push(c);
+        break;
+      }
+    }
+  }
+  for (const k of Object.keys(groups)) {
+    groups[k].sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0));
+  }
+  return groups;
+};
+
 const Result = ({
-  name, q2, q3, q4, q5, onReset,
+  name, q2, q3, q4, q5, onReset, initialSessionId, sharedMode,
 }: {
   name: string;
   q2: string | null;
@@ -425,11 +447,14 @@ const Result = ({
   q4: string | null;
   q5: string | null;
   onReset: () => void;
+  initialSessionId?: string;
+  sharedMode?: boolean;
 }) => {
   const [saved, setSaved] = useState(false);
   const [chunksByTool, setChunksByTool] = useState<Record<string, Chunk[]>>({});
   const [showSlowMessage, setShowSlowMessage] = useState(false);
-  const [, setSessionId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(initialSessionId ?? null);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const c2 = codeQ2(q2);
   const c3 = codeQ3(q3);
@@ -442,8 +467,9 @@ const Result = ({
   const picks = useMemo(() => recommend(c2, c3, c4), [c2, c3, c4]);
   const pickSlugs = useMemo(() => picks.map((k) => TOOLS[k].slug), [picks]);
 
-  // Submit session via edge function (fire-and-forget — don't block render).
+  // Submit session via edge function — skip if we already have a sessionId (shared link load).
   useEffect(() => {
+    if (initialSessionId) return;
     let cancelled = false;
     (async () => {
       try {
@@ -457,13 +483,20 @@ const Result = ({
             q5_learning_style: Q5_EDGE_MAP[c5],
           },
         });
-        if (!cancelled && !error && data?.session_id) setSessionId(data.session_id);
+        if (!cancelled && !error && data?.session_id) {
+          setSessionId(data.session_id);
+          // Update the URL so it's shareable, without a reload.
+          const target = `/stack/result/${data.session_id}`;
+          if (typeof window !== "undefined" && window.location.pathname !== target) {
+            window.history.pushState(null, "", target);
+          }
+        }
       } catch {
         // non-fatal
       }
     })();
     return () => { cancelled = true; };
-  }, [displayName, c2, c3, c4, c5, q3]);
+  }, [initialSessionId, displayName, c2, c3, c4, c5, q3]);
 
   // Load chunks for each picked tool.
   useEffect(() => {
@@ -484,12 +517,11 @@ const Result = ({
         pickSlugs.map(async (slug) => {
           const toolId = slugToId.get(slug);
           if (!toolId) { result[slug] = []; return; }
-          let q = supabase
+          const { data: rows } = await supabase
             .from("chunks")
             .select("id, tool_id, chunk_type, title, content, priority, tags_audience, tags_use_case, tags_confidence")
             .eq("tool_id", toolId);
 
-          const { data: rows } = await q;
           const filtered = (rows ?? []).filter((r: any) => {
             const a: string[] = r.tags_audience ?? [];
             const u: string[] = r.tags_use_case ?? [];
@@ -500,7 +532,7 @@ const Result = ({
             return audOk && useOk && confOk;
           });
           filtered.sort((a: any, b: any) => (b.priority ?? 0) - (a.priority ?? 0));
-          result[slug] = filtered.slice(0, 3) as Chunk[];
+          result[slug] = filtered.slice(0, 6) as Chunk[];
         }),
       );
       if (!cancelled) {
@@ -513,10 +545,25 @@ const Result = ({
   }, [pickSlugs.join("|"), c2, c3, c4]);
 
   const handleStartOver = () => {
+    if (typeof window !== "undefined" && window.location.pathname !== "/stack") {
+      window.history.pushState(null, "", "/stack");
+    }
     onReset();
     setTimeout(() => {
       document.getElementById("build-my-stack")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 50);
+  };
+
+  const handleCopyShareLink = async () => {
+    if (!sessionId || typeof window === "undefined") return;
+    const url = `${window.location.origin}/stack/result/${sessionId}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 1500);
+    } catch {
+      // ignore
+    }
   };
 
   const why = (k: ToolKey) => k === "04" ? whyForChatGPT(c4) : whyFor(k, c2);
@@ -529,6 +576,35 @@ const Result = ({
         {introQ2(c2)}, {introQ4(c4)}. Three tools to start with — and the bits worth reading tonight.
       </p>
 
+      {/* Jump-to nav strip */}
+      {picks.length > 1 && (
+        <div className="mt-8 border-t border-b border-foreground/15 py-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[14px]">
+          <span className="font-mono text-navy">Jump to —</span>
+          {picks.map((k, i) => {
+            const t = TOOLS[k];
+            return (
+              <span key={k} className="flex items-baseline gap-2">
+                <a
+                  href={`#tool-${t.slug}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const el = document.getElementById(`tool-${t.slug}`);
+                    if (el) {
+                      const top = el.getBoundingClientRect().top + window.scrollY - 60;
+                      window.scrollTo({ top, behavior: "smooth" });
+                    }
+                  }}
+                  className="text-navy hover:underline underline-offset-2"
+                >
+                  {t.name}
+                </a>
+                {i < picks.length - 1 && <span className="text-foreground/40">·</span>}
+              </span>
+            );
+          })}
+        </div>
+      )}
+
       {showSlowMessage && Object.keys(chunksByTool).length === 0 && (
         <p className="mt-6 text-[14px] text-foreground/60 italic">
           One moment — finding the right bits for you.
@@ -540,23 +616,40 @@ const Result = ({
         {picks.map((k) => {
           const t = TOOLS[k];
           const tChunks = chunksByTool[t.slug] ?? [];
+          const grouped = groupChunks(tChunks);
+          const hasAnyChunks = tChunks.length > 0;
           return (
-            <div key={k} className="bg-navy-light rounded-[12px] px-8 py-7 sm:px-10 sm:py-8">
+            <div
+              key={k}
+              id={`tool-${t.slug}`}
+              className="bg-navy-light rounded-[12px] px-8 py-7 sm:px-10 sm:py-8 scroll-mt-[60px]"
+            >
               <h4 className="text-[22px] font-bold text-navy">
                 <span className="font-mono text-[15px] text-navy/70 mr-2.5">{t.num}</span>
                 {t.name}
               </h4>
               <p className="mt-3 text-navy text-[16px] leading-[1.65]">{why(k)}</p>
 
-              {tChunks.length > 0 && (
-                <>
-                  <div className="mt-5 mb-5 h-px bg-foreground/15" />
-                  <div className="flex flex-col gap-5">
-                    {tChunks.map((ch) => (
-                      <ChunkBlock key={ch.id} chunk={ch} />
-                    ))}
-                  </div>
-                </>
+              {hasAnyChunks && (
+                <div className="mt-5 flex flex-col gap-8">
+                  {SECTION_LABELS.map((s) => {
+                    const items = grouped[s.key];
+                    if (!items || items.length === 0) return null;
+                    return (
+                      <div key={s.key}>
+                        <div className="font-mono text-[12px] tracking-[0.05em] text-navy">
+                          {s.label}
+                        </div>
+                        <div className="mt-2 mb-4 h-px bg-foreground/15" />
+                        <div className="flex flex-col gap-5">
+                          {items.map((ch) => (
+                            <ChunkBlock key={ch.id} chunk={ch} />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
 
               <a
@@ -596,6 +689,14 @@ const Result = ({
 
       {/* Footer actions */}
       <div className="mt-14 text-[14px] text-navy">
+        <button
+          onClick={handleCopyShareLink}
+          disabled={!sessionId}
+          className="hover:underline transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed disabled:no-underline"
+        >
+          {linkCopied ? "Copied" : "Copy share link"}
+        </button>
+        <span className="text-foreground/40 mx-2">·</span>
         <button
           onClick={() => setSaved(true)}
           className="hover:underline transition-colors duration-150"
