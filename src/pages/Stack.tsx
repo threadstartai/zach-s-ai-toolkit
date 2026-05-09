@@ -782,6 +782,61 @@ const Result = ({
                   })}
                 </div>
               )}
+
+              <div className="mt-6 pt-4 border-t border-foreground/10">
+                {!feedbackOpen[t.slug] && !feedbackSubmitted[t.slug] && (
+                  <button
+                    onClick={() => setFeedbackOpen((prev) => ({ ...prev, [t.slug]: true }))}
+                    className="text-[13px] italic text-navy/60 hover:text-navy underline underline-offset-2"
+                  >
+                    Not for me ↓
+                  </button>
+                )}
+
+                {feedbackOpen[t.slug] && !feedbackSubmitted[t.slug] && (
+                  <div className="flex flex-col gap-2">
+                    <p className="text-[13px] italic text-navy/65">Why's this not landing?</p>
+                    {[
+                      { reason: "audience-wrong", label: "Wrong fit for who I am" },
+                      { reason: "use-case-wrong", label: "Wrong fit for what I'm doing" },
+                      { reason: "pace-wrong", label: "Wrong pace for me" },
+                      { reason: "already-using", label: "Already using this" },
+                    ].map((opt) => (
+                      <button
+                        key={opt.reason}
+                        onClick={() => submitFeedback(t.slug, opt.reason)}
+                        className="self-start text-[13px] text-navy underline underline-offset-2 hover:opacity-80"
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {feedbackSubmitted[t.slug] && (
+                  <p className="text-[13px] italic text-navy/60">Thanks — noted.</p>
+                )}
+              </div>
+                    const items = grouped[s.key];
+                    if (!items || items.length === 0) return null;
+                    return (
+                      <div key={s.key}>
+                        <div className="mt-1 mb-3">
+                          <div className="font-mono text-[11px] tracking-[0.08em] text-navy">
+                            {s.label}
+                          </div>
+                          <div className="mt-1.5 h-px w-12 bg-foreground/20" />
+                        </div>
+                        <div className="flex flex-col gap-4">
+                          {items.map((ch) => (
+                            <ChunkBlock key={ch.id} chunk={ch} />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
             </Fragment>
           );
