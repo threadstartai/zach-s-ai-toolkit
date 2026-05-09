@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import SiteLayout from "@/components/SiteLayout";
+import { supabase } from "@/integrations/supabase/client";
 
 type Tool = {
   num?: string;
