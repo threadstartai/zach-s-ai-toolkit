@@ -847,6 +847,10 @@ const Result = ({
         </p>
       </div>
 
+      <p className="mt-12 text-navy/80 text-[16px] leading-[1.7] italic">
+        That's the stack. If you do one thing tonight, take the prompt at the top of the first card. If you want to come back to this — save your link, or just take a screenshot.
+      </p>
+
       {/* Footer actions */}
       <div className="mt-14 text-[14px] text-navy">
         <button
