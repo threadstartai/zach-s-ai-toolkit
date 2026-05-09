@@ -35,13 +35,13 @@ const ResetPassword = () => {
 
   return (
     <AuthCard title="Set a new password" subtitle="You're almost back in.">
-      <form onSubmit={onSubmit} className="flex flex-col gap-3">
+      <form onSubmit={onSubmit} className="flex flex-col space-y-4">
         <div>
           <label htmlFor="password" className={labelCls}>New password</label>
           <input id="password" type="password" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className={inputCls} />
           <p className="mt-1.5 text-[12px] text-foreground/60">At least 8 characters.</p>
         </div>
-        {error && <p className="text-[13px] text-destructive">{error}</p>}
+        {error && <p className={errorCls}>{error}</p>}
         <button type="submit" disabled={submitting} className={primaryBtn}>
           {submitting ? "Saving…" : "Save and continue"}
         </button>
