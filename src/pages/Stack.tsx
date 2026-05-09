@@ -532,7 +532,21 @@ const Result = ({
             return audOk && useOk && confOk;
           });
           filtered.sort((a: any, b: any) => (b.priority ?? 0) - (a.priority ?? 0));
-          result[slug] = filtered.slice(0, 6) as Chunk[];
+
+          // Diversity selection: bucket all matching chunks, then pick the
+          // highest-priority chunk from each non-empty section. Up to 3 total.
+          const grouped: Record<string, Chunk[]> = { why: [], tonight: [], worth: [] };
+          for (const ch of filtered as Chunk[]) {
+            for (const s of SECTION_LABELS) {
+              if (s.types.includes(ch.chunk_type)) { grouped[s.key].push(ch); break; }
+            }
+          }
+          const picked: Chunk[] = [];
+          for (const s of SECTION_LABELS) {
+            const top = grouped[s.key][0];
+            if (top) picked.push(top);
+          }
+          result[slug] = picked;
         }),
       );
       if (!cancelled) {
