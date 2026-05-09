@@ -379,7 +379,7 @@ const ChunkBlock = ({ chunk }: { chunk: Chunk }) => {
   return (
     <div>
       {chunk.title && (
-        <h5 className="text-[16.5px] font-bold text-navy mb-2">{chunk.title}</h5>
+        <h5 className="text-[15px] font-semibold text-navy mb-2">{chunk.title}</h5>
       )}
       {isFirstPrompt && split && split.prompt ? (
         <>
@@ -388,12 +388,12 @@ const ChunkBlock = ({ chunk }: { chunk: Chunk }) => {
               {split.before}
             </ReactMarkdown>
           )}
-          <div className="my-3 bg-background/60 border border-navy/15 rounded-[8px] px-5 py-4">
+          <div className="my-3 bg-background border border-navy/[0.12] border-l-[3px] border-l-navy rounded-[8px] px-5 py-4">
             <pre className="whitespace-pre-wrap font-mono text-[13.5px] leading-[1.7] text-foreground/90">{split.prompt}</pre>
           </div>
           <button
             onClick={() => handleCopy(split.prompt!)}
-            className="inline-flex items-center justify-center border border-navy text-navy px-3.5 py-1.5 rounded-[8px] text-[13px] font-medium hover:bg-background/60 transition-colors duration-150"
+            className="mt-4 inline-flex items-center justify-center border border-navy text-navy px-3.5 py-1.5 rounded-[8px] text-[13px] font-medium hover:bg-background/60 transition-colors duration-150"
           >
             {copied ? "Copied" : "Copy prompt"}
           </button>
@@ -532,7 +532,21 @@ const Result = ({
             return audOk && useOk && confOk;
           });
           filtered.sort((a: any, b: any) => (b.priority ?? 0) - (a.priority ?? 0));
-          result[slug] = filtered.slice(0, 6) as Chunk[];
+
+          // Diversity selection: bucket all matching chunks, then pick the
+          // highest-priority chunk from each non-empty section. Up to 3 total.
+          const grouped: Record<string, Chunk[]> = { why: [], tonight: [], worth: [] };
+          for (const ch of filtered as Chunk[]) {
+            for (const s of SECTION_LABELS) {
+              if (s.types.includes(ch.chunk_type)) { grouped[s.key].push(ch); break; }
+            }
+          }
+          const picked: Chunk[] = [];
+          for (const s of SECTION_LABELS) {
+            const top = grouped[s.key][0];
+            if (top) picked.push(top);
+          }
+          result[slug] = picked;
         }),
       );
       if (!cancelled) {
@@ -622,7 +636,7 @@ const Result = ({
             <div
               key={k}
               id={`tool-${t.slug}`}
-              className="bg-navy-light rounded-[12px] px-8 py-7 sm:px-10 sm:py-8 scroll-mt-[60px]"
+              className="bg-navy-light rounded-[12px] px-7 py-6 sm:px-8 sm:py-7 scroll-mt-[60px]"
             >
               <h4 className="text-[22px] font-bold text-navy">
                 <span className="font-mono text-[15px] text-navy/70 mr-2.5">{t.num}</span>
@@ -631,17 +645,19 @@ const Result = ({
               <p className="mt-3 text-navy text-[16px] leading-[1.65]">{why(k)}</p>
 
               {hasAnyChunks && (
-                <div className="mt-5 flex flex-col gap-8">
+                <div className="mt-5 flex flex-col gap-6">
                   {SECTION_LABELS.map((s) => {
                     const items = grouped[s.key];
                     if (!items || items.length === 0) return null;
                     return (
                       <div key={s.key}>
-                        <div className="font-mono text-[12px] tracking-[0.05em] text-navy">
-                          {s.label}
+                        <div className="mt-1 mb-3">
+                          <div className="font-mono text-[11px] tracking-[0.08em] text-navy">
+                            {s.label}
+                          </div>
+                          <div className="mt-1.5 h-px w-12 bg-foreground/20" />
                         </div>
-                        <div className="mt-2 mb-4 h-px bg-foreground/15" />
-                        <div className="flex flex-col gap-5">
+                        <div className="flex flex-col gap-4">
                           {items.map((ch) => (
                             <ChunkBlock key={ch.id} chunk={ch} />
                           ))}
