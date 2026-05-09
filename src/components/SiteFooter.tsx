@@ -1,32 +1,35 @@
+import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+
 const SiteFooter = () => {
+  const { user } = useAuth();
   return (
-    <footer className="mt-32">
-      <div className="mx-auto max-w-[760px] px-6">
-        <hr className="border-0 border-t border-[hsl(var(--border))]/50" />
-        <div className="py-12 text-[14px] leading-relaxed text-foreground/70">
-          <p className="italic">Created By Zach Z. Made For Friends &amp; Family.</p>
-          <p className="mt-4">
-            If you know someone whose business or team would benefit from a proper AI setup, send them my way:
-          </p>
-          <p className="mt-2">
-            <a
-              href="mailto:zach@chromeconsulting.xyz"
-              className="text-navy hover:underline"
-            >
-              zach@chromeconsulting.xyz
-            </a>{" "}
+    <footer className="mt-24 border-t border-[hsl(var(--border))] bg-background">
+      <div className="mx-auto max-w-[1100px] px-6 py-12 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-10 md:gap-16 text-[14px] leading-relaxed text-foreground/75">
+        <div className="max-w-[640px]">
+          <p className="italic">
+            Created by Zach Z. Made for friends &amp; family. If you know someone whose business or team would benefit from a proper AI setup, send them my way:{" "}
+            <a href="mailto:zach@chromeconsulting.xyz" className="text-navy hover:underline">zach@chromeconsulting.xyz</a>{" "}
             <span className="text-foreground/40">|</span>{" "}
-            <a
-              href="https://instagram.com/chrome.zach"
-              className="text-navy hover:underline"
-            >
-              @chrome.zach
-            </a>
+            <a href="https://instagram.com/chrome.zach" className="text-navy hover:underline">@chrome.zach</a>{" "}
+            <span className="not-italic text-foreground/55">(Instagram)</span>.
           </p>
-          <p className="mt-8 text-[12px] text-foreground/50">
+          <p className="mt-5 text-[12px] text-foreground/55">
             No affiliate links. No sponsored placements. Updated regularly.
           </p>
         </div>
+        <nav aria-label="Footer">
+          <ul className="flex flex-col gap-2 text-[13px]">
+            <li><Link to="/" className="hover:text-navy transition-colors">Home</Link></li>
+            <li><Link to="/stack" className="hover:text-navy transition-colors">The Stack</Link></li>
+            <li><Link to="/work-with-me" className="hover:text-navy transition-colors">Work with me</Link></li>
+            {user ? (
+              <li><Link to="/dashboard" className="hover:text-navy transition-colors">Dashboard</Link></li>
+            ) : (
+              <li><Link to="/login" className="hover:text-navy transition-colors">Log in</Link></li>
+            )}
+          </ul>
+        </nav>
       </div>
     </footer>
   );
