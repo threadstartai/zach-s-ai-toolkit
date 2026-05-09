@@ -40,26 +40,26 @@ const Login = () => {
     <AuthCard
       title="Welcome back"
       subtitle="Log in to your AI Stack."
-      footer={<>Don't have an account? <Link to="/signup" className="text-navy underline underline-offset-2 hover:opacity-80">Sign up</Link></>}
+      footer={<>Don't have an account? <Link to="/signup" className="text-navy hover:underline">Sign up</Link></>}
     >
       <SocialButtons />
       <Divider />
-      <form onSubmit={onSubmit} className="flex flex-col gap-3">
+      <form onSubmit={onSubmit} className="flex flex-col space-y-4">
         <div>
           <label htmlFor="email" className={labelCls}>Email</label>
           <input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} />
         </div>
         <div>
-          <label htmlFor="password" className={labelCls}>Password</label>
+          <div className="flex items-center justify-between mb-1.5">
+            <label htmlFor="password" className="block text-[13px] font-medium text-navy">Password</label>
+            <Link to="/forgot-password" className="text-[13px] text-navy hover:underline underline-offset-2">Forgot?</Link>
+          </div>
           <input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} className={inputCls} />
         </div>
-        {error && <p className="text-[13px] text-destructive">{error}</p>}
+        {error && <p className={errorCls}>{error}</p>}
         <button type="submit" disabled={submitting} className={primaryBtn}>
           {submitting ? "Logging in…" : "Log in"}
         </button>
-        <div className="text-right">
-          <Link to="/forgot-password" className="text-[13px] text-navy/80 hover:text-navy hover:underline">Forgot password?</Link>
-        </div>
       </form>
     </AuthCard>
   );
