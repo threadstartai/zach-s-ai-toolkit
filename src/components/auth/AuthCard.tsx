@@ -19,17 +19,17 @@ const AuthCard = ({
           My AI Stack
         </Link>
       </header>
-      <main className="flex-1 flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-[420px] bg-background border border-[hsl(var(--border))] rounded-[12px] p-8 shadow-[0_2px_8px_rgba(26,58,92,0.08)]">
-          <h1 className="text-[24px] font-bold text-navy tracking-tight">{title}</h1>
-          {subtitle && <p className="mt-2 text-[15px] text-foreground/75">{subtitle}</p>}
-          <div className="mt-6">{children}</div>
-          {footer && (
-            <div className="mt-6 pt-6 border-t border-[hsl(var(--border))]/60 text-[14px] text-foreground/75 text-center">
-              {footer}
-            </div>
-          )}
+      <main className="flex-1 flex flex-col items-center justify-center px-5 py-12">
+        <div className="w-full max-w-[440px] bg-background border border-[hsl(var(--border))] rounded-[16px] p-10 md:p-12 shadow-[0_2px_12px_rgba(26,58,92,0.06)]">
+          <h1 className="text-3xl font-bold text-navy tracking-tight">{title}</h1>
+          {subtitle && <p className="mt-2 text-base text-foreground/65">{subtitle}</p>}
+          <div className="mt-10">{children}</div>
         </div>
+        {footer && (
+          <div className="mt-8 text-sm text-foreground/65 text-center">
+            {footer}
+          </div>
+        )}
       </main>
     </div>
   );
