@@ -25,7 +25,7 @@ const Index = () => {
             Free. Mine to keep updated. No course at the end.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-3">
-            <Link to="/stack#start-here" className={primaryBtn}>
+            <Link to={startHref} className={primaryBtn}>
               Start Here →
             </Link>
             <Link to="/stack#tools" className={outlineBtn}>
