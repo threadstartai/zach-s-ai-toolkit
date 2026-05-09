@@ -102,16 +102,100 @@ const Category = ({ data }: { data: CategoryData }) => (
   </section>
 );
 
-type QuizStep = "intro" | "q1" | "done";
+type QuizStep = "intro" | "q1" | "q2" | "q3" | "q4" | "q5" | "done";
+
+const Q2_OPTIONS = ["Student", "Personal life / family", "Business / work", "Just exploring"];
+const Q3_OPTIONS = [
+  "Writing something properly",
+  "Researching a topic",
+  "Building a website or tool",
+  "Note-taking and meetings",
+  "Generating images or video",
+  "Sorting admin or emails",
+];
+const Q4_OPTIONS = ["Never used it", "Tried it a bit", "Use it weekly", "Pretty confident"];
+const Q5_OPTIONS = [
+  "Just give me the prompt to copy",
+  "Show me a video",
+  "I'll read a guide",
+  "Walk me through it step by step",
+];
 
 const Stack = () => {
   const [step, setStep] = useState<QuizStep>("intro");
   const [name, setName] = useState("");
+  const [q2, setQ2] = useState<string | null>(null);
+  const [q3, setQ3] = useState<string | null>(null);
+  const [q3Other, setQ3Other] = useState("");
+  const [q3OtherSelected, setQ3OtherSelected] = useState(false);
+  const [q4, setQ4] = useState<string | null>(null);
+  const [q5, setQ5] = useState<string | null>(null);
 
   const reset = () => {
     setStep("intro");
     setName("");
+    setQ2(null);
+    setQ3(null);
+    setQ3Other("");
+    setQ3OtherSelected(false);
+    setQ4(null);
+    setQ5(null);
   };
+
+  const advance = (next: QuizStep) => {
+    setTimeout(() => setStep(next), 150);
+  };
+
+  const selectQ2 = (v: string) => {
+    if (q2 !== v) {
+      setQ3(null);
+      setQ3Other("");
+      setQ3OtherSelected(false);
+      setQ4(null);
+      setQ5(null);
+    }
+    setQ2(v);
+    advance("q3");
+  };
+  const selectQ3 = (v: string) => {
+    if (q3 !== v) {
+      setQ4(null);
+      setQ5(null);
+    }
+    setQ3(v);
+    setQ3OtherSelected(false);
+    setQ3Other("");
+    advance("q4");
+  };
+  const selectQ3Other = () => {
+    setQ3OtherSelected(true);
+    setQ3(null);
+  };
+  const submitQ3Other = () => {
+    if (!q3Other.trim()) return;
+    setQ3(q3Other.trim());
+    setQ4(null);
+    setQ5(null);
+    advance("q4");
+  };
+  const selectQ4 = (v: string) => {
+    if (q4 !== v) setQ5(null);
+    setQ4(v);
+    advance("q5");
+  };
+  const selectQ5 = (v: string) => {
+    setQ5(v);
+    advance("done");
+  };
+
+  const pillBase =
+    "inline-flex items-center justify-start text-left rounded-[8px] border border-navy px-4 py-2.5 text-[15px] font-medium transition-colors duration-150";
+  const pill = (selected: boolean) =>
+    `${pillBase} ${selected ? "bg-navy text-primary-foreground hover:bg-navy/90" : "bg-transparent text-navy hover:bg-navy-light"}`;
+  const backLink =
+    "text-[13px] text-navy/80 hover:text-navy hover:underline transition-colors duration-150";
+  const microcopy = "mt-2 italic text-[14px] text-navy/75";
+  const qHeading = "text-[22px] font-bold text-navy";
 
   return (
     <SiteLayout>
@@ -145,8 +229,8 @@ const Stack = () => {
 
             {step === "q1" && (
               <div>
-                <h3 className="text-[22px] font-bold text-navy">What should I call you?</h3>
-                <p className="mt-2 italic text-[14px] text-navy/75">
+                <h3 className={qHeading}>What should I call you?</h3>
+                <p className={microcopy}>
                   Just a first name. Makes the result feel personal.
                 </p>
                 <input
@@ -159,7 +243,7 @@ const Stack = () => {
                 />
                 <div className="mt-5">
                   <button
-                    onClick={() => name.trim() && setStep("done")}
+                    onClick={() => name.trim() && setStep("q2")}
                     disabled={!name.trim()}
                     className="inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150 disabled:opacity-40 disabled:hover:bg-navy disabled:cursor-not-allowed"
                   >
@@ -169,11 +253,108 @@ const Stack = () => {
               </div>
             )}
 
+            {step === "q2" && (
+              <div>
+                <h3 className={qHeading}>What are you using AI for first?</h3>
+                <p className={microcopy}>This routes which tools I recommend.</p>
+                <div className="mt-5 flex flex-col items-start gap-2.5">
+                  {Q2_OPTIONS.map((o) => (
+                    <button key={o} onClick={() => selectQ2(o)} className={pill(q2 === o)}>
+                      {o}
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-6">
+                  <button onClick={() => setStep("q1")} className={backLink}>← back</button>
+                </div>
+              </div>
+            )}
+
+            {step === "q3" && (
+              <div>
+                <h3 className={qHeading}>What's one thing you want help with this week?</h3>
+                <p className={microcopy}>This makes the recommendation specific.</p>
+                <div className="mt-5 flex flex-col items-start gap-2.5">
+                  {Q3_OPTIONS.map((o) => (
+                    <button key={o} onClick={() => selectQ3(o)} className={pill(q3 === o && !q3OtherSelected)}>
+                      {o}
+                    </button>
+                  ))}
+                  <button onClick={selectQ3Other} className={pill(q3OtherSelected)}>
+                    Other
+                  </button>
+                  {q3OtherSelected && (
+                    <div className="mt-2 flex flex-col sm:flex-row gap-2.5 w-full max-w-[480px]">
+                      <input
+                        type="text"
+                        value={q3Other}
+                        onChange={(e) => setQ3Other(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter") submitQ3Other(); }}
+                        placeholder="Tell me what you'd like help with"
+                        autoFocus
+                        className="flex-1 rounded-[8px] border border-navy bg-navy-light px-4 py-2.5 text-[15px] text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-navy/30"
+                      />
+                      <button
+                        onClick={submitQ3Other}
+                        disabled={!q3Other.trim()}
+                        className="inline-flex items-center justify-center bg-navy text-primary-foreground px-4 py-2.5 rounded-[8px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150 disabled:opacity-40 disabled:hover:bg-navy disabled:cursor-not-allowed"
+                      >
+                        Continue →
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div className="mt-6">
+                  <button onClick={() => setStep("q2")} className={backLink}>← back</button>
+                </div>
+              </div>
+            )}
+
+            {step === "q4" && (
+              <div>
+                <h3 className={qHeading}>How confident are you with AI right now?</h3>
+                <p className={microcopy}>This sets how much I explain.</p>
+                <div className="mt-5 flex flex-col items-start gap-2.5">
+                  {Q4_OPTIONS.map((o) => (
+                    <button key={o} onClick={() => selectQ4(o)} className={pill(q4 === o)}>
+                      {o}
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-6">
+                  <button onClick={() => setStep("q3")} className={backLink}>← back</button>
+                </div>
+              </div>
+            )}
+
+            {step === "q5" && (
+              <div>
+                <h3 className={qHeading}>How do you prefer to learn something new?</h3>
+                <p className={microcopy}>This changes the format of your first task.</p>
+                <div className="mt-5 flex flex-col items-start gap-2.5">
+                  {Q5_OPTIONS.map((o) => (
+                    <button key={o} onClick={() => selectQ5(o)} className={pill(q5 === o)}>
+                      {o}
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-6">
+                  <button onClick={() => setStep("q4")} className={backLink}>← back</button>
+                </div>
+              </div>
+            )}
+
             {step === "done" && (
               <div>
-                <h3 className="text-[22px] font-bold text-navy">Hi {name.trim()}.</h3>
-                <p className="mt-3 text-foreground/85 text-[17px] leading-[1.7]">
-                  This is a placeholder. The rest of the quiz will land here in the next step.
+                <h3 className={qHeading}>Hi {name.trim()}.</h3>
+                <ul className="mt-5 space-y-2 text-foreground/85 text-[16px] leading-[1.7]">
+                  <li><span className="text-navy font-semibold">Using AI for:</span> {q2}</li>
+                  <li><span className="text-navy font-semibold">This week:</span> {q3}</li>
+                  <li><span className="text-navy font-semibold">Confidence:</span> {q4}</li>
+                  <li><span className="text-navy font-semibold">Learning style:</span> {q5}</li>
+                </ul>
+                <p className="mt-5 italic text-foreground/70 text-[14px]">
+                  Placeholder — the real result page lands next.
                 </p>
                 <button
                   onClick={reset}
