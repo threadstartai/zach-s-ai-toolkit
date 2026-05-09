@@ -388,7 +388,7 @@ const ChunkBlock = ({ chunk }: { chunk: Chunk }) => {
               {split.before}
             </ReactMarkdown>
           )}
-          <div className="my-3 bg-background border-l-[3px] border-navy border-y border-r border-y-navy/12 border-r-navy/12 rounded-[8px] px-5 py-4">
+          <div className="my-3 bg-background border border-navy/[0.12] border-l-[3px] border-l-navy rounded-[8px] px-5 py-4">
             <pre className="whitespace-pre-wrap font-mono text-[13.5px] leading-[1.7] text-foreground/90">{split.prompt}</pre>
           </div>
           <button
