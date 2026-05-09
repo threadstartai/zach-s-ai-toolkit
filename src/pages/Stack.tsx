@@ -636,7 +636,7 @@ const Result = ({
             <div
               key={k}
               id={`tool-${t.slug}`}
-              className="bg-navy-light rounded-[12px] px-8 py-7 sm:px-10 sm:py-8 scroll-mt-[60px]"
+              className="bg-navy-light rounded-[12px] px-7 py-6 sm:px-8 sm:py-7 scroll-mt-[60px]"
             >
               <h4 className="text-[22px] font-bold text-navy">
                 <span className="font-mono text-[15px] text-navy/70 mr-2.5">{t.num}</span>
@@ -645,17 +645,19 @@ const Result = ({
               <p className="mt-3 text-navy text-[16px] leading-[1.65]">{why(k)}</p>
 
               {hasAnyChunks && (
-                <div className="mt-5 flex flex-col gap-8">
+                <div className="mt-5 flex flex-col gap-6">
                   {SECTION_LABELS.map((s) => {
                     const items = grouped[s.key];
                     if (!items || items.length === 0) return null;
                     return (
                       <div key={s.key}>
-                        <div className="font-mono text-[12px] tracking-[0.05em] text-navy">
-                          {s.label}
+                        <div className="mt-1 mb-3">
+                          <div className="font-mono text-[11px] tracking-[0.08em] text-navy">
+                            {s.label}
+                          </div>
+                          <div className="mt-1.5 h-px w-12 bg-foreground/20" />
                         </div>
-                        <div className="mt-2 mb-4 h-px bg-foreground/15" />
-                        <div className="flex flex-col gap-5">
+                        <div className="flex flex-col gap-4">
                           {items.map((ch) => (
                             <ChunkBlock key={ch.id} chunk={ch} />
                           ))}
