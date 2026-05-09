@@ -204,46 +204,55 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
 
   const isDashboard = chrome === "dashboard";
 
-  const inner = (
-    <div
-      className={
-        isDashboard
-          ? "mx-auto max-w-[1180px] px-5 sm:px-8 pt-8 md:pt-10 pb-20"
-          : "mx-auto max-w-[1100px] px-6 pt-10 pb-24"
-      }
-    >
-      <div className="flex flex-col md:flex-row gap-8 md:gap-10">
-        <aside className="md:w-[220px] md:shrink-0">
-          <div className="md:sticky md:top-24">
-            <ResultSidebar />
-          </div>
-        </aside>
-
-        <main className={`flex-1 min-w-0 ${isDashboard ? "max-w-[820px] md:px-2 md:py-2" : "max-w-[760px]"}`}>
-          {loading && (
-            <p className="text-[14px] text-foreground/60 italic">
-              One moment — loading this Stack.
-            </p>
-          )}
-          {!loading && error && (
-            <div>
-              <h2 className="text-[28px] font-bold text-navy">This Stack isn't here.</h2>
-              <p className="mt-3 text-navy/85 text-[17px] leading-[1.7]">
-                Either the link's expired or the URL got mangled in transit.{" "}
-                <Link to="/stack" className="text-navy underline underline-offset-2 hover:opacity-80">
-                  Build your own Stack →
-                </Link>
-              </p>
-            </div>
-          )}
-          {!loading && !error && session && <Outlet context={ctx} />}
-        </main>
-      </div>
-    </div>
+  const body = (
+    <>
+      {loading && (
+        <p className="text-[14px] text-foreground/60 italic">
+          One moment — loading this Stack.
+        </p>
+      )}
+      {!loading && error && (
+        <div>
+          <h2 className="text-[28px] font-bold text-navy">This Stack isn't here.</h2>
+          <p className="mt-3 text-navy/85 text-[17px] leading-[1.7]">
+            Either the link's expired or the URL got mangled in transit.{" "}
+            <Link to="/stack" className="text-navy underline underline-offset-2 hover:opacity-80">
+              Build your own Stack →
+            </Link>
+          </p>
+        </div>
+      )}
+      {!loading && !error && session && <Outlet context={ctx} />}
+    </>
   );
 
-  if (isDashboard) return inner;
-  return <SiteLayout>{inner}</SiteLayout>;
+  if (isDashboard) {
+    return (
+      <div className="flex">
+        <ResultSidebar />
+        <main className="flex-1 min-w-0 bg-offwhite min-h-[calc(100vh-3.5rem)]">
+          <div className="max-w-[820px] mx-auto px-5 sm:px-8 md:px-12 py-10 md:py-12">
+            {body}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  return (
+    <SiteLayout>
+      <div className="mx-auto max-w-[1100px] px-6 pt-10 pb-24">
+        <div className="flex flex-col md:flex-row gap-8 md:gap-10">
+          <aside className="md:w-[220px] md:shrink-0">
+            <div className="md:sticky md:top-24">
+              <ResultSidebar />
+            </div>
+          </aside>
+          <main className="flex-1 min-w-0 max-w-[760px]">{body}</main>
+        </div>
+      </div>
+    </SiteLayout>
+  );
 };
 
 export default ResultLayout;
