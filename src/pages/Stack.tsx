@@ -1,3 +1,4 @@
+import { useState } from "react";
 import SiteLayout from "@/components/SiteLayout";
 
 type Tool = {
@@ -101,7 +102,17 @@ const Category = ({ data }: { data: CategoryData }) => (
   </section>
 );
 
+type QuizStep = "intro" | "q1" | "done";
+
 const Stack = () => {
+  const [step, setStep] = useState<QuizStep>("intro");
+  const [name, setName] = useState("");
+
+  const reset = () => {
+    setStep("intro");
+    setName("");
+  };
+
   return (
     <SiteLayout>
       <div className="mx-auto max-w-[760px] px-6 pt-16 pb-24">
@@ -114,6 +125,67 @@ const Stack = () => {
             17 AI tools. Built around how real people actually work.
           </p>
         </header>
+
+        {/* Build My Stack quiz */}
+        <section className="mt-24 mb-24">
+          <h2 className="text-[28px] font-bold text-navy">Build My Stack</h2>
+          <p className="mt-3 text-navy/85 text-[17px] leading-[1.7]">
+            I'll build your first AI Stack in under two minutes. No jargon. No spam. Just the tools I'd start with if you were sat across from me.
+          </p>
+
+          <div className="mt-8 transition-all duration-200">
+            {step === "intro" && (
+              <button
+                onClick={() => setStep("q1")}
+                className="inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150"
+              >
+                Start →
+              </button>
+            )}
+
+            {step === "q1" && (
+              <div>
+                <h3 className="text-[22px] font-bold text-navy">What should I call you?</h3>
+                <p className="mt-2 italic text-[14px] text-navy/75">
+                  Just a first name. Makes the result feel personal.
+                </p>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Sarah"
+                  autoFocus
+                  className="mt-5 w-full max-w-[360px] rounded-[8px] border border-navy bg-navy-light px-4 py-3 text-[15px] text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-navy/30"
+                />
+                <div className="mt-5">
+                  <button
+                    onClick={() => name.trim() && setStep("done")}
+                    disabled={!name.trim()}
+                    className="inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150 disabled:opacity-40 disabled:hover:bg-navy disabled:cursor-not-allowed"
+                  >
+                    Continue →
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {step === "done" && (
+              <div>
+                <h3 className="text-[22px] font-bold text-navy">Hi {name.trim()}.</h3>
+                <p className="mt-3 text-foreground/85 text-[17px] leading-[1.7]">
+                  This is a placeholder. The rest of the quiz will land here in the next step.
+                </p>
+                <button
+                  onClick={reset}
+                  className="mt-5 text-[14px] text-navy hover:underline"
+                >
+                  Start over
+                </button>
+              </div>
+            )}
+          </div>
+        </section>
+
 
         {/* The full Stack */}
         <section className="mt-16">
