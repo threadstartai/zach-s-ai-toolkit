@@ -5,7 +5,10 @@ import { useAuth } from "@/contexts/AuthContext";
 const DashboardTopBar = () => {
   const { user, signOut } = useAuth();
   const [scrolled, setScrolled] = useState(false);
-  const display = user?.user_metadata?.display_name || user?.email || "You";
+  const display =
+    (user?.user_metadata as { display_name?: string } | undefined)?.display_name ||
+    user?.email ||
+    "You";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 4);
@@ -16,21 +19,22 @@ const DashboardTopBar = () => {
 
   return (
     <header
-      className={`sticky top-0 z-40 bg-background border-b border-[hsl(var(--border))] transition-shadow duration-150 ${
-        scrolled ? "shadow-[0_1px_0_rgba(26,58,92,0.04)]" : ""
+      className={`sticky top-0 z-40 h-14 bg-background border-b border-[hsl(var(--border))] transition-shadow duration-150 ${
+        scrolled ? "shadow-[0_1px_3px_rgba(0,0,0,0.04)]" : ""
       }`}
     >
-      <div className="px-5 sm:px-8 py-3.5 flex items-center justify-between">
-        <Link to="/dashboard" className="font-bold text-navy tracking-tight text-[15px]">
+      <div className="h-full px-6 flex items-center justify-between">
+        <Link to="/dashboard" className="text-base font-bold text-navy tracking-tight">
           My AI Stack
         </Link>
-        <div className="flex items-center gap-4">
-          <span className="text-[13px] text-foreground/65 hidden sm:inline truncate max-w-[200px]">
+        <div className="flex items-center">
+          <span className="text-sm text-navy hidden sm:inline truncate max-w-[200px]">
             {display}
           </span>
+          <span className="text-sm text-navy/40 mx-2 hidden sm:inline">·</span>
           <button
             onClick={() => { void signOut(); window.location.assign("/"); }}
-            className="text-[13px] text-navy/75 hover:text-navy hover:underline transition-colors duration-150"
+            className="text-sm text-navy/60 hover:text-navy hover:underline transition-colors duration-150 ml-3 sm:ml-0"
           >
             Sign out
           </button>
