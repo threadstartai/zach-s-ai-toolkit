@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import SiteLayout from "@/components/SiteLayout";
@@ -415,8 +416,30 @@ const ChunkBlock = ({ chunk }: { chunk: Chunk }) => {
 
 // ---------- Result component ----------
 
+const SECTION_LABELS: { key: "why" | "tonight" | "worth"; label: string; types: string[] }[] = [
+  { key: "why", label: "WHY", types: ["intro", "why-it-matters"] },
+  { key: "tonight", label: "TONIGHT", types: ["setup", "first-prompt", "workflow-example"] },
+  { key: "worth", label: "WORTH KNOWING", types: ["advanced", "common-mistake"] },
+];
+
+const groupChunks = (chunks: Chunk[]) => {
+  const groups: Record<string, Chunk[]> = { why: [], tonight: [], worth: [] };
+  for (const c of chunks) {
+    for (const s of SECTION_LABELS) {
+      if (s.types.includes(c.chunk_type)) {
+        groups[s.key].push(c);
+        break;
+      }
+    }
+  }
+  for (const k of Object.keys(groups)) {
+    groups[k].sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0));
+  }
+  return groups;
+};
+
 const Result = ({
-  name, q2, q3, q4, q5, onReset,
+  name, q2, q3, q4, q5, onReset, initialSessionId, sharedMode,
 }: {
   name: string;
   q2: string | null;
@@ -424,11 +447,14 @@ const Result = ({
   q4: string | null;
   q5: string | null;
   onReset: () => void;
+  initialSessionId?: string;
+  sharedMode?: boolean;
 }) => {
   const [saved, setSaved] = useState(false);
   const [chunksByTool, setChunksByTool] = useState<Record<string, Chunk[]>>({});
   const [showSlowMessage, setShowSlowMessage] = useState(false);
-  const [, setSessionId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(initialSessionId ?? null);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const c2 = codeQ2(q2);
   const c3 = codeQ3(q3);
@@ -441,8 +467,9 @@ const Result = ({
   const picks = useMemo(() => recommend(c2, c3, c4), [c2, c3, c4]);
   const pickSlugs = useMemo(() => picks.map((k) => TOOLS[k].slug), [picks]);
 
-  // Submit session via edge function (fire-and-forget — don't block render).
+  // Submit session via edge function — skip if we already have a sessionId (shared link load).
   useEffect(() => {
+    if (initialSessionId) return;
     let cancelled = false;
     (async () => {
       try {
@@ -456,13 +483,20 @@ const Result = ({
             q5_learning_style: Q5_EDGE_MAP[c5],
           },
         });
-        if (!cancelled && !error && data?.session_id) setSessionId(data.session_id);
+        if (!cancelled && !error && data?.session_id) {
+          setSessionId(data.session_id);
+          // Update the URL so it's shareable, without a reload.
+          const target = `/stack/result/${data.session_id}`;
+          if (typeof window !== "undefined" && window.location.pathname !== target) {
+            window.history.pushState(null, "", target);
+          }
+        }
       } catch {
         // non-fatal
       }
     })();
     return () => { cancelled = true; };
-  }, [displayName, c2, c3, c4, c5, q3]);
+  }, [initialSessionId, displayName, c2, c3, c4, c5, q3]);
 
   // Load chunks for each picked tool.
   useEffect(() => {
@@ -483,12 +517,11 @@ const Result = ({
         pickSlugs.map(async (slug) => {
           const toolId = slugToId.get(slug);
           if (!toolId) { result[slug] = []; return; }
-          let q = supabase
+          const { data: rows } = await supabase
             .from("chunks")
             .select("id, tool_id, chunk_type, title, content, priority, tags_audience, tags_use_case, tags_confidence")
             .eq("tool_id", toolId);
 
-          const { data: rows } = await q;
           const filtered = (rows ?? []).filter((r: any) => {
             const a: string[] = r.tags_audience ?? [];
             const u: string[] = r.tags_use_case ?? [];
@@ -499,7 +532,7 @@ const Result = ({
             return audOk && useOk && confOk;
           });
           filtered.sort((a: any, b: any) => (b.priority ?? 0) - (a.priority ?? 0));
-          result[slug] = filtered.slice(0, 3) as Chunk[];
+          result[slug] = filtered.slice(0, 6) as Chunk[];
         }),
       );
       if (!cancelled) {
@@ -512,10 +545,25 @@ const Result = ({
   }, [pickSlugs.join("|"), c2, c3, c4]);
 
   const handleStartOver = () => {
+    if (typeof window !== "undefined" && window.location.pathname !== "/stack") {
+      window.history.pushState(null, "", "/stack");
+    }
     onReset();
     setTimeout(() => {
       document.getElementById("build-my-stack")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 50);
+  };
+
+  const handleCopyShareLink = async () => {
+    if (!sessionId || typeof window === "undefined") return;
+    const url = `${window.location.origin}/stack/result/${sessionId}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 1500);
+    } catch {
+      // ignore
+    }
   };
 
   const why = (k: ToolKey) => k === "04" ? whyForChatGPT(c4) : whyFor(k, c2);
@@ -528,6 +576,35 @@ const Result = ({
         {introQ2(c2)}, {introQ4(c4)}. Three tools to start with — and the bits worth reading tonight.
       </p>
 
+      {/* Jump-to nav strip */}
+      {picks.length > 1 && (
+        <div className="mt-8 border-t border-b border-foreground/15 py-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[14px]">
+          <span className="font-mono text-navy">Jump to —</span>
+          {picks.map((k, i) => {
+            const t = TOOLS[k];
+            return (
+              <span key={k} className="flex items-baseline gap-2">
+                <a
+                  href={`#tool-${t.slug}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const el = document.getElementById(`tool-${t.slug}`);
+                    if (el) {
+                      const top = el.getBoundingClientRect().top + window.scrollY - 60;
+                      window.scrollTo({ top, behavior: "smooth" });
+                    }
+                  }}
+                  className="text-navy hover:underline underline-offset-2"
+                >
+                  {t.name}
+                </a>
+                {i < picks.length - 1 && <span className="text-foreground/40">·</span>}
+              </span>
+            );
+          })}
+        </div>
+      )}
+
       {showSlowMessage && Object.keys(chunksByTool).length === 0 && (
         <p className="mt-6 text-[14px] text-foreground/60 italic">
           One moment — finding the right bits for you.
@@ -539,23 +616,40 @@ const Result = ({
         {picks.map((k) => {
           const t = TOOLS[k];
           const tChunks = chunksByTool[t.slug] ?? [];
+          const grouped = groupChunks(tChunks);
+          const hasAnyChunks = tChunks.length > 0;
           return (
-            <div key={k} className="bg-navy-light rounded-[12px] px-8 py-7 sm:px-10 sm:py-8">
+            <div
+              key={k}
+              id={`tool-${t.slug}`}
+              className="bg-navy-light rounded-[12px] px-8 py-7 sm:px-10 sm:py-8 scroll-mt-[60px]"
+            >
               <h4 className="text-[22px] font-bold text-navy">
                 <span className="font-mono text-[15px] text-navy/70 mr-2.5">{t.num}</span>
                 {t.name}
               </h4>
               <p className="mt-3 text-navy text-[16px] leading-[1.65]">{why(k)}</p>
 
-              {tChunks.length > 0 && (
-                <>
-                  <div className="mt-5 mb-5 h-px bg-foreground/15" />
-                  <div className="flex flex-col gap-5">
-                    {tChunks.map((ch) => (
-                      <ChunkBlock key={ch.id} chunk={ch} />
-                    ))}
-                  </div>
-                </>
+              {hasAnyChunks && (
+                <div className="mt-5 flex flex-col gap-8">
+                  {SECTION_LABELS.map((s) => {
+                    const items = grouped[s.key];
+                    if (!items || items.length === 0) return null;
+                    return (
+                      <div key={s.key}>
+                        <div className="font-mono text-[12px] tracking-[0.05em] text-navy">
+                          {s.label}
+                        </div>
+                        <div className="mt-2 mb-4 h-px bg-foreground/15" />
+                        <div className="flex flex-col gap-5">
+                          {items.map((ch) => (
+                            <ChunkBlock key={ch.id} chunk={ch} />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
 
               <a
@@ -595,6 +689,14 @@ const Result = ({
 
       {/* Footer actions */}
       <div className="mt-14 text-[14px] text-navy">
+        <button
+          onClick={handleCopyShareLink}
+          disabled={!sessionId}
+          className="hover:underline transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed disabled:no-underline"
+        >
+          {linkCopied ? "Copied" : "Copy share link"}
+        </button>
+        <span className="text-foreground/40 mx-2">·</span>
         <button
           onClick={() => setSaved(true)}
           className="hover:underline transition-colors duration-150"
@@ -641,7 +743,49 @@ const Q5_OPTIONS = [
   "Walk me through it step by step",
 ];
 
+// Reverse mappings: DB-stored codes back to the raw question strings used by Result.
+const Q2_FROM_CODE: Record<string, string> = {
+  student: "Student",
+  personal: "Personal life / family",
+  business: "Business / work",
+  exploring: "Just exploring",
+};
+const Q3_FROM_CODE: Record<string, string> = {
+  writing: "Writing something properly",
+  research: "Researching a topic",
+  building: "Building a website or tool",
+  notes: "Note-taking and meetings",
+  images: "Generating images or video",
+  admin: "Sorting admin or emails",
+};
+const Q4_FROM_CODE: Record<string, string> = {
+  never: "Never used it",
+  tried: "Tried it a bit",
+  weekly: "Use it weekly",
+  confident: "Pretty confident",
+};
+const Q5_FROM_CODE: Record<string, string> = {
+  prompt: "Just give me the prompt to copy",
+  video: "Show me a video",
+  guide: "I'll read a guide",
+  "step-by-step": "Walk me through it step by step",
+};
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+type LoadedSession = {
+  name: string | null;
+  q2_audience: string | null;
+  q3_use_case: string | null;
+  q3_other_text: string | null;
+  q4_confidence: string | null;
+  q5_learning_style: string | null;
+};
+
 const Stack = () => {
+  const { sessionId: routeSessionId } = useParams<{ sessionId?: string }>();
+  const sharedMode = !!routeSessionId;
+
   const [step, setStep] = useState<QuizStep>("intro");
   const [name, setName] = useState("");
   const [q2, setQ2] = useState<string | null>(null);
@@ -650,6 +794,39 @@ const Stack = () => {
   const [q3OtherSelected, setQ3OtherSelected] = useState(false);
   const [q4, setQ4] = useState<string | null>(null);
   const [q5, setQ5] = useState<string | null>(null);
+
+  // Shared-load state
+  const [sharedLoading, setSharedLoading] = useState<boolean>(sharedMode);
+  const [sharedError, setSharedError] = useState<boolean>(false);
+  const [sharedSession, setSharedSession] = useState<LoadedSession | null>(null);
+
+  useEffect(() => {
+    if (!sharedMode) return;
+    if (!routeSessionId || !UUID_RE.test(routeSessionId)) {
+      setSharedError(true);
+      setSharedLoading(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("get-session", {
+          body: { session_id: routeSessionId },
+        });
+        if (cancelled) return;
+        if (error || !data?.session) {
+          setSharedError(true);
+        } else {
+          setSharedSession(data.session as LoadedSession);
+        }
+      } catch {
+        if (!cancelled) setSharedError(true);
+      } finally {
+        if (!cancelled) setSharedLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [sharedMode, routeSessionId]);
 
   const reset = () => {
     setStep("intro");
@@ -661,6 +838,7 @@ const Stack = () => {
     setQ4(null);
     setQ5(null);
   };
+
 
   const advance = (next: QuizStep) => {
     setTimeout(() => setStep(next), 150);
@@ -730,144 +908,190 @@ const Stack = () => {
           </p>
         </header>
 
-        {/* Build My Stack quiz */}
+        {/* Build My Stack quiz / shared result */}
         <section id="build-my-stack" className="mt-24 mb-24 scroll-mt-20">
-          <h2 className="text-[28px] font-bold text-navy">Build My Stack</h2>
-          <p className="mt-3 text-navy/85 text-[17px] leading-[1.7]">
-            I'll build your first AI Stack in under two minutes. No jargon. No spam. Just the tools I'd start with if you were sat across from me.
-          </p>
-
-          <div className="mt-8 transition-all duration-200">
-            {step === "intro" && (
-              <button
-                onClick={() => setStep("q1")}
-                className="inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150"
-              >
-                Start →
-              </button>
-            )}
-
-            {step === "q1" && (
-              <div>
-                <h3 className={qHeading}>What should I call you?</h3>
-                <p className={microcopy}>
-                  Just a first name. Makes the result feel personal.
+          {sharedMode ? (
+            <div>
+              {sharedLoading && (
+                <p className="text-[14px] text-foreground/60 italic">
+                  One moment — loading this Stack.
                 </p>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Sarah"
-                  autoFocus
-                  className="mt-5 w-full max-w-[360px] rounded-[8px] border border-navy bg-navy-light px-4 py-3 text-[15px] text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-navy/30"
-                />
-                <div className="mt-5">
+              )}
+              {!sharedLoading && sharedError && (
+                <div>
+                  <h2 className="text-[28px] font-bold text-navy">This Stack isn't here.</h2>
+                  <p className="mt-3 text-navy/85 text-[17px] leading-[1.7]">
+                    Either the link's expired or the URL got mangled in transit.{" "}
+                    <Link to="/stack" className="text-navy underline underline-offset-2 hover:opacity-80">
+                      Build your own Stack →
+                    </Link>
+                  </p>
+                </div>
+              )}
+              {!sharedLoading && !sharedError && sharedSession && (
+                <>
+                  <div className="mb-6 text-[14px]">
+                    <Link to="/stack" className="text-navy hover:underline underline-offset-2">
+                      Build your own Stack →
+                    </Link>
+                  </div>
+                  <Result
+                    name={sharedSession.name ?? ""}
+                    q2={Q2_FROM_CODE[sharedSession.q2_audience ?? ""] ?? null}
+                    q3={
+                      sharedSession.q3_use_case === "other"
+                        ? (sharedSession.q3_other_text ?? "Other")
+                        : (Q3_FROM_CODE[sharedSession.q3_use_case ?? ""] ?? null)
+                    }
+                    q4={Q4_FROM_CODE[sharedSession.q4_confidence ?? ""] ?? null}
+                    q5={Q5_FROM_CODE[sharedSession.q5_learning_style ?? ""] ?? null}
+                    onReset={reset}
+                    initialSessionId={routeSessionId}
+                    sharedMode
+                  />
+                </>
+              )}
+            </div>
+          ) : (
+            <>
+              <h2 className="text-[28px] font-bold text-navy">Build My Stack</h2>
+              <p className="mt-3 text-navy/85 text-[17px] leading-[1.7]">
+                I'll build your first AI Stack in under two minutes. No jargon. No spam. Just the tools I'd start with if you were sat across from me.
+              </p>
+
+              <div className="mt-8 transition-all duration-200">
+                {step === "intro" && (
                   <button
-                    onClick={() => name.trim() && setStep("q2")}
-                    disabled={!name.trim()}
-                    className="inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150 disabled:opacity-40 disabled:hover:bg-navy disabled:cursor-not-allowed"
+                    onClick={() => setStep("q1")}
+                    className="inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150"
                   >
-                    Continue →
+                    Start →
                   </button>
-                </div>
-              </div>
-            )}
+                )}
 
-            {step === "q2" && (
-              <div>
-                <h3 className={qHeading}>What are you using AI for first?</h3>
-                <p className={microcopy}>This routes which tools I recommend.</p>
-                <div className="mt-5 flex flex-col items-start gap-2.5">
-                  {Q2_OPTIONS.map((o) => (
-                    <button key={o} onClick={() => selectQ2(o)} className={pill(q2 === o)}>
-                      {o}
-                    </button>
-                  ))}
-                </div>
-                <div className="mt-6">
-                  <button onClick={() => setStep("q1")} className={backLink}>← back</button>
-                </div>
-              </div>
-            )}
-
-            {step === "q3" && (
-              <div>
-                <h3 className={qHeading}>What's one thing you want help with this week?</h3>
-                <p className={microcopy}>This makes the recommendation specific.</p>
-                <div className="mt-5 flex flex-col items-start gap-2.5">
-                  {Q3_OPTIONS.map((o) => (
-                    <button key={o} onClick={() => selectQ3(o)} className={pill(q3 === o && !q3OtherSelected)}>
-                      {o}
-                    </button>
-                  ))}
-                  <button onClick={selectQ3Other} className={pill(q3OtherSelected)}>
-                    Other
-                  </button>
-                  {q3OtherSelected && (
-                    <div className="mt-2 flex flex-col sm:flex-row gap-2.5 w-full max-w-[480px]">
-                      <input
-                        type="text"
-                        value={q3Other}
-                        onChange={(e) => setQ3Other(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === "Enter") submitQ3Other(); }}
-                        placeholder="Tell me what you'd like help with"
-                        autoFocus
-                        className="flex-1 rounded-[8px] border border-navy bg-navy-light px-4 py-2.5 text-[15px] text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-navy/30"
-                      />
+                {step === "q1" && (
+                  <div>
+                    <h3 className={qHeading}>What should I call you?</h3>
+                    <p className={microcopy}>
+                      Just a first name. Makes the result feel personal.
+                    </p>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="e.g. Sarah"
+                      autoFocus
+                      className="mt-5 w-full max-w-[360px] rounded-[8px] border border-navy bg-navy-light px-4 py-3 text-[15px] text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-navy/30"
+                    />
+                    <div className="mt-5">
                       <button
-                        onClick={submitQ3Other}
-                        disabled={!q3Other.trim()}
-                        className="inline-flex items-center justify-center bg-navy text-primary-foreground px-4 py-2.5 rounded-[8px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150 disabled:opacity-40 disabled:hover:bg-navy disabled:cursor-not-allowed"
+                        onClick={() => name.trim() && setStep("q2")}
+                        disabled={!name.trim()}
+                        className="inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150 disabled:opacity-40 disabled:hover:bg-navy disabled:cursor-not-allowed"
                       >
                         Continue →
                       </button>
                     </div>
-                  )}
-                </div>
-                <div className="mt-6">
-                  <button onClick={() => setStep("q2")} className={backLink}>← back</button>
-                </div>
-              </div>
-            )}
+                  </div>
+                )}
 
-            {step === "q4" && (
-              <div>
-                <h3 className={qHeading}>How confident are you with AI right now?</h3>
-                <p className={microcopy}>This sets how much I explain.</p>
-                <div className="mt-5 flex flex-col items-start gap-2.5">
-                  {Q4_OPTIONS.map((o) => (
-                    <button key={o} onClick={() => selectQ4(o)} className={pill(q4 === o)}>
-                      {o}
-                    </button>
-                  ))}
-                </div>
-                <div className="mt-6">
-                  <button onClick={() => setStep("q3")} className={backLink}>← back</button>
-                </div>
-              </div>
-            )}
+                {step === "q2" && (
+                  <div>
+                    <h3 className={qHeading}>What are you using AI for first?</h3>
+                    <p className={microcopy}>This routes which tools I recommend.</p>
+                    <div className="mt-5 flex flex-col items-start gap-2.5">
+                      {Q2_OPTIONS.map((o) => (
+                        <button key={o} onClick={() => selectQ2(o)} className={pill(q2 === o)}>
+                          {o}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-6">
+                      <button onClick={() => setStep("q1")} className={backLink}>← back</button>
+                    </div>
+                  </div>
+                )}
 
-            {step === "q5" && (
-              <div>
-                <h3 className={qHeading}>How do you prefer to learn something new?</h3>
-                <p className={microcopy}>This changes the format of your first task.</p>
-                <div className="mt-5 flex flex-col items-start gap-2.5">
-                  {Q5_OPTIONS.map((o) => (
-                    <button key={o} onClick={() => selectQ5(o)} className={pill(q5 === o)}>
-                      {o}
-                    </button>
-                  ))}
-                </div>
-                <div className="mt-6">
-                  <button onClick={() => setStep("q4")} className={backLink}>← back</button>
-                </div>
-              </div>
-            )}
+                {step === "q3" && (
+                  <div>
+                    <h3 className={qHeading}>What's one thing you want help with this week?</h3>
+                    <p className={microcopy}>This makes the recommendation specific.</p>
+                    <div className="mt-5 flex flex-col items-start gap-2.5">
+                      {Q3_OPTIONS.map((o) => (
+                        <button key={o} onClick={() => selectQ3(o)} className={pill(q3 === o && !q3OtherSelected)}>
+                          {o}
+                        </button>
+                      ))}
+                      <button onClick={selectQ3Other} className={pill(q3OtherSelected)}>
+                        Other
+                      </button>
+                      {q3OtherSelected && (
+                        <div className="mt-2 flex flex-col sm:flex-row gap-2.5 w-full max-w-[480px]">
+                          <input
+                            type="text"
+                            value={q3Other}
+                            onChange={(e) => setQ3Other(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === "Enter") submitQ3Other(); }}
+                            placeholder="Tell me what you'd like help with"
+                            autoFocus
+                            className="flex-1 rounded-[8px] border border-navy bg-navy-light px-4 py-2.5 text-[15px] text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-navy/30"
+                          />
+                          <button
+                            onClick={submitQ3Other}
+                            disabled={!q3Other.trim()}
+                            className="inline-flex items-center justify-center bg-navy text-primary-foreground px-4 py-2.5 rounded-[8px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150 disabled:opacity-40 disabled:hover:bg-navy disabled:cursor-not-allowed"
+                          >
+                            Continue →
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div className="mt-6">
+                      <button onClick={() => setStep("q2")} className={backLink}>← back</button>
+                    </div>
+                  </div>
+                )}
 
-            {step === "done" && (
-              <Result name={name} q2={q2} q3={q3} q4={q4} q5={q5} onReset={reset} />
-            )}
-          </div>
+                {step === "q4" && (
+                  <div>
+                    <h3 className={qHeading}>How confident are you with AI right now?</h3>
+                    <p className={microcopy}>This sets how much I explain.</p>
+                    <div className="mt-5 flex flex-col items-start gap-2.5">
+                      {Q4_OPTIONS.map((o) => (
+                        <button key={o} onClick={() => selectQ4(o)} className={pill(q4 === o)}>
+                          {o}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-6">
+                      <button onClick={() => setStep("q3")} className={backLink}>← back</button>
+                    </div>
+                  </div>
+                )}
+
+                {step === "q5" && (
+                  <div>
+                    <h3 className={qHeading}>How do you prefer to learn something new?</h3>
+                    <p className={microcopy}>This changes the format of your first task.</p>
+                    <div className="mt-5 flex flex-col items-start gap-2.5">
+                      {Q5_OPTIONS.map((o) => (
+                        <button key={o} onClick={() => selectQ5(o)} className={pill(q5 === o)}>
+                          {o}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-6">
+                      <button onClick={() => setStep("q4")} className={backLink}>← back</button>
+                    </div>
+                  </div>
+                )}
+
+                {step === "done" && (
+                  <Result name={name} q2={q2} q3={q3} q4={q4} q5={q5} onReset={reset} />
+                )}
+              </div>
+            </>
+          )}
         </section>
 
 
