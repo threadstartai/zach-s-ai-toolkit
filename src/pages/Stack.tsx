@@ -645,6 +645,20 @@ const Result = ({
     }, 50);
   };
 
+  const submitFeedback = async (toolSlug: string, reason: string) => {
+    try {
+      await supabase.from("chunk_feedback").insert({
+        session_id: sessionId,
+        tool_slug: toolSlug,
+        reason,
+      });
+    } catch {
+      // non-fatal — still update UI
+    }
+    setFeedbackOpen((prev) => ({ ...prev, [toolSlug]: false }));
+    setFeedbackSubmitted((prev) => ({ ...prev, [toolSlug]: true }));
+  };
+
   const handleCopyShareLink = async () => {
     if (!sessionId || typeof window === "undefined") return;
     const url = `${window.location.origin}/stack/result/${sessionId}`;
