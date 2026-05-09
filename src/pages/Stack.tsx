@@ -1,10 +1,6 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import SiteLayout from "@/components/SiteLayout";
-import { Card } from "@/components/ui-primitives/Card";
-import { supabase } from "@/integrations/supabase/client";
-import { codeQ2, codeQ3, codeQ4, isMeaningfulName } from "@/pages/result/shared/codes";
-import type { QuizStep } from "@/pages/result/shared/types";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Tool = {
   num?: string;
@@ -78,106 +74,26 @@ const categories: CategoryData[] = [
 ];
 
 const ToolCard = ({ tool }: { tool: Tool }) => (
-  <Card hoverable className="h-full">
-    <div className="flex items-baseline gap-3">
-      {tool.num && <span className="font-mono text-[12px] text-navy/55">{tool.num}</span>}
-      <h4 className="text-[17px] font-bold text-navy">{tool.name}</h4>
-    </div>
-    <p className="mt-2 text-[14.5px] leading-[1.6] text-foreground/80">{tool.tagline}</p>
-  </Card>
+  <div className="bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 hover:border-navy/40 transition-colors duration-150">
+    {tool.num && <div className="font-mono text-xs text-navy/60">{tool.num}</div>}
+    <h4 className="text-lg font-bold text-navy mt-1">{tool.name}</h4>
+    <p className="mt-2 text-sm text-foreground/80 leading-[1.6]">{tool.tagline}</p>
+  </div>
 );
 
 const CategorySection = ({ data }: { data: CategoryData }) => (
-  <section className="mt-14 first:mt-0 scroll-mt-20">
-    <h3 className="text-[22px] font-bold text-navy">{data.title}</h3>
+  <section className="mt-16 first:mt-0 scroll-mt-20">
+    <h3 className="text-2xl font-bold text-navy">{data.title}</h3>
     <p className="mt-2 italic text-[14px] text-foreground/70">{data.blurb}</p>
-    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5">
       {data.tools.map((t) => <ToolCard key={t.slug} tool={t} />)}
     </div>
   </section>
 );
 
-const Q2_OPTIONS = ["Student", "Personal life / family", "Business / work", "Just exploring"];
-const Q3_OPTIONS = [
-  "Writing something properly",
-  "Researching a topic",
-  "Building a website or tool",
-  "Note-taking and meetings",
-  "Generating images or video",
-  "Sorting admin or emails",
-];
-const Q4_OPTIONS = ["Never used it", "Tried it a bit", "Use it weekly", "Pretty confident"];
-
 const Stack = () => {
-  const navigate = useNavigate();
-
-  const [step, setStep] = useState<QuizStep>("intro");
-  const [name, setName] = useState("");
-  const [q2, setQ2] = useState<string | null>(null);
-  const [q3, setQ3] = useState<string | null>(null);
-  const [q3Other, setQ3Other] = useState("");
-  const [q3OtherSelected, setQ3OtherSelected] = useState(false);
-  const [q4, setQ4] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState(false);
-
-  const advance = (next: QuizStep) => setTimeout(() => setStep(next), 150);
-
-  const selectQ2 = (v: string) => {
-    if (q2 !== v) { setQ3(null); setQ3Other(""); setQ3OtherSelected(false); setQ4(null); }
-    setQ2(v); advance("q3");
-  };
-  const selectQ3 = (v: string) => {
-    if (q3 !== v) setQ4(null);
-    setQ3(v); setQ3OtherSelected(false); setQ3Other(""); advance("q4");
-  };
-  const selectQ3Other = () => { setQ3OtherSelected(true); setQ3(null); };
-  const submitQ3Other = () => {
-    if (!q3Other.trim()) return;
-    setQ3(q3Other.trim()); setQ4(null); advance("q4");
-  };
-
-  const submitQuiz = async (q4Value: string) => {
-    setSubmitting(true);
-    setSubmitError(false);
-    const c2 = codeQ2(q2);
-    const c3 = codeQ3(q3);
-    const c4 = codeQ4(q4Value);
-    const displayName = isMeaningfulName(name) ? name.trim() : null;
-    try {
-      const { data, error } = await supabase.functions.invoke("submit-quiz", {
-        body: {
-          name: displayName ?? "Anonymous",
-          q2_audience: c2,
-          q3_use_case: c3,
-          q3_other_text: c3 === "other" ? (q3 ?? "") : "",
-          q4_confidence: c4,
-          q5_learning_style: null,
-        },
-      });
-      if (error || !data?.session_id) {
-        setSubmitError(true);
-        setSubmitting(false);
-        return;
-      }
-      navigate(`/stack/result/${data.session_id}/my-stack`);
-    } catch {
-      setSubmitError(true);
-      setSubmitting(false);
-    }
-  };
-
-  const selectQ4 = (v: string) => { setQ4(v); void submitQuiz(v); };
-
-  const pillBase =
-    "inline-flex items-center justify-start text-left rounded-[8px] border border-navy px-4 py-2.5 text-[15px] font-medium transition-colors duration-150";
-  const pill = (selected: boolean) =>
-    `${pillBase} ${selected ? "bg-navy text-primary-foreground hover:bg-navy/90" : "bg-transparent text-navy hover:bg-navy-light"}`;
-  const backLink = "text-[13px] text-navy/80 hover:text-navy hover:underline transition-colors duration-150";
-  const microcopy = "mt-2 italic text-[14px] text-navy/75";
-  const qHeading = "text-[20px] font-bold text-navy";
-
-  const quizActive = step !== "intro";
+  const { user } = useAuth();
+  const startHref = user ? "/onboarding" : "/signup";
 
   return (
     <SiteLayout>
@@ -190,125 +106,24 @@ const Stack = () => {
           <p className="mt-4 text-[18px] text-navy/85 leading-snug">
             All 17 tools, organised by where they fit in real life.
           </p>
-          <p className="mt-3 italic text-[14px] text-navy/65">
+          <p className="mt-3 italic text-[14px] text-navy/70">
             No affiliate links. If I recommend something, it's because I'd tell my own family to use it.
           </p>
         </header>
 
-        {/* Build My Stack — banner / panel */}
-        <section id="build-my-stack" className="mt-10 scroll-mt-20">
-          {!quizActive ? (
-            <Card className="bg-navy-light/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <h2 className="text-[18px] font-bold text-navy">Build my Stack</h2>
-                <p className="mt-1 text-[14.5px] text-navy/80">
-                  Four quick questions. I'll narrow this down to three tools, just for you.
-                </p>
-              </div>
-              <button
-                onClick={() => setStep("q1")}
-                className="self-start sm:self-center inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-2.5 rounded-[8px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150"
-              >
-                Start →
-              </button>
-            </Card>
-          ) : (
-            <Card className="bg-background">
-              {step === "q1" && (
-                <div>
-                  <h3 className={qHeading}>What should I call you?</h3>
-                  <p className={microcopy}>Just a first name. Makes the result feel personal.</p>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Sarah"
-                    autoFocus
-                    className="mt-5 w-full max-w-[360px] rounded-[8px] border border-[hsl(var(--border))] bg-background px-4 py-3 text-[15px] text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-navy/30 focus:border-navy"
-                  />
-                  <div className="mt-5 flex items-center gap-4">
-                    <button
-                      onClick={() => name.trim() && setStep("q2")}
-                      disabled={!name.trim()}
-                      className="inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-2.5 rounded-[8px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150 disabled:opacity-40 disabled:hover:bg-navy disabled:cursor-not-allowed"
-                    >
-                      Continue →
-                    </button>
-                    <button onClick={() => setStep("intro")} className={backLink}>cancel</button>
-                  </div>
-                </div>
-              )}
-
-              {step === "q2" && (
-                <div>
-                  <h3 className={qHeading}>What are you using AI for first?</h3>
-                  <p className={microcopy}>This routes which tools I recommend.</p>
-                  <div className="mt-5 flex flex-col items-start gap-2.5">
-                    {Q2_OPTIONS.map((o) => (
-                      <button key={o} onClick={() => selectQ2(o)} className={pill(q2 === o)}>{o}</button>
-                    ))}
-                  </div>
-                  <div className="mt-5"><button onClick={() => setStep("q1")} className={backLink}>← back</button></div>
-                </div>
-              )}
-
-              {step === "q3" && (
-                <div>
-                  <h3 className={qHeading}>What's one thing you want help with this week?</h3>
-                  <p className={microcopy}>This makes the recommendation specific.</p>
-                  <div className="mt-5 flex flex-col items-start gap-2.5">
-                    {Q3_OPTIONS.map((o) => (
-                      <button key={o} onClick={() => selectQ3(o)} className={pill(q3 === o && !q3OtherSelected)}>{o}</button>
-                    ))}
-                    <button onClick={selectQ3Other} className={pill(q3OtherSelected)}>Other</button>
-                    {q3OtherSelected && (
-                      <div className="mt-2 flex flex-col sm:flex-row gap-2.5 w-full max-w-[480px]">
-                        <input
-                          type="text"
-                          value={q3Other}
-                          onChange={(e) => setQ3Other(e.target.value)}
-                          onKeyDown={(e) => { if (e.key === "Enter") submitQ3Other(); }}
-                          placeholder="Tell me what you'd like help with"
-                          autoFocus
-                          className="flex-1 rounded-[8px] border border-[hsl(var(--border))] bg-background px-4 py-2.5 text-[15px] text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-navy/30 focus:border-navy"
-                        />
-                        <button
-                          onClick={submitQ3Other}
-                          disabled={!q3Other.trim()}
-                          className="inline-flex items-center justify-center bg-navy text-primary-foreground px-4 py-2.5 rounded-[8px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150 disabled:opacity-40 disabled:hover:bg-navy disabled:cursor-not-allowed"
-                        >
-                          Continue →
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  <div className="mt-5"><button onClick={() => setStep("q2")} className={backLink}>← back</button></div>
-                </div>
-              )}
-
-              {step === "q4" && (
-                <div>
-                  <h3 className={qHeading}>How confident are you with AI right now?</h3>
-                  <p className={microcopy}>This sets how much I explain.</p>
-                  <div className="mt-5 flex flex-col items-start gap-2.5">
-                    {Q4_OPTIONS.map((o) => (
-                      <button
-                        key={o}
-                        onClick={() => selectQ4(o)}
-                        disabled={submitting}
-                        className={`${pill(q4 === o)} ${submitting ? "opacity-60 cursor-not-allowed" : ""}`}
-                      >
-                        {o}
-                      </button>
-                    ))}
-                  </div>
-                  {submitting && <p className="mt-5 text-[14px] text-foreground/60 italic">One moment — building your Stack.</p>}
-                  {submitError && <p className="mt-5 text-[14px] text-navy/85">Something went wrong saving that. Please try again.</p>}
-                  <div className="mt-5"><button onClick={() => setStep("q3")} className={backLink}>← back</button></div>
-                </div>
-              )}
-            </Card>
-          )}
+        {/* Build my stack — banner */}
+        <section className="mt-10">
+          <div className="bg-navy-light/40 rounded-[12px] p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <p className="text-[15px] text-navy">
+              <span className="font-bold">Build my stack</span> — answer 4 questions, get 3 personalised tools.
+            </p>
+            <Link
+              to={startHref}
+              className="self-start sm:self-center inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-2.5 rounded-[8px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150"
+            >
+              Start →
+            </Link>
+          </div>
         </section>
 
         {/* Categories */}
@@ -320,7 +135,7 @@ const Stack = () => {
           Last updated: May 2026.
         </p>
 
-        {/* Hidden link target preserved for old Index linkout */}
+        {/* Hidden anchor targets preserved for legacy links */}
         <span id="start-here" className="sr-only" />
         <span id="process" className="sr-only" />
       </div>

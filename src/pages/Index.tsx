@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import SiteLayout from "@/components/SiteLayout";
-import { Card } from "@/components/ui-primitives/Card";
 import { useAuth } from "@/contexts/AuthContext";
 
 const primaryBtn =
@@ -14,6 +13,9 @@ const CATEGORIES = [
   { num: "03", name: "Building Things" },
   { num: "04", name: "Daily Life" },
 ];
+
+const processCardCls =
+  "bg-background border border-[hsl(var(--border))] rounded-[12px] p-6 hover:border-navy/40 transition-colors duration-150";
 
 const PROCESS = [
   {
@@ -86,19 +88,17 @@ const Index = () => {
                 </p>
               </div>
             </div>
-            <Card className="self-start">
-              <p className="text-[12px] uppercase tracking-wider text-navy/60 font-medium">
-                The four categories
-              </p>
-              <ul className="mt-4 flex flex-col divide-y divide-[hsl(var(--border))]/70">
+            <div className="self-start bg-navy-light/40 border border-navy-light rounded-[16px] p-8">
+              <p className="text-[15px] font-bold text-navy">Four ways AI shows up.</p>
+              <ul className="mt-4 flex flex-col gap-2.5">
                 {CATEGORIES.map((c) => (
-                  <li key={c.num} className="flex items-baseline gap-4 py-3 first:pt-0 last:pb-0">
-                    <span className="font-mono text-[13px] text-navy/55 w-6">{c.num}</span>
-                    <span className="text-[15px] text-navy font-medium">{c.name}</span>
+                  <li key={c.num} className="flex items-baseline gap-3 text-[15px] text-navy">
+                    <span className="font-mono text-[13px] text-navy/60">{c.num}</span>
+                    <span>— {c.name}</span>
                   </li>
                 ))}
               </ul>
-            </Card>
+            </div>
           </div>
         </section>
 
@@ -110,16 +110,14 @@ const Index = () => {
               The tools matter less than the loop. Here's the four-step process I use for almost everything:
             </p>
           </div>
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
             {PROCESS.map((item, i) => (
-              <Card key={i} className="bg-navy-light/30">
-                <div className="flex items-baseline gap-3">
-                  <span className="font-mono text-[13px] text-navy/60 tabular-nums">{`0${i + 1}`}</span>
-                  <p className="text-[16px] leading-[1.65] text-foreground/90">
-                    <span className="font-semibold text-navy">{item.lead}</span> {item.rest}
-                  </p>
-                </div>
-              </Card>
+              <div key={i} className={processCardCls}>
+                <span className="font-mono text-[12px] text-navy/60 tabular-nums">{`0${i + 1}.`}</span>
+                <p className="mt-2 text-[16px] leading-[1.65] text-foreground/90">
+                  <span className="font-semibold text-navy">{item.lead}</span> {item.rest}
+                </p>
+              </div>
             ))}
           </div>
           <p className="mt-8 text-[14px]">
