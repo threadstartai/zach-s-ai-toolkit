@@ -652,7 +652,13 @@ const Result = ({
       {/* Title + intro */}
       <h3 className="text-[32px] sm:text-[36px] font-bold text-navy tracking-[-0.02em]">{title}</h3>
       <p className="mt-3 text-navy text-[17px] leading-[1.7]">
-        {introQ2(c2)}, {introQ4(c4)}. Three tools to start with — and the bits worth reading tonight.
+        Here's what I'm reading: {audiencePhrase(c2)}, working on {useCasePhrase(c3, c3 === "other" ? (q3 ?? "") : "")}, {confidencePhrase(c4)}. Three tools, and what's worth doing tonight. If that's slightly off,{" "}
+        <button
+          onClick={handleStartOver}
+          className="text-navy underline underline-offset-2 hover:opacity-80"
+        >
+          Start over
+        </button>.
       </p>
 
       {/* Jump-to nav strip */}
