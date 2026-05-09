@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import SiteLayout from "@/components/SiteLayout";
+import { supabase } from "@/integrations/supabase/client";
 
 type Tool = {
   num?: string;
@@ -274,25 +277,6 @@ const introQ4 = (q4: Q4Code) =>
   : q4 === "weekly" ? "starting from regular use"
   : "starting from a confident base";
 
-const promptFor = (q3: Q3Code, q3Raw: string): string => {
-  switch (q3) {
-    case "writing":
-      return "I'm trying to [thing you want to write]. Here's the messy version: [paste your draft]. Help me sharpen it without losing my voice. Push back on anything weak.";
-    case "research":
-      return "I want to understand [topic]. I know almost nothing. Walk me through it in three layers — beginner, intermediate, what an expert would say. Give me three good follow-up questions to ask.";
-    case "building":
-      return "I want to build [thing]. I'll describe it loosely. Ask me three questions that will sharpen the brief before I take it to Lovable.";
-    case "notes":
-      return "Here's a transcript or set of notes from a meeting: [paste]. Pull the decisions, the actions, and the open questions. Format as a Slack-ready summary.";
-    case "images":
-      return "I want to create [thing]. Help me write a detailed visual prompt for it. Push back if I'm being vague.";
-    case "admin":
-      return "Here's an email I need to send: [paste rough version]. Make it sound like me but tighter. Don't make it corporate.";
-    case "other":
-      return `I'm trying to figure out how to ${q3Raw.trim() || "[describe what you want help with]"}. Ask me three questions that will help you actually help me.`;
-  }
-};
-
 const isMeaningfulName = (raw: string) => {
   const n = raw.trim();
   if (n.length < 2) return false;
@@ -309,6 +293,126 @@ const LADDER = [
   { name: "Automate the boring bits.", desc: "Once you've got patterns that work, get them running on autopilot." },
 ];
 
+const Q5_EDGE_MAP: Record<Q5Code, string> = {
+  prompt: "prompt",
+  video: "video",
+  guide: "guide",
+  stepbystep: "step-by-step",
+};
+
+type Chunk = {
+  id: string;
+  tool_id: string;
+  chunk_type: string;
+  title: string | null;
+  content: string;
+  priority: number;
+};
+
+// Split a first-prompt chunk into parts: text before the blockquote, the
+// blockquote text itself (the prompt to copy), and text after the blockquote.
+const splitFirstPrompt = (content: string) => {
+  const lines = content.split("\n");
+  let start = -1;
+  let end = -1;
+  for (let i = 0; i < lines.length; i++) {
+    const isQuote = /^>\s?/.test(lines[i]);
+    if (isQuote && start === -1) start = i;
+    if (start !== -1 && !isQuote && lines[i].trim() === "") continue;
+    if (start !== -1 && !isQuote) { end = i; break; }
+  }
+  if (start === -1) return { before: content, prompt: null as string | null, after: "" };
+  if (end === -1) end = lines.length;
+  const before = lines.slice(0, start).join("\n").trim();
+  const prompt = lines.slice(start, end).map((l) => l.replace(/^>\s?/, "")).join("\n").trim();
+  const after = lines.slice(end).join("\n").trim();
+  return { before, prompt, after };
+};
+
+const markdownComponents = {
+  p: ({ node, ...props }: any) => (
+    <p className="text-foreground/85 text-[15.5px] leading-[1.7] mb-3 last:mb-0" {...props} />
+  ),
+  strong: ({ node, ...props }: any) => <strong className="font-semibold text-navy" {...props} />,
+  em: ({ node, ...props }: any) => <em className="italic" {...props} />,
+  ul: ({ node, ...props }: any) => (
+    <ul className="list-disc pl-5 my-3 space-y-1.5 text-foreground/85 text-[15.5px] leading-[1.7]" {...props} />
+  ),
+  ol: ({ node, ...props }: any) => (
+    <ol className="list-decimal pl-5 my-3 space-y-1.5 text-foreground/85 text-[15.5px] leading-[1.7]" {...props} />
+  ),
+  li: ({ node, ...props }: any) => <li {...props} />,
+  blockquote: ({ node, ...props }: any) => (
+    <blockquote
+      className="my-3 border-l-[3px] border-navy pl-4 italic text-foreground/85 text-[15.5px] leading-[1.7]"
+      {...props}
+    />
+  ),
+  code: ({ node, ...props }: any) => (
+    <code className="font-mono text-[13.5px] bg-background/60 px-1.5 py-0.5 rounded" {...props} />
+  ),
+  a: ({ node, ...props }: any) => (
+    <a className="text-navy underline underline-offset-2 hover:opacity-80" {...props} />
+  ),
+};
+
+const ChunkBlock = ({ chunk }: { chunk: Chunk }) => {
+  const [copied, setCopied] = useState(false);
+
+  const isFirstPrompt = chunk.chunk_type === "first-prompt";
+  const split = useMemo(
+    () => (isFirstPrompt ? splitFirstPrompt(chunk.content) : null),
+    [isFirstPrompt, chunk.content],
+  );
+
+  const handleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // ignore
+    }
+  };
+
+  return (
+    <div>
+      {chunk.title && (
+        <h5 className="text-[16.5px] font-bold text-navy mb-2">{chunk.title}</h5>
+      )}
+      {isFirstPrompt && split && split.prompt ? (
+        <>
+          {split.before && (
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+              {split.before}
+            </ReactMarkdown>
+          )}
+          <div className="my-3 bg-background/60 border border-navy/15 rounded-[8px] px-5 py-4">
+            <pre className="whitespace-pre-wrap font-mono text-[13.5px] leading-[1.7] text-foreground/90">{split.prompt}</pre>
+          </div>
+          <button
+            onClick={() => handleCopy(split.prompt!)}
+            className="inline-flex items-center justify-center border border-navy text-navy px-3.5 py-1.5 rounded-[8px] text-[13px] font-medium hover:bg-background/60 transition-colors duration-150"
+          >
+            {copied ? "Copied" : "Copy prompt"}
+          </button>
+          {split.after && (
+            <div className="mt-3">
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                {split.after}
+              </ReactMarkdown>
+            </div>
+          )}
+        </>
+      ) : (
+        <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+          {chunk.content}
+        </ReactMarkdown>
+      )}
+    </div>
+  );
+};
+
 // ---------- Result component ----------
 
 const Result = ({
@@ -321,8 +425,10 @@ const Result = ({
   q5: string | null;
   onReset: () => void;
 }) => {
-  const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [chunksByTool, setChunksByTool] = useState<Record<string, Chunk[]>>({});
+  const [showSlowMessage, setShowSlowMessage] = useState(false);
+  const [, setSessionId] = useState<string | null>(null);
 
   const c2 = codeQ2(q2);
   const c3 = codeQ3(q3);
@@ -332,20 +438,78 @@ const Result = ({
   const displayName = isMeaningfulName(name) ? name.trim() : null;
   const title = displayName ? `${displayName}'s AI Stack` : "My AI Stack";
 
-  const picks = recommend(c2, c3, c4);
-  const firstTool = TOOLS[picks[0]];
+  const picks = useMemo(() => recommend(c2, c3, c4), [c2, c3, c4]);
+  const pickSlugs = useMemo(() => picks.map((k) => TOOLS[k].slug), [picks]);
 
-  const prompt = promptFor(c3, q3 ?? "");
+  // Submit session via edge function (fire-and-forget — don't block render).
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("submit-quiz", {
+          body: {
+            name: displayName ?? "Anonymous",
+            q2_audience: c2,
+            q3_use_case: c3,
+            q3_other_text: c3 === "other" ? (q3 ?? "") : "",
+            q4_confidence: c4,
+            q5_learning_style: Q5_EDGE_MAP[c5],
+          },
+        });
+        if (!cancelled && !error && data?.session_id) setSessionId(data.session_id);
+      } catch {
+        // non-fatal
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [displayName, c2, c3, c4, c5, q3]);
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(prompt);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      // ignore
-    }
-  };
+  // Load chunks for each picked tool.
+  useEffect(() => {
+    let cancelled = false;
+    const slowTimer = setTimeout(() => { if (!cancelled) setShowSlowMessage(true); }, 300);
+
+    (async () => {
+      const { data: tools } = await supabase
+        .from("tools")
+        .select("id, slug")
+        .in("slug", pickSlugs);
+
+      if (!tools || cancelled) return;
+      const slugToId = new Map(tools.map((t) => [t.slug, t.id]));
+
+      const result: Record<string, Chunk[]> = {};
+      await Promise.all(
+        pickSlugs.map(async (slug) => {
+          const toolId = slugToId.get(slug);
+          if (!toolId) { result[slug] = []; return; }
+          let q = supabase
+            .from("chunks")
+            .select("id, tool_id, chunk_type, title, content, priority, tags_audience, tags_use_case, tags_confidence")
+            .eq("tool_id", toolId);
+
+          const { data: rows } = await q;
+          const filtered = (rows ?? []).filter((r: any) => {
+            const a: string[] = r.tags_audience ?? [];
+            const u: string[] = r.tags_use_case ?? [];
+            const co: string[] = r.tags_confidence ?? [];
+            const audOk = a.length === 0 || a.includes(c2) || a.includes("all");
+            const useOk = c3 === "other" || u.length === 0 || u.includes(c3) || u.includes("all");
+            const confOk = co.length === 0 || co.includes(c4) || co.includes("all");
+            return audOk && useOk && confOk;
+          });
+          filtered.sort((a: any, b: any) => (b.priority ?? 0) - (a.priority ?? 0));
+          result[slug] = filtered.slice(0, 3) as Chunk[];
+        }),
+      );
+      if (!cancelled) {
+        setChunksByTool(result);
+        setShowSlowMessage(false);
+      }
+    })();
+
+    return () => { cancelled = true; clearTimeout(slowTimer); };
+  }, [pickSlugs.join("|"), c2, c3, c4]);
 
   const handleStartOver = () => {
     onReset();
@@ -361,104 +525,55 @@ const Result = ({
       {/* Title + intro */}
       <h3 className="text-[32px] sm:text-[36px] font-bold text-navy tracking-[-0.02em]">{title}</h3>
       <p className="mt-3 text-navy text-[17px] leading-[1.7]">
-        {introQ2(c2)}, {introQ4(c4)}. Three tools to start with, one prompt to use tonight.
+        {introQ2(c2)}, {introQ4(c4)}. Three tools to start with — and the bits worth reading tonight.
       </p>
 
+      {showSlowMessage && Object.keys(chunksByTool).length === 0 && (
+        <p className="mt-6 text-[14px] text-foreground/60 italic">
+          One moment — finding the right bits for you.
+        </p>
+      )}
+
       {/* Tool cards */}
-      <div className="mt-10 flex flex-col gap-5">
+      <div className="mt-10 flex flex-col gap-7">
         {picks.map((k) => {
           const t = TOOLS[k];
+          const tChunks = chunksByTool[t.slug] ?? [];
           return (
-            <div key={k} className="bg-navy-light rounded-[12px] p-7 sm:p-8">
-              <h4 className="text-[20px] font-bold text-navy">
-                <span className="font-mono text-[15px] text-navy/70 mr-2">{t.num}</span>
+            <div key={k} className="bg-navy-light rounded-[12px] px-8 py-7 sm:px-10 sm:py-8">
+              <h4 className="text-[22px] font-bold text-navy">
+                <span className="font-mono text-[15px] text-navy/70 mr-2.5">{t.num}</span>
                 {t.name}
               </h4>
-              <p className="mt-3 text-foreground/85 text-[16px] leading-[1.65]">{why(k)}</p>
-              <p className="mt-4 text-[14px] font-bold text-navy">Start here:</p>
-              <p className="mt-1 text-foreground/85 text-[15px]">{t.tagline}</p>
+              <p className="mt-3 text-navy text-[16px] leading-[1.65]">{why(k)}</p>
+
+              {tChunks.length > 0 && (
+                <>
+                  <div className="mt-5 mb-5 h-px bg-foreground/15" />
+                  <div className="flex flex-col gap-5">
+                    {tChunks.map((ch) => (
+                      <ChunkBlock key={ch.id} chunk={ch} />
+                    ))}
+                  </div>
+                </>
+              )}
+
               <a
                 href={`/pdfs/${t.slug}.pdf`}
-                className="mt-5 inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150"
+                className="mt-6 inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150"
               >
-                Read the guide →
+                Read the full guide →
               </a>
             </div>
           );
         })}
       </div>
 
-      {/* First task */}
-      <div className="mt-14 bg-navy-light rounded-[12px] p-7 sm:p-8">
-        <h4 className="text-[22px] font-bold text-navy">Your first task tonight</h4>
-
-        {c5 === "prompt" && (
-          <>
-            <p className="mt-3 text-foreground/85 text-[16px] leading-[1.65]">
-              Copy this prompt into {firstTool.name}:
-            </p>
-            <div className="mt-4 bg-background/70 border-l-[3px] border-navy rounded-r-[8px] px-6 py-5">
-              <pre className="whitespace-pre-wrap font-mono text-[14px] leading-[1.7] text-foreground/90">{prompt}</pre>
-            </div>
-            <button
-              onClick={handleCopy}
-              className="mt-4 inline-flex items-center justify-center border border-navy text-navy px-4 py-2 rounded-[8px] text-[13px] font-medium hover:bg-background/60 transition-colors duration-150"
-            >
-              {copied ? "Copied" : "Copy prompt"}
-            </button>
-          </>
-        )}
-
-        {c5 === "video" && (
-          <>
-            <p className="mt-3 text-foreground/85 text-[16px] leading-[1.65]">
-              Watch this 3-minute walkthrough:
-            </p>
-            <a
-              href="/videos/start.mp4"
-              className="mt-4 inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150"
-            >
-              Watch →
-            </a>
-          </>
-        )}
-
-        {c5 === "guide" && (
-          <>
-            <p className="mt-3 text-foreground/85 text-[16px] leading-[1.65]">
-              Read the first three pages of {firstTool.name}'s guide:
-            </p>
-            <a
-              href={`/pdfs/${firstTool.slug}.pdf`}
-              className="mt-4 inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150"
-            >
-              Open the guide →
-            </a>
-          </>
-        )}
-
-        {c5 === "stepbystep" && (
-          <>
-            <p className="mt-3 text-foreground/85 text-[16px] leading-[1.65]">
-              Follow this six-step setup:
-            </p>
-            <ol className="mt-4 list-decimal pl-6 space-y-2 text-foreground/85 text-[15px] leading-[1.7]">
-              <li>Step one — placeholder.</li>
-              <li>Step two — placeholder.</li>
-              <li>Step three — placeholder.</li>
-              <li>Step four — placeholder.</li>
-              <li>Step five — placeholder.</li>
-              <li>Step six — placeholder.</li>
-            </ol>
-          </>
-        )}
-      </div>
-
       {/* Where this leads — ladder */}
       <div className="mt-20">
         <h4 className="text-[24px] font-bold text-navy">Where this leads</h4>
         <p className="mt-3 text-foreground/85 text-[16px] leading-[1.7]">
-          AI fluency isn't a list of tools. It's a skill that builds in stages. Here's the ladder:
+          Using AI well isn't a list of tools. It's a skill that builds in stages. Here's the ladder:
         </p>
         <ol className="mt-7 space-y-5">
           {LADDER.map((s, i) => (
@@ -479,7 +594,7 @@ const Result = ({
       </div>
 
       {/* Footer actions */}
-      <div className="mt-12 text-[14px] text-navy">
+      <div className="mt-14 text-[14px] text-navy">
         <button
           onClick={() => setSaved(true)}
           className="hover:underline transition-colors duration-150"
