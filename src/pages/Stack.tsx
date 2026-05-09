@@ -379,7 +379,7 @@ const ChunkBlock = ({ chunk }: { chunk: Chunk }) => {
   return (
     <div>
       {chunk.title && (
-        <h5 className="text-[16.5px] font-bold text-navy mb-2">{chunk.title}</h5>
+        <h5 className="text-[15px] font-semibold text-navy mb-2">{chunk.title}</h5>
       )}
       {isFirstPrompt && split && split.prompt ? (
         <>
