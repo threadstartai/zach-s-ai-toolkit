@@ -517,6 +517,7 @@ const Result = ({
 }) => {
   const [saved, setSaved] = useState(false);
   const [chunksByTool, setChunksByTool] = useState<Record<string, Chunk[]>>({});
+  const [statusByTool, setStatusByTool] = useState<Record<string, { status: string; update_message: string | null }>>({});
   const [showSlowMessage, setShowSlowMessage] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(initialSessionId ?? null);
   const [linkCopied, setLinkCopied] = useState(false);
