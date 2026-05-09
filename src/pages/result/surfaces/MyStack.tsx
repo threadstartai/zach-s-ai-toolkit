@@ -82,12 +82,12 @@ const MyStack = () => {
               )}
               <div
                 id={`tool-${t.slug}`}
-                className="bg-navy-light rounded-[12px] px-7 py-6 sm:px-8 sm:py-7 scroll-mt-[60px]"
+                className="bg-background border border-[hsl(var(--border))] rounded-[16px] p-6 sm:p-8 scroll-mt-[80px] transition-colors duration-150 hover:border-navy/30"
               >
-                <h4 className="text-[22px] font-bold text-navy">
-                  <span className="font-mono text-[15px] text-navy/70 mr-2.5">{t.num}</span>
-                  {t.name}
-                </h4>
+                <div className="flex items-baseline gap-2.5">
+                  <span className="font-mono text-[13px] text-navy/60">{t.num}</span>
+                  <h4 className="text-[22px] font-bold text-navy">{t.name}</h4>
+                </div>
                 {statusByTool[t.slug]?.status === "update" && statusByTool[t.slug]?.update_message && (
                   <div className="mt-4 bg-navy text-primary-foreground rounded-[8px] px-4 py-3 text-[14px] leading-[1.55]">
                     <span className="font-semibold">Update:</span> {statusByTool[t.slug]?.update_message}
@@ -104,7 +104,7 @@ const MyStack = () => {
                 </p>
 
                 {hasAnyChunks && (
-                  <div className="mt-5 flex flex-col gap-6">
+                  <div className="mt-6 flex flex-col gap-5">
                     {SECTION_LABELS.map((s) => {
                       const items = grouped[s.key];
                       if (!items || items.length === 0) return null;
@@ -114,11 +114,16 @@ const MyStack = () => {
                             <div className="font-mono text-[11px] tracking-[0.08em] text-navy">
                               {s.label}
                             </div>
-                            <div className="mt-1.5 h-px w-12 bg-foreground/20" />
+                            <div className="mt-1.5 h-px w-12 bg-navy/30" />
                           </div>
-                          <div className="flex flex-col gap-4">
+                          <div className="flex flex-col gap-3">
                             {items.map((ch) => (
-                              <ChunkBlock key={ch.id} chunk={ch} />
+                              <div
+                                key={ch.id}
+                                className="bg-offwhite border border-[hsl(var(--border))] rounded-[12px] p-5 sm:p-6 transition-colors duration-150 hover:border-navy/30"
+                              >
+                                <ChunkBlock chunk={ch} />
+                              </div>
                             ))}
                           </div>
                         </div>

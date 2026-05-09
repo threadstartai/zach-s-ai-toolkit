@@ -11,16 +11,19 @@ const items: Item[] = [
   { label: "Work with Zach", disabled: true },
 ];
 
+const baseLink =
+  "block px-4 py-2 text-[14px] border-l-2 transition-colors duration-150 rounded-r-[6px]";
+
 export const ResultSidebar = () => {
   return (
-    <nav aria-label="Result sections" className="text-[15px]">
-      <ul className="flex md:flex-col gap-x-5 gap-y-1 flex-wrap">
+    <nav aria-label="Result sections" className="md:bg-background md:border md:border-[hsl(var(--border))] md:rounded-[12px] md:py-3 md:px-1.5">
+      <ul className="flex md:flex-col gap-x-2 gap-y-0.5 flex-wrap">
         {items.map((item) => (
           <li key={item.label}>
             {item.disabled || !item.to ? (
               <span
                 aria-disabled="true"
-                className="block px-3 py-2 border-l-2 border-transparent text-navy/40 cursor-not-allowed select-none"
+                className={`${baseLink} border-transparent text-navy/30 cursor-not-allowed select-none`}
               >
                 {item.label}
               </span>
@@ -29,10 +32,10 @@ export const ResultSidebar = () => {
                 to={item.to}
                 end
                 className={({ isActive }) =>
-                  `block px-3 py-2 border-l-2 transition-colors duration-150 ${
+                  `${baseLink} ${
                     isActive
-                      ? "border-navy text-navy font-medium"
-                      : "border-transparent text-navy/80 hover:text-navy"
+                      ? "border-navy bg-navy-light text-navy font-medium"
+                      : "border-transparent text-navy/70 hover:text-navy hover:bg-navy-light/40"
                   }`
                 }
               >

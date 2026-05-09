@@ -88,30 +88,38 @@ const Onboarding = () => {
   const qHeading = "text-[22px] font-bold text-navy";
 
   const stepIndex = STEPS.indexOf(step);
-  const progress = Math.max(0, Math.min(1, (stepIndex - 1) / (STEPS.length - 2))) * 100;
+
+  const segmentCount = 4; // q1..q4
+  const segmentIndex = Math.max(0, stepIndex - 1); // 0..3
 
   return (
     <div className="min-h-screen bg-offwhite flex flex-col">
       <DashboardTopBar />
-      <div className="h-[3px] bg-[hsl(var(--border))]/40">
-        <div
-          className="h-full bg-navy transition-[width] duration-300 ease-out"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-      <main className="flex-1 px-6 py-12">
-        <div className="mx-auto max-w-[640px]">
-          <header>
-            <p className="text-[13px] uppercase tracking-wider text-navy/65 font-medium">Onboarding</p>
-            <h1 className="mt-2 text-[28px] font-bold text-navy tracking-tight">
+      <main className="flex-1 px-5 py-10 sm:py-14">
+        <div className="mx-auto max-w-[560px]">
+          {/* Segmented progress */}
+          <div className="flex gap-1.5">
+            {Array.from({ length: segmentCount }).map((_, i) => (
+              <div
+                key={i}
+                className={`h-[3px] flex-1 rounded-full transition-colors duration-200 ${
+                  i <= segmentIndex ? "bg-navy" : "bg-[hsl(var(--border))]"
+                }`}
+              />
+            ))}
+          </div>
+
+          <header className="mt-6">
+            <p className="text-[12px] uppercase tracking-wider text-navy/60 font-medium">Onboarding</p>
+            <h1 className="mt-2 text-[24px] font-bold text-navy tracking-tight">
               Let me build your first Stack.
             </h1>
-            <p className="mt-2 text-navy/80 text-[16px] leading-[1.6]">
+            <p className="mt-2 text-navy/75 text-[15px] leading-[1.6]">
               Four quick questions. Under two minutes.
             </p>
           </header>
 
-          <section className="mt-10 bg-background border border-[hsl(var(--border))] rounded-[12px] p-7">
+          <section className="mt-7 bg-background border border-[hsl(var(--border))] rounded-[16px] p-8 sm:p-10 shadow-[0_2px_8px_rgba(26,58,92,0.06)]">
             {step === "q1" && (
               <div>
                 <h2 className={qHeading}>What should I call you?</h2>
