@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
       q3_use_case: q3,
       q3_other_text: q3 === "other" ? q3Other : null,
       q4_confidence: q4,
-      q5_learning_style: q5,
+      q5_learning_style: q5 ?? null,
     })
     .select("id")
     .single();
