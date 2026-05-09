@@ -100,7 +100,7 @@ const Category = ({ data }: { data: CategoryData }) => (
   </section>
 );
 
-type QuizStep = "intro" | "q1" | "q2" | "q3" | "q4" | "q5" | "done";
+type QuizStep = "intro" | "q1" | "q2" | "q3" | "q4" | "done";
 
 // ---------- Result engine ----------
 
@@ -548,7 +548,7 @@ const Result = ({
             q3_use_case: c3,
             q3_other_text: c3 === "other" ? (q3 ?? "") : "",
             q4_confidence: c4,
-            q5_learning_style: Q5_EDGE_MAP[c5],
+            q5_learning_style: null,
           },
         });
         if (!cancelled && !error && data?.session_id) {
@@ -1037,12 +1037,7 @@ const Stack = () => {
     advance("q4");
   };
   const selectQ4 = (v: string) => {
-    if (q4 !== v) setQ5(null);
     setQ4(v);
-    advance("q5");
-  };
-  const selectQ5 = (v: string) => {
-    setQ5(v);
     advance("done");
   };
 
@@ -1229,25 +1224,8 @@ const Stack = () => {
                   </div>
                 )}
 
-                {step === "q5" && (
-                  <div>
-                    <h3 className={qHeading}>How do you prefer to learn something new?</h3>
-                    <p className={microcopy}>This changes the format of your first task.</p>
-                    <div className="mt-5 flex flex-col items-start gap-2.5">
-                      {Q5_OPTIONS.map((o) => (
-                        <button key={o} onClick={() => selectQ5(o)} className={pill(q5 === o)}>
-                          {o}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="mt-6">
-                      <button onClick={() => setStep("q4")} className={backLink}>← back</button>
-                    </div>
-                  </div>
-                )}
-
                 {step === "done" && (
-                  <Result name={name} q2={q2} q3={q3} q4={q4} q5={q5} onReset={reset} />
+                  <Result name={name} q2={q2} q3={q3} q4={q4} q5={null} onReset={reset} />
                 )}
               </div>
             </>
