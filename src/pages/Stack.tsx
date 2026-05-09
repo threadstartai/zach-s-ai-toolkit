@@ -817,26 +817,6 @@ const Result = ({
                   <p className="text-[13px] italic text-navy/60">Thanks — noted.</p>
                 )}
               </div>
-                    const items = grouped[s.key];
-                    if (!items || items.length === 0) return null;
-                    return (
-                      <div key={s.key}>
-                        <div className="mt-1 mb-3">
-                          <div className="font-mono text-[11px] tracking-[0.08em] text-navy">
-                            {s.label}
-                          </div>
-                          <div className="mt-1.5 h-px w-12 bg-foreground/20" />
-                        </div>
-                        <div className="flex flex-col gap-4">
-                          {items.map((ch) => (
-                            <ChunkBlock key={ch.id} chunk={ch} />
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
             </div>
             </Fragment>
           );
