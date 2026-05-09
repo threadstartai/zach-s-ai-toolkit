@@ -691,14 +691,19 @@ const Result = ({
 
       {/* Tool cards */}
       <div className="mt-10 flex flex-col gap-7">
-        {picks.map((k) => {
+        {picks.map((k, i) => {
           const t = TOOLS[k];
           const tChunks = chunksByTool[t.slug] ?? [];
           const grouped = groupChunks(tChunks);
           const hasAnyChunks = tChunks.length > 0;
           return (
+            <Fragment key={k}>
+              {i === 0 && (
+                <p className="mb-3 mt-2 italic text-[14px] text-navy/75 font-medium">
+                  Start here tonight ↓
+                </p>
+              )}
             <div
-              key={k}
               id={`tool-${t.slug}`}
               className="bg-navy-light rounded-[12px] px-7 py-6 sm:px-8 sm:py-7 scroll-mt-[60px]"
             >
