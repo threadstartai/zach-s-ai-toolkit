@@ -48,11 +48,11 @@ const Signup = () => {
     <AuthCard
       title="Create your account"
       subtitle="Free. Yours to keep updated."
-      footer={<>Already have an account? <Link to="/login" className="text-navy underline underline-offset-2 hover:opacity-80">Log in</Link></>}
+      footer={<>Already have an account? <Link to="/login" className="text-navy hover:underline">Log in</Link></>}
     >
       <SocialButtons />
       <Divider />
-      <form onSubmit={onSubmit} className="flex flex-col gap-3">
+      <form onSubmit={onSubmit} className="flex flex-col space-y-4">
         <div>
           <label htmlFor="email" className={labelCls}>Email</label>
           <input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} />
@@ -62,7 +62,7 @@ const Signup = () => {
           <input id="password" type="password" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className={inputCls} />
           <p className="mt-1.5 text-[12px] text-foreground/60">At least 8 characters.</p>
         </div>
-        {error && <p className="text-[13px] text-destructive">{error}</p>}
+        {error && <p className={errorCls}>{error}</p>}
         {info && <p className="text-[13px] text-navy/85">{info}</p>}
         <button type="submit" disabled={submitting} className={primaryBtn}>
           {submitting ? "Creating account…" : "Sign up"}
