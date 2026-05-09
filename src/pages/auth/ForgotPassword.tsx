@@ -36,19 +36,19 @@ const ForgotPassword = () => {
     <AuthCard
       title="Reset your password"
       subtitle="I'll email you a link to set a new one."
-      footer={<><Link to="/login" className="text-navy underline underline-offset-2 hover:opacity-80">Back to log in</Link></>}
+      footer={<><Link to="/login" className="text-navy hover:underline">Back to log in</Link></>}
     >
       {done ? (
         <p className="text-[14px] text-navy/85 leading-[1.6]">
           If an account exists for <span className="font-medium">{email}</span>, you'll get a reset link in the next minute or two. Check your spam folder if it doesn't arrive.
         </p>
       ) : (
-        <form onSubmit={onSubmit} className="flex flex-col gap-3">
+        <form onSubmit={onSubmit} className="flex flex-col space-y-4">
           <div>
             <label htmlFor="email" className={labelCls}>Email</label>
             <input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} />
           </div>
-          {error && <p className="text-[13px] text-destructive">{error}</p>}
+          {error && <p className={errorCls}>{error}</p>}
           <button type="submit" disabled={submitting} className={primaryBtn}>
             {submitting ? "Sending…" : "Send reset link"}
           </button>
