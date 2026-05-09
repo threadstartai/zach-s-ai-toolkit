@@ -55,7 +55,9 @@ Deno.serve(async (req) => {
   if (!isValidAudience(q2)) return json({ error: "Invalid audience" }, 400);
   if (!isValidUseCase(q3)) return json({ error: "Invalid use case" }, 400);
   if (!isValidConfidence(q4)) return json({ error: "Invalid confidence" }, 400);
-  if (!isValidLearningStyle(q5)) return json({ error: "Invalid learning style" }, 400);
+  if (q5 !== null && q5 !== undefined && !isValidLearningStyle(q5)) {
+    return json({ error: "Invalid learning style" }, 400);
+  }
 
   const { data, error } = await supabase
     .from("sessions")
@@ -65,7 +67,7 @@ Deno.serve(async (req) => {
       q3_use_case: q3,
       q3_other_text: q3 === "other" ? q3Other : null,
       q4_confidence: q4,
-      q5_learning_style: q5,
+      q5_learning_style: q5 ?? null,
     })
     .select("id")
     .single();
