@@ -309,6 +309,205 @@ const LADDER = [
   { name: "Automate the boring bits.", desc: "Once you've got patterns that work, get them running on autopilot." },
 ];
 
+// ---------- Result component ----------
+
+const Result = ({
+  name, q2, q3, q4, q5, onReset,
+}: {
+  name: string;
+  q2: string | null;
+  q3: string | null;
+  q4: string | null;
+  q5: string | null;
+  onReset: () => void;
+}) => {
+  const [copied, setCopied] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const c2 = codeQ2(q2);
+  const c3 = codeQ3(q3);
+  const c4 = codeQ4(q4);
+  const c5 = codeQ5(q5);
+
+  const displayName = isMeaningfulName(name) ? name.trim() : null;
+  const title = displayName ? `${displayName}'s AI Stack` : "My AI Stack";
+
+  const picks = recommend(c2, c3, c4);
+  const firstTool = TOOLS[picks[0]];
+
+  const prompt = promptFor(c3, q3 ?? "");
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(prompt);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleStartOver = () => {
+    onReset();
+    setTimeout(() => {
+      document.getElementById("build-my-stack")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+  };
+
+  const why = (k: ToolKey) => k === "04" ? whyForChatGPT(c4) : whyFor(k, c2);
+
+  return (
+    <div>
+      {/* Title + intro */}
+      <h3 className="text-[32px] sm:text-[36px] font-bold text-navy tracking-[-0.02em]">{title}</h3>
+      <p className="mt-3 text-navy text-[17px] leading-[1.7]">
+        {introQ2(c2)}, {introQ4(c4)}. Three tools to start with, one prompt to use tonight.
+      </p>
+
+      {/* Tool cards */}
+      <div className="mt-10 flex flex-col gap-5">
+        {picks.map((k) => {
+          const t = TOOLS[k];
+          return (
+            <div key={k} className="bg-navy-light rounded-[12px] p-7 sm:p-8">
+              <h4 className="text-[20px] font-bold text-navy">
+                <span className="font-mono text-[15px] text-navy/70 mr-2">{t.num}</span>
+                {t.name}
+              </h4>
+              <p className="mt-3 text-foreground/85 text-[16px] leading-[1.65]">{why(k)}</p>
+              <p className="mt-4 text-[14px] font-bold text-navy">Start here:</p>
+              <p className="mt-1 text-foreground/85 text-[15px]">{t.tagline}</p>
+              <a
+                href={`/pdfs/${t.slug}.pdf`}
+                className="mt-5 inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150"
+              >
+                Read the guide →
+              </a>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* First task */}
+      <div className="mt-14 bg-navy-light rounded-[12px] p-7 sm:p-8">
+        <h4 className="text-[22px] font-bold text-navy">Your first task tonight</h4>
+
+        {c5 === "prompt" && (
+          <>
+            <p className="mt-3 text-foreground/85 text-[16px] leading-[1.65]">
+              Copy this prompt into {firstTool.name}:
+            </p>
+            <div className="mt-4 bg-background/70 border-l-[3px] border-navy rounded-r-[8px] px-6 py-5">
+              <pre className="whitespace-pre-wrap font-mono text-[14px] leading-[1.7] text-foreground/90">{prompt}</pre>
+            </div>
+            <button
+              onClick={handleCopy}
+              className="mt-4 inline-flex items-center justify-center border border-navy text-navy px-4 py-2 rounded-[8px] text-[13px] font-medium hover:bg-background/60 transition-colors duration-150"
+            >
+              {copied ? "Copied" : "Copy prompt"}
+            </button>
+          </>
+        )}
+
+        {c5 === "video" && (
+          <>
+            <p className="mt-3 text-foreground/85 text-[16px] leading-[1.65]">
+              Watch this 3-minute walkthrough:
+            </p>
+            <a
+              href="/videos/start.mp4"
+              className="mt-4 inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150"
+            >
+              Watch →
+            </a>
+          </>
+        )}
+
+        {c5 === "guide" && (
+          <>
+            <p className="mt-3 text-foreground/85 text-[16px] leading-[1.65]">
+              Read the first three pages of {firstTool.name}'s guide:
+            </p>
+            <a
+              href={`/pdfs/${firstTool.slug}.pdf`}
+              className="mt-4 inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150"
+            >
+              Open the guide →
+            </a>
+          </>
+        )}
+
+        {c5 === "stepbystep" && (
+          <>
+            <p className="mt-3 text-foreground/85 text-[16px] leading-[1.65]">
+              Follow this six-step setup:
+            </p>
+            <ol className="mt-4 list-decimal pl-6 space-y-2 text-foreground/85 text-[15px] leading-[1.7]">
+              <li>Step one — placeholder.</li>
+              <li>Step two — placeholder.</li>
+              <li>Step three — placeholder.</li>
+              <li>Step four — placeholder.</li>
+              <li>Step five — placeholder.</li>
+              <li>Step six — placeholder.</li>
+            </ol>
+          </>
+        )}
+      </div>
+
+      {/* Where this leads — ladder */}
+      <div className="mt-20">
+        <h4 className="text-[24px] font-bold text-navy">Where this leads</h4>
+        <p className="mt-3 text-foreground/85 text-[16px] leading-[1.7]">
+          AI fluency isn't a list of tools. It's a skill that builds in stages. Here's the ladder:
+        </p>
+        <ol className="mt-7 space-y-5">
+          {LADDER.map((s, i) => (
+            <li key={i} className="flex gap-4">
+              <span className="shrink-0 w-8 h-8 rounded-full bg-navy text-primary-foreground flex items-center justify-center text-[14px] font-semibold">
+                {i + 1}
+              </span>
+              <div>
+                <p className="font-bold text-navy text-[16px]">{s.name}</p>
+                <p className="mt-1 text-foreground/85 text-[15px] leading-[1.65]">{s.desc}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-7 italic text-navy text-[15px]">
+          You're starting at Stage 1. That's where everyone starts.
+        </p>
+      </div>
+
+      {/* Footer actions */}
+      <div className="mt-12 text-[14px] text-navy">
+        <button
+          onClick={() => setSaved(true)}
+          className="hover:underline transition-colors duration-150"
+        >
+          Save my Stack
+        </button>
+        <span className="text-foreground/40 mx-2">·</span>
+        <button
+          onClick={handleStartOver}
+          className="hover:underline transition-colors duration-150"
+        >
+          Start over
+        </button>
+        <span className="text-foreground/40 mx-2">·</span>
+        <a href="#tools" className="hover:underline transition-colors duration-150">
+          Browse all 17 tools ↓
+        </a>
+        {saved && (
+          <p className="mt-3 italic text-foreground/75 text-[13px]">
+            Email save coming next — for now, take a screenshot.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+
 
 const Q2_OPTIONS = ["Student", "Personal life / family", "Business / work", "Just exploring"];
 const Q3_OPTIONS = [
