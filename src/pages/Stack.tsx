@@ -743,7 +743,49 @@ const Q5_OPTIONS = [
   "Walk me through it step by step",
 ];
 
+// Reverse mappings: DB-stored codes back to the raw question strings used by Result.
+const Q2_FROM_CODE: Record<string, string> = {
+  student: "Student",
+  personal: "Personal life / family",
+  business: "Business / work",
+  exploring: "Just exploring",
+};
+const Q3_FROM_CODE: Record<string, string> = {
+  writing: "Writing something properly",
+  research: "Researching a topic",
+  building: "Building a website or tool",
+  notes: "Note-taking and meetings",
+  images: "Generating images or video",
+  admin: "Sorting admin or emails",
+};
+const Q4_FROM_CODE: Record<string, string> = {
+  never: "Never used it",
+  tried: "Tried it a bit",
+  weekly: "Use it weekly",
+  confident: "Pretty confident",
+};
+const Q5_FROM_CODE: Record<string, string> = {
+  prompt: "Just give me the prompt to copy",
+  video: "Show me a video",
+  guide: "I'll read a guide",
+  "step-by-step": "Walk me through it step by step",
+};
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+type LoadedSession = {
+  name: string | null;
+  q2_audience: string | null;
+  q3_use_case: string | null;
+  q3_other_text: string | null;
+  q4_confidence: string | null;
+  q5_learning_style: string | null;
+};
+
 const Stack = () => {
+  const { sessionId: routeSessionId } = useParams<{ sessionId?: string }>();
+  const sharedMode = !!routeSessionId;
+
   const [step, setStep] = useState<QuizStep>("intro");
   const [name, setName] = useState("");
   const [q2, setQ2] = useState<string | null>(null);
@@ -752,6 +794,39 @@ const Stack = () => {
   const [q3OtherSelected, setQ3OtherSelected] = useState(false);
   const [q4, setQ4] = useState<string | null>(null);
   const [q5, setQ5] = useState<string | null>(null);
+
+  // Shared-load state
+  const [sharedLoading, setSharedLoading] = useState<boolean>(sharedMode);
+  const [sharedError, setSharedError] = useState<boolean>(false);
+  const [sharedSession, setSharedSession] = useState<LoadedSession | null>(null);
+
+  useEffect(() => {
+    if (!sharedMode) return;
+    if (!routeSessionId || !UUID_RE.test(routeSessionId)) {
+      setSharedError(true);
+      setSharedLoading(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("get-session", {
+          body: { session_id: routeSessionId },
+        });
+        if (cancelled) return;
+        if (error || !data?.session) {
+          setSharedError(true);
+        } else {
+          setSharedSession(data.session as LoadedSession);
+        }
+      } catch {
+        if (!cancelled) setSharedError(true);
+      } finally {
+        if (!cancelled) setSharedLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [sharedMode, routeSessionId]);
 
   const reset = () => {
     setStep("intro");
@@ -763,6 +838,7 @@ const Stack = () => {
     setQ4(null);
     setQ5(null);
   };
+
 
   const advance = (next: QuizStep) => {
     setTimeout(() => setStep(next), 150);
