@@ -120,7 +120,7 @@ const MyStack = () => {
                             {items.map((ch) => (
                               <div
                                 key={ch.id}
-                                className="bg-offwhite border border-[hsl(var(--border))] rounded-[12px] p-5 sm:p-6 transition-colors duration-150 hover:border-navy/30"
+                                className="bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6 transition-colors duration-150 hover:border-navy/40"
                               >
                                 <ChunkBlock chunk={ch} />
                               </div>
