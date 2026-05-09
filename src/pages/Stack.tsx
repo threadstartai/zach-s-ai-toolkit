@@ -616,7 +616,7 @@ const Stack = () => {
         </header>
 
         {/* Build My Stack quiz */}
-        <section className="mt-24 mb-24">
+        <section id="build-my-stack" className="mt-24 mb-24 scroll-mt-20">
           <h2 className="text-[28px] font-bold text-navy">Build My Stack</h2>
           <p className="mt-3 text-navy/85 text-[17px] leading-[1.7]">
             I'll build your first AI Stack in under two minutes. No jargon. No spam. Just the tools I'd start with if you were sat across from me.
@@ -757,7 +757,7 @@ const Stack = () => {
 
 
         {/* The full Stack */}
-        <section className="mt-16">
+        <section id="tools" className="mt-16 scroll-mt-20">
           <h2 className="text-[28px] font-bold text-navy">The full Stack</h2>
           <p className="mt-3 text-foreground/85">
             All 17 tools, organised by where they fit in real life.
