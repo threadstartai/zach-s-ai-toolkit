@@ -13,7 +13,7 @@ const Index = () => {
         {/* Hero */}
         <section className="pt-24 pb-28 md:pt-32 md:pb-32">
           <h1 className="text-5xl md:text-6xl font-extrabold text-navy tracking-[-0.02em]">
-            Zach's AI Stack.
+            My AI Stack.
           </h1>
           <p className="mt-6 text-xl md:text-2xl font-normal text-navy leading-snug max-w-[600px]">
             A guide to every AI tool worth using, written for the people I care about.
