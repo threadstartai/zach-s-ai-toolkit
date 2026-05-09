@@ -620,6 +620,12 @@ const Result = ({
       );
       if (!cancelled) {
         setChunksByTool(result);
+        const statusResult: Record<string, { status: string; update_message: string | null }> = {};
+        for (const slug of pickSlugs) {
+          const s = slugToStatus.get(slug);
+          if (s) statusResult[slug] = s;
+        }
+        setStatusByTool(statusResult);
         setShowSlowMessage(false);
       }
     })();
