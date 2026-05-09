@@ -12,7 +12,7 @@ import { SECTION_LABELS } from "./shared/chunks";
 import type { Chunk, LoadedSession, ToolStatus } from "./shared/types";
 import type { ResultContext } from "./shared/useResultContext";
 
-const ResultLayout = () => {
+const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" } = {}) => {
   const { sessionId: routeSessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
 
