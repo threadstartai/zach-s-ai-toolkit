@@ -43,17 +43,21 @@ const SocialButtons = () => {
   };
 
   const btn =
-    "w-full inline-flex items-center justify-center gap-3 border border-[hsl(var(--border))] rounded-[8px] px-4 py-2.5 text-[14px] font-medium text-navy hover:bg-navy-light transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed";
+    "w-full inline-flex items-center justify-center gap-3 border border-[hsl(var(--border))] bg-background rounded-[10px] px-4 py-3.5 text-[15px] font-medium text-navy hover:border-navy hover:bg-navy-light/30 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed";
 
   return (
     <div className="flex flex-col gap-2.5">
       <button onClick={() => handle("google")} disabled={loading !== null} className={btn}>
         <GoogleIcon />
-        {loading === "google" ? "Opening Google…" : "Continue with Google"}
+        <span className={loading === "google" ? "opacity-70" : ""}>
+          {loading === "google" ? "Opening Google…" : "Continue with Google"}
+        </span>
       </button>
       <button onClick={() => handle("apple")} disabled={loading !== null} className={btn}>
         <AppleIcon />
-        {loading === "apple" ? "Opening Apple…" : "Continue with Apple"}
+        <span className={loading === "apple" ? "opacity-70" : ""}>
+          {loading === "apple" ? "Opening Apple…" : "Continue with Apple"}
+        </span>
       </button>
       {error && <p className="text-[13px] text-destructive">{error}</p>}
     </div>
