@@ -20,13 +20,13 @@ const SiteFooter = () => {
         </div>
         <nav aria-label="Footer">
           <ul className="flex flex-col gap-2 text-[13px]">
-            <li><Link to="/" className="hover:text-navy transition-colors">Home</Link></li>
-            <li><Link to="/stack" className="hover:text-navy transition-colors">The Stack</Link></li>
-            <li><Link to="/work-with-me" className="hover:text-navy transition-colors">Work with me</Link></li>
+            <li><Link to="/" className="hover:text-navy transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm">Home</Link></li>
+            <li><Link to="/stack" className="hover:text-navy transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm">The Stack</Link></li>
+            <li><Link to="/work-with-me" className="hover:text-navy transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm">Work with me</Link></li>
             {user ? (
-              <li><Link to="/dashboard" className="hover:text-navy transition-colors">Dashboard</Link></li>
+              <li><Link to="/dashboard" className="hover:text-navy transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm">Dashboard</Link></li>
             ) : (
-              <li><Link to="/login" className="hover:text-navy transition-colors">Log in</Link></li>
+              <li><Link to="/login" className="hover:text-navy transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm">Log in</Link></li>
             )}
           </ul>
         </nav>
