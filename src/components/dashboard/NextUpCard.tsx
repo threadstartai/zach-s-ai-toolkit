@@ -50,7 +50,16 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
   const [toolName, setToolName] = useState<string | null>(null);
   const [fallback, setFallback] = useState<FallbackFocus | null>(null);
   const [saved, setSaved] = useState(false);
+  const [busy, setBusy] = useState(false);
 
+  const current = plan && steps.length > 0
+    ? (steps.find((s) => s.id === plan.current_step_id) ||
+       steps.find((s) => s.status === "available") ||
+       steps.find((s) => s.status === "in_progress") ||
+       steps[0])
+    : null;
+
+  // Initial fetch: plan + steps (or fallback)
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -60,13 +69,13 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
       setChunk(null);
       setToolName(null);
       setFallback(null);
+      setSaved(false);
 
       const { data: planRow } = await supabase
         .from("learning_plans")
         .select("id, title, current_step_id, lane, plan_version")
         .eq("session_id", sessionId)
         .maybeSingle();
-
       if (cancelled) return;
 
       if (planRow) {
@@ -76,45 +85,8 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
           .eq("plan_id", planRow.id)
           .order("position", { ascending: true });
         if (cancelled) return;
-
-        const all = (stepRows ?? []) as Step[];
-        const current =
-          all.find((s) => s.id === planRow.current_step_id) ||
-          all.find((s) => s.status === "available") ||
-          all.find((s) => s.status === "in_progress") ||
-          all[0] ||
-          null;
-
         setPlan(planRow as Plan);
-        setSteps(all);
-
-        if (current?.primary_chunk_id) {
-          const { data: c } = await supabase
-            .from("chunks")
-            .select("id, content, title")
-            .eq("id", current.primary_chunk_id)
-            .maybeSingle();
-          if (!cancelled && c) setChunk(c as ChunkRow);
-        }
-        if (current?.tool_slug) {
-          const { data: t } = await supabase
-            .from("tools")
-            .select("name, slug")
-            .eq("slug", current.tool_slug)
-            .maybeSingle();
-          if (!cancelled && t) setToolName(t.name);
-        }
-
-        if (user && current?.primary_chunk_id) {
-          const { data: existing } = await supabase
-            .from("saved_chunks")
-            .select("id")
-            .eq("user_id", user.id)
-            .eq("chunk_id", current.primary_chunk_id)
-            .maybeSingle();
-          if (!cancelled) setSaved(!!existing);
-        }
-
+        setSteps((stepRows ?? []) as Step[]);
         setLoading(false);
         return;
       }
@@ -128,19 +100,13 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
       if (cancelled) return;
 
       const slugs = (session?.ai_picked_tools ?? []).filter(Boolean);
-      if (slugs.length === 0) {
-        setLoading(false);
-        return;
-      }
+      if (slugs.length === 0) { setLoading(false); return; }
 
       const { data: tools } = await supabase
         .from("tools")
         .select("id, name, slug")
         .in("slug", slugs);
-      if (cancelled || !tools || tools.length === 0) {
-        setLoading(false);
-        return;
-      }
+      if (cancelled || !tools || tools.length === 0) { setLoading(false); return; }
 
       const toolIds = tools.map((t: any) => t.id);
       const { data: chunks } = await supabase
@@ -153,10 +119,7 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
       if (cancelled) return;
 
       const top = chunks?.[0];
-      if (!top) {
-        setLoading(false);
-        return;
-      }
+      if (!top) { setLoading(false); return; }
       const tool = tools.find((t: any) => t.id === top.tool_id);
       const split = splitFirstPrompt(top.content ?? "");
       setFallback({
@@ -171,7 +134,44 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
       setLoading(false);
     })();
     return () => { cancelled = true; };
-  }, [sessionId, user?.id]);
+  }, [sessionId]);
+
+  // Re-fetch chunk + tool + saved state whenever current step changes
+  useEffect(() => {
+    if (!current) return;
+    let cancelled = false;
+    setChunk(null);
+    setToolName(null);
+    setSaved(false);
+    (async () => {
+      if (current.primary_chunk_id) {
+        const { data: c } = await supabase
+          .from("chunks")
+          .select("id, content, title")
+          .eq("id", current.primary_chunk_id)
+          .maybeSingle();
+        if (!cancelled && c) setChunk(c as ChunkRow);
+      }
+      if (current.tool_slug) {
+        const { data: t } = await supabase
+          .from("tools")
+          .select("name, slug")
+          .eq("slug", current.tool_slug)
+          .maybeSingle();
+        if (!cancelled && t) setToolName(t.name);
+      }
+      if (user && current.primary_chunk_id) {
+        const { data: existing } = await supabase
+          .from("saved_chunks")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("chunk_id", current.primary_chunk_id)
+          .maybeSingle();
+        if (!cancelled) setSaved(!!existing);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [current?.id, user?.id]);
 
   const cardCls =
     "bg-card border border-[hsl(var(--border))] rounded-[12px] p-6 md:p-8";
@@ -187,6 +187,44 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
       toast.error("Couldn't save — try again");
     } else {
       toast.success("Saved");
+    }
+  };
+
+  const complete = async (action: "done" | "skipped") => {
+    if (busy || !current) return;
+    setBusy(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("complete-step", {
+        body: { step_id: current.id, action },
+      });
+      if (error || !data) {
+        toast.error("Couldn't update — try again");
+        setBusy(false);
+        return;
+      }
+      const completedId = current.id;
+      const completedPosition = current.position;
+      setSteps((prev) =>
+        prev.map((s) => {
+          if (s.id === completedId) {
+            return { ...s, status: action === "done" ? "done" : "skipped" };
+          }
+          if (data.next_step_id && s.id === data.next_step_id && s.status === "locked") {
+            return { ...s, status: "available" };
+          }
+          return s;
+        }),
+      );
+      setPlan((prev) => (prev ? { ...prev, current_step_id: data.next_step_id } : prev));
+      toast.success(
+        action === "done"
+          ? `Step ${completedPosition} done`
+          : `Step ${completedPosition} skipped`,
+      );
+      setBusy(false);
+    } catch {
+      toast.error("Couldn't update — try again");
+      setBusy(false);
     }
   };
 
