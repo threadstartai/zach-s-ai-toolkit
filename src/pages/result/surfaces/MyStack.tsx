@@ -269,6 +269,9 @@ const MyStack = () => {
                                   </CollapsibleTrigger>
                                   <CollapsibleContent className="pt-3 data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
                                     <ChunkBlock chunk={ch} showTitle={false} />
+                                    <div className="mt-3 flex justify-end">
+                                      <ChunkFeedbackButton chunkId={ch.id} />
+                                    </div>
                                   </CollapsibleContent>
                                 </Collapsible>
                               </div>
