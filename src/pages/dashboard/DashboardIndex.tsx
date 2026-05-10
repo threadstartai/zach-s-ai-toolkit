@@ -87,8 +87,6 @@ const DashboardIndex = () => {
 
   const [sections, setSections] = useState<SectionsState>(DEFAULT_SECTIONS);
 
-  const [focus, setFocus] = useState<FocusChunk | null>(null);
-  const [focusLoading, setFocusLoading] = useState(true);
 
   const [noteContent, setNoteContent] = useState("");
   const [noteSummary, setNoteSummary] = useState<string | null>(null);
