@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { TOOLS } from "../shared/tools";
 import { ChunkBlock } from "../shared/ChunkBlock";
 import { SaveChunkButton } from "../shared/SaveChunkButton";
+import { ChunkFeedbackButton } from "../shared/ChunkFeedbackButton";
 import type { Chunk, ToolKey } from "../shared/types";
 
 const PREFERRED_TYPES = ["first-prompt", "setup", "workflow-example"];
@@ -52,6 +53,9 @@ const Tonight = () => {
               )}
               <div className="mt-4">
                 <ChunkBlock chunk={best.chunk} />
+              </div>
+              <div className="mt-6 flex justify-end">
+                <ChunkFeedbackButton chunkId={best.chunk.id} />
               </div>
             </div>
           </div>

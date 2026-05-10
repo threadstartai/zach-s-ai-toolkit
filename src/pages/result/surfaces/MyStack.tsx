@@ -13,6 +13,7 @@ import { fullGuideUrl } from "@/lib/pdfs";
 import { ToolDetailDrawer } from "../ToolDetailDrawer";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
+import { ChunkFeedbackButton } from "../shared/ChunkFeedbackButton";
 
 const MyStack = () => {
   const {
@@ -268,6 +269,9 @@ const MyStack = () => {
                                   </CollapsibleTrigger>
                                   <CollapsibleContent className="pt-3 data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
                                     <ChunkBlock chunk={ch} showTitle={false} />
+                                    <div className="mt-3 flex justify-end">
+                                      <ChunkFeedbackButton chunkId={ch.id} />
+                                    </div>
                                   </CollapsibleContent>
                                 </Collapsible>
                               </div>
