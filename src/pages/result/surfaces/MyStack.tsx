@@ -329,6 +329,7 @@ const MyStack = () => {
           </p>
         )}
       </div>
+      <AskDrawer open={askOpen} onOpenChange={setAskOpen} sessionId={sessionId} />
     </div>
   );
 };
