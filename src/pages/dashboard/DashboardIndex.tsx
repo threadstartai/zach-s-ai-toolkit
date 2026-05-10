@@ -476,14 +476,6 @@ const DashboardIndex = () => {
         </SectionShell>
       </section>
 
-      {/* Quick links */}
-      <footer className={`mt-10 ${divider} pt-6 flex flex-wrap items-center gap-x-2 gap-y-2 text-[14px] text-foreground/70`}>
-        <Link to={`/dashboard/stacks/${recentId}/foundations`} className="text-navy hover:underline">Foundations</Link>
-        <span className="text-foreground/30">·</span>
-        <Link to="/dashboard/settings" className="text-navy hover:underline">Settings</Link>
-        <span className="text-foreground/30">·</span>
-        <Link to={`/dashboard/stacks/${recentId}/work-with-zach`} className="text-navy hover:underline">Work with Zach</Link>
-      </footer>
     </div>
   );
 };
