@@ -15,7 +15,7 @@ const CATEGORIES = [
 ];
 
 const processCardCls =
-  "bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6 hover:border-navy/40 transition-colors duration-150";
+  "bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6 hover:border-navy/40 transition-colors duration-200 ease-out";
 
 const PROCESS = [
   {
