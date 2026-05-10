@@ -1,15 +1,24 @@
 import { CATEGORIES, type CategoryData, type CategoryTool } from "../shared/categories";
+import { fullGuideUrl } from "@/lib/pdfs";
 
 const ToolCard = ({ tool }: { tool: CategoryTool }) => (
-  <a
-    href={`#tool-${tool.slug}`}
-    onClick={(e) => e.preventDefault()}
+  <div
     className="block bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 hover:border-navy/40 transition-colors duration-150"
   >
     {tool.num && <div className="font-mono text-xs text-navy/60">{tool.num}</div>}
     <h4 className="text-lg font-bold text-navy mt-1">{tool.name}</h4>
     <p className="mt-2 text-sm text-foreground/80 leading-[1.6]">{tool.tagline}</p>
-  </a>
+    {fullGuideUrl(tool.slug) && (
+      <a
+        href={fullGuideUrl(tool.slug)!}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-3 inline-block text-[12.5px] italic text-navy/65 hover:text-navy underline underline-offset-2"
+      >
+        Download PDF ↓
+      </a>
+    )}
+  </div>
 );
 
 const CategorySection = ({ data }: { data: CategoryData }) => (
