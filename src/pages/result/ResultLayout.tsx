@@ -317,13 +317,10 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
 
   if (isDashboard) {
     return (
-      <div className="flex flex-col md:flex-row">
-        <ResultSidebar />
-        <main className="flex-1 min-w-0 bg-background min-h-[calc(100vh-3.5rem)]">
-          <div className="max-w-[820px] mx-auto px-5 sm:px-8 md:px-12 py-10 md:py-12">
-            {body}
-          </div>
-        </main>
+      <>
+        <div className="max-w-[820px] mx-auto px-5 sm:px-8 md:px-12 py-10 md:py-12">
+          {body}
+        </div>
         {user && (
           <>
             <button
@@ -340,7 +337,7 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
             />
           </>
         )}
-      </div>
+      </>
     );
   }
 
@@ -350,7 +347,12 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
         <div className="flex flex-col md:flex-row gap-8 md:gap-10">
           <aside className="md:w-[220px] md:shrink-0">
             <div className="md:sticky md:top-24">
-              <ResultSidebar />
+              <ResultSidebar
+                mode="public"
+                currentStackId={routeSessionId ?? null}
+                currentStackLabel={session?.stack_label ?? null}
+                currentStackCreatedAt={(session as any)?.created_at ?? null}
+              />
             </div>
           </aside>
           <main className="flex-1 min-w-0 max-w-[760px]">{body}</main>
