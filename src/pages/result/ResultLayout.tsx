@@ -202,6 +202,8 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
     handleCopyShareLink,
     setFeedbackOpen,
     submitFeedback,
+    savedChunkIds,
+    toggleSave,
   };
 
   const isDashboard = chrome === "dashboard";
