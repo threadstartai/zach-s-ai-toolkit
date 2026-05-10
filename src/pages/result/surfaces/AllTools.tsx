@@ -34,7 +34,7 @@ const CategorySection = ({ data }: { data: CategoryData }) => (
 const AllTools = () => {
   return (
     <div>
-      <h3 className="text-3xl font-bold text-navy tracking-[-0.02em]">All tools</h3>
+      <h3 className="text-3xl font-bold tracking-[-0.02em]">All tools</h3>
       <p className="mt-3 italic text-[15px] text-foreground/70">
         Every tool, organised by where they fit in real life.
       </p>
