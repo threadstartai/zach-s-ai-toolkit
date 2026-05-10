@@ -10,10 +10,10 @@ const links = [
 ];
 
 const primaryBtn =
-  "inline-flex items-center justify-center bg-navy text-primary-foreground px-3.5 py-1.5 rounded-[8px] text-[13px] font-medium hover:bg-navy/90 transition-colors duration-150";
+  "inline-flex items-center justify-center bg-navy text-primary-foreground px-3.5 py-1.5 rounded-[8px] text-[13px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2";
 
 const primaryBtnFull =
-  "inline-flex w-full items-center justify-center bg-navy text-primary-foreground px-4 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150";
+  "inline-flex w-full items-center justify-center bg-navy text-primary-foreground px-4 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2";
 
 const SiteNav = () => {
   const { user, loading, signOut } = useAuth();
