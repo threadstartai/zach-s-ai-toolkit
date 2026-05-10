@@ -97,12 +97,12 @@ const Foundations = () => {
             return (
               <div
                 key={t.slug}
-                className="bg-background border border-[hsl(var(--border))] rounded-[16px] p-6 sm:p-8 transition-colors duration-150 hover:border-navy/30"
+                className="bg-background border border-[hsl(var(--border))] rounded-[12px] p-6 sm:p-8 transition-colors duration-200 ease-out hover:border-navy/30"
               >
                 <button
                   type="button"
                   onClick={() => setExpandedSlug(isOpen ? null : t.slug)}
-                  className="w-full text-left flex items-start gap-4"
+                  className="w-full text-left flex items-start gap-4 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
                   aria-expanded={isOpen}
                 >
                   <div className="flex-1 min-w-0">
@@ -112,7 +112,7 @@ const Foundations = () => {
                     )}
                   </div>
                   <svg
-                    className={`shrink-0 mt-2 h-4 w-4 text-navy/60 transition-transform duration-150 ${isOpen ? "rotate-180" : ""}`}
+                    className={`shrink-0 mt-2 h-4 w-4 text-navy/60 transition-transform duration-200 ease-out ${isOpen ? "rotate-180" : ""}`}
                     viewBox="0 0 16 16"
                     fill="none"
                     stroke="currentColor"
