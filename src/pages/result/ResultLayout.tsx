@@ -3,6 +3,7 @@ import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
 import SiteLayout from "@/components/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { ResultSidebar } from "./ResultSidebar";
+import { useSavedChunks } from "./shared/useSavedChunks";
 import { TOOLS, recommend } from "./shared/tools";
 import {
   Q2_FROM_CODE, Q3_FROM_CODE, Q4_FROM_CODE,
