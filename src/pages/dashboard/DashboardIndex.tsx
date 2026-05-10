@@ -136,50 +136,6 @@ const DashboardIndex = () => {
 
   const mostRecent = stacks[0] ?? null;
 
-  // Tonight focus
-  useEffect(() => {
-    if (!mostRecent) { setFocusLoading(false); return; }
-    let cancelled = false;
-    (async () => {
-      setFocusLoading(true);
-      const slugs = (mostRecent.ai_picked_tools ?? []).filter(Boolean);
-      if (slugs.length === 0) {
-        if (!cancelled) { setFocus(null); setFocusLoading(false); }
-        return;
-      }
-      const { data: tools } = await supabase
-        .from("tools")
-        .select("id, name, slug")
-        .in("slug", slugs);
-      if (cancelled) return;
-      if (!tools || tools.length === 0) { setFocus(null); setFocusLoading(false); return; }
-
-      const toolIds = tools.map((t: any) => t.id);
-      const { data: chunks } = await supabase
-        .from("chunks")
-        .select("id, title, content, chunk_type, priority, tool_id")
-        .in("tool_id", toolIds)
-        .eq("chunk_type", "first-prompt")
-        .order("priority", { ascending: false })
-        .limit(3);
-      if (cancelled) return;
-      const top = chunks?.[0];
-      if (!top) { setFocus(null); setFocusLoading(false); return; }
-      const tool = tools.find((t: any) => t.id === top.tool_id);
-      const split = splitFirstPrompt(top.content ?? "");
-      setFocus({
-        id: top.id,
-        title: top.title,
-        content: top.content,
-        toolName: tool?.name ?? "Your stack",
-        toolSlug: tool?.slug ?? "",
-        prompt: split.prompt,
-      });
-      setFocusLoading(false);
-    })();
-    return () => { cancelled = true; };
-  }, [mostRecent?.id]);
-
   // Load notes
   useEffect(() => {
     if (!user) return;
