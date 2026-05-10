@@ -18,6 +18,7 @@ type StackRow = {
   q3_other_text: string | null;
   q4_confidence: string | null;
   ai_picked_tools: string[] | null;
+  onboarding_role: string | null;
   created_at: string;
 };
 
