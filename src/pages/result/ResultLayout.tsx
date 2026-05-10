@@ -14,6 +14,7 @@ import {
 import { SECTION_LABELS } from "./shared/chunks";
 import type { Chunk, LoadedSession, ToolKey, ToolStatus } from "./shared/types";
 import type { ResultContext } from "./shared/useResultContext";
+import { SkeletonHeroCard, SkeletonChunkList } from "@/components/ui-primitives/Skeletons";
 
 const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" } = {}) => {
   const { sessionId: routeSessionId } = useParams<{ sessionId: string }>();
@@ -295,9 +296,11 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
     <>
       {loading && (
         chrome === "dashboard" ? dashboardSkeleton : (
-          <p className="text-[14px] text-foreground/60 italic">
-            One moment — loading this Stack.
-          </p>
+          <div className="flex flex-col gap-6">
+            <SkeletonHeroCard />
+            <SkeletonChunkList count={2} />
+            <SkeletonChunkList count={2} />
+          </div>
         )
       )}
       {!loading && error && (

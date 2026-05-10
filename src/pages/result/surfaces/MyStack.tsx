@@ -14,6 +14,7 @@ import { ToolDetailDrawer } from "../ToolDetailDrawer";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
 import { ChunkFeedbackButton } from "../shared/ChunkFeedbackButton";
+import { SkeletonChunkList } from "@/components/ui-primitives/Skeletons";
 
 const MyStack = () => {
   const {
@@ -182,10 +183,10 @@ const MyStack = () => {
         </div>
       )}
 
-      {showSlowMessage && Object.keys(chunksByTool).length === 0 && (
-        <p className="mt-6 text-[14px] text-foreground/60 italic">
-          One moment — finding the right bits for you.
-        </p>
+      {Object.keys(chunksByTool).length === 0 && picks.length > 0 && (
+        <div className="mt-8">
+          <SkeletonChunkList count={3} />
+        </div>
       )}
 
       {/* Tool cards */}
