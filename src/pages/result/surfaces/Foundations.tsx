@@ -6,6 +6,7 @@ import type { Chunk } from "../shared/types";
 import { fullGuideUrl } from "@/lib/pdfs";
 import { SkeletonGuideCard } from "@/components/ui-primitives/Skeletons";
 import { EmptyState } from "@/components/ui-primitives/EmptyState";
+import { ProcessDiagram } from "@/components/diagrams/ProcessDiagram";
 
 const FOUNDATIONAL_ORDER = [
   "start-here",
