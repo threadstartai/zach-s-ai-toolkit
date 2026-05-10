@@ -79,7 +79,9 @@ const MyStack = () => {
           </p>
         </div>
       )}
-      <p className="mt-6 text-navy text-[17px] leading-[1.7]">
+      <div className="mt-8 font-mono text-[11px] tracking-[0.12em] text-navy/55 uppercase">Your situation</div>
+      <div className="mt-1 mb-1 h-px w-10 bg-navy/30" />
+      <p className="mt-3 text-navy text-[17px] leading-[1.7]">
         Here's what I'm reading: {audiencePhrase(c2)}, working on {useCasePhrase(c3, q3OtherText)}, {confidencePhrase(c4)}. Three tools, and what's worth doing tonight. If that's slightly off,{" "}
         <button
           onClick={handleStartOver}
