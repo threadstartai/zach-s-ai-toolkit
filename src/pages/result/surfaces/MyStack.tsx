@@ -24,6 +24,8 @@ const MyStack = () => {
     aiPickReasoning,
     isDashboard,
     stackLabel,
+    onboardingRole,
+    onboardingTimeBudget,
   } = useResultContext();
   const { user } = useAuth();
   const [renaming, setRenaming] = useState(false);
