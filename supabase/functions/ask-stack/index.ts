@@ -154,25 +154,29 @@ Deno.serve(async (req) => {
         blocks.push(`${i + 1}. ${t.name} — ${reason}`);
       }
 
+      const toolIds = orderedTools.map((t: any) => t.id);
+      let q = admin
+        .from("chunks")
+        .select("title, content, chunk_type, priority, tool_id, tags_audience, tags_use_case, tags_confidence")
+        .in("tool_id", toolIds)
+        .contains("tags_audience", [audience])
+        .contains("tags_confidence", [confidence])
+        .order("priority", { ascending: false });
+
+      if (useCase && useCase !== "other") {
+        q = q.contains("tags_use_case", [useCase]);
+      }
+
+      const { data: allChunks } = await q;
+
       const chunkBlocks: string[] = [];
       for (const t of orderedTools) {
-        let q = admin
-          .from("chunks")
-          .select("title, content, chunk_type, priority, tags_audience, tags_use_case, tags_confidence")
-          .eq("tool_id", t.id)
-          .contains("tags_audience", [audience])
-          .contains("tags_confidence", [confidence])
-          .order("priority", { ascending: false })
-          .limit(3);
-        if (useCase && useCase !== "other") {
-          q = q.contains("tags_use_case", [useCase]);
-        }
-        const { data: chunks } = await q;
-        if (chunks && chunks.length > 0) {
-          for (const c of chunks) {
-            const snippet = (c.content ?? "").slice(0, 400);
-            chunkBlocks.push(`## ${t.name} — ${c.title ?? c.chunk_type}\n${snippet}`);
-          }
+        const tChunks = (allChunks ?? [])
+          .filter((c: any) => c.tool_id === t.id)
+          .slice(0, 3);
+        for (const c of tChunks) {
+          const snippet = (c.content ?? "").slice(0, 400);
+          chunkBlocks.push(`## ${t.name} — ${c.title ?? c.chunk_type}\n${snippet}`);
         }
       }
 
