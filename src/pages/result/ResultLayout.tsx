@@ -10,7 +10,7 @@ import {
   codeQ2, codeQ3, codeQ4, isMeaningfulName, UUID_RE,
 } from "./shared/codes";
 import { SECTION_LABELS } from "./shared/chunks";
-import type { Chunk, LoadedSession, ToolStatus } from "./shared/types";
+import type { Chunk, LoadedSession, ToolKey, ToolStatus } from "./shared/types";
 import type { ResultContext } from "./shared/useResultContext";
 
 const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" } = {}) => {
