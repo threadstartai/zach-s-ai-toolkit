@@ -46,8 +46,7 @@ const DashboardIndex = () => {
     (async () => {
       const { data, error: err } = await supabase
         .from("sessions")
-        .select("id, stack_label, q2_audience, q3_use_case, q3_other_text, q4_confidence, ai_picked_tools, created_at, updated_at")
-        .order("updated_at", { ascending: false, nullsFirst: false })
+        .select("id, stack_label, q2_audience, q3_use_case, q3_other_text, q4_confidence, ai_picked_tools, created_at")
         .order("created_at", { ascending: false });
       if (cancelled) return;
       if (err) { setError(true); setLoading(false); return; }
