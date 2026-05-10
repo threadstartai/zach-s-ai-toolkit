@@ -54,6 +54,9 @@ const Tonight = () => {
               <div className="mt-4">
                 <ChunkBlock chunk={best.chunk} />
               </div>
+              <div className="mt-6 flex justify-end">
+                <ChunkFeedbackButton chunkId={best.chunk.id} />
+              </div>
             </div>
           </div>
           <p className="mt-10 italic text-[14px] text-foreground/65">
