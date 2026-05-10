@@ -100,7 +100,7 @@ const Index = () => {
         {/* Inside the stack */}
         <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]">
           <div className={sectionLabelCls}>02 — Inside</div>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">17 tools, four ways AI shows up.</h2>
+          <h2 className="text-[26px] md:text-[28px] font-bold tracking-tight">17 tools, four ways AI shows up.</h2>
           <p className="mt-5 max-w-[680px] text-foreground/85 text-[16.5px] leading-[1.7]">
             Every tool I'd actually recommend, organised by where it fits in real life. Read the ones that match what you're doing. Skip the rest.
           </p>
