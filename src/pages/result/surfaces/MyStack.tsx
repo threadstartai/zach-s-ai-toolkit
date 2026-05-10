@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { useResultContext } from "../shared/useResultContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { TOOLS, whyFor, whyForChatGPT } from "../shared/tools";
@@ -21,8 +21,30 @@ const MyStack = () => {
 
   const why = (k: ToolKey) => k === "04" ? whyForChatGPT(c4) : whyFor(k, c2);
 
+  const [showWelcome, setShowWelcome] = useState(
+    () => typeof window !== "undefined" && !localStorage.getItem("myaistack_dashboard_welcomed")
+  );
+  const dismissWelcome = () => {
+    localStorage.setItem("myaistack_dashboard_welcomed", "1");
+    setShowWelcome(false);
+  };
+
   return (
     <div>
+      {showWelcome && (
+        <div className="bg-navy-light/40 border border-navy-light rounded-[16px] p-6 mb-8">
+          <h2 className="text-[18px] font-bold text-navy">Welcome.</h2>
+          <p className="mt-2 text-navy text-[15px] leading-[1.6]">
+            This is your Stack. Three tools picked from the 17 I use, based on what you told me. Read the cards. Try the prompts. The bookmark on each card saves it for later. <em>— Zach</em>
+          </p>
+          <button
+            onClick={dismissWelcome}
+            className="mt-4 inline-flex items-center justify-center border border-navy text-navy px-4 py-2 rounded-[8px] text-[13.5px] font-medium hover:bg-navy/5 transition-colors duration-150"
+          >
+            Got it →
+          </button>
+        </div>
+      )}
       {/* Title + intro */}
       <h3 className="text-[32px] sm:text-[36px] font-bold text-navy tracking-[-0.02em]">{title}</h3>
       <p className="mt-3 text-navy text-[17px] leading-[1.7]">

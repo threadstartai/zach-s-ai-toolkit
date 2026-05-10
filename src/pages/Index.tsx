@@ -53,7 +53,7 @@ const Index = () => {
               A guide to every AI tool worth using, written for the people I care about.
             </p>
             <p className="mt-5 text-foreground/80">
-              Free. Mine to keep updated. No course at the end.
+              100% free. Made for friends and family — so nobody gets left behind by AI.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <Link to={startHref} className={`${primaryBtn} w-full sm:w-auto`}>
@@ -67,7 +67,7 @@ const Index = () => {
 
           {/* Trust strip */}
           <p className="mt-6 md:mt-10 italic text-[14px] text-navy/70">
-            17 AI tools. 346 paragraphs of guidance. No affiliate links. No course at the end.
+            17 AI tools. No affiliate links. No marketing. No upsells. Just what's worth using and how to use it.
           </p>
         </section>
 
