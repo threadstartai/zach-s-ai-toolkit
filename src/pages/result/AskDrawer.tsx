@@ -135,6 +135,20 @@ export const AskDrawer = ({ open, onOpenChange, sessionId }: AskDrawerProps) => 
           content: data.content,
         },
       ]);
+      setConversations((prev) => {
+        const id = data.conversation_id;
+        if (!id) return prev;
+        const existing = prev.find((c) => c.id === id);
+        const now = new Date().toISOString();
+        const titleFromFirstMessage = prev.length === 0 || !existing ? text.slice(0, 80) : existing.title;
+        const updated: ConversationItem = {
+          id,
+          title: existing?.title ?? titleFromFirstMessage,
+          updated_at: now,
+        };
+        const others = prev.filter((c) => c.id !== id);
+        return [updated, ...others];
+      });
     } catch (e) {
       setMessages((m) => [
         ...m,
