@@ -7,8 +7,6 @@ import { fullGuideUrl } from "@/lib/pdfs";
 
 const FOUNDATIONAL_ORDER = [
   "start-here",
-  "master-prompt-guide",
-  "rules-with-ai",
   "the-process",
   "why-i-made-this",
   "how-this-was-built",
