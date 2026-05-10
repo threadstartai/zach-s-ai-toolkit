@@ -42,7 +42,7 @@ const BriefingMethod = () => {
 
   return (
     <div>
-      <h3 className="text-3xl font-bold tracking-[-0.02em]">{PAGE_TITLE}</h3>
+      <h3 className="text-[32px] font-bold tracking-[-0.02em]">{PAGE_TITLE}</h3>
       <p className="mt-3 italic text-[15px] text-foreground/70 max-w-[640px]">
         {PAGE_SUBTITLE}
       </p>
