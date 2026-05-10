@@ -32,6 +32,9 @@ export type LoadedSession = {
   ai_picked_at?: string | null;
   ai_pick_reasoning?: Record<string, string> | null;
   stack_label?: string | null;
+  onboarding_role?: string | null;
+  onboarding_time_budget?: string | null;
+  onboarding_existing_tools?: string[] | null;
 };
 
-export type QuizStep = "intro" | "q1" | "q2" | "q3" | "q4" | "done";
+export type QuizStep = "intro" | "q1" | "q2" | "role" | "q3" | "tools" | "q4" | "time" | "done";
