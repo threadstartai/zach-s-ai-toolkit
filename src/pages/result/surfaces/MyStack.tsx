@@ -2,6 +2,7 @@ import { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 import { useResultContext } from "../shared/useResultContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { TOOLS, whyFor, whyForChatGPT } from "../shared/tools";
 import { audiencePhrase, useCasePhrase, confidencePhrase, whyThisTool, ladderLine } from "../shared/phrases";
 import { SECTION_LABELS, LADDER, groupChunks } from "../shared/chunks";
@@ -16,12 +17,15 @@ const MyStack = () => {
     chunksByTool, statusByTool, showSlowMessage,
     feedbackOpen, feedbackSubmitted, setFeedbackOpen, submitFeedback,
     sessionId, linkCopied, handleCopyShareLink, handleStartOver,
-    saved, setSaved,
     savedChunkIds, toggleSave,
     aiPickReasoning,
     isDashboard,
+    stackLabel,
   } = useResultContext();
   const { user } = useAuth();
+  const [renaming, setRenaming] = useState(false);
+  const [labelDraft, setLabelDraft] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const why = (k: ToolKey) => k === "04" ? whyForChatGPT(c4) : whyFor(k, c2);
 
@@ -50,6 +54,9 @@ const MyStack = () => {
         </div>
       )}
       {/* Title + intro */}
+      {stackLabel && (
+        <p className="text-[13px] italic text-navy/70 mb-1">Stack: {stackLabel}</p>
+      )}
       <h3 className="text-[32px] sm:text-[36px] font-bold text-navy tracking-[-0.02em]">{title}</h3>
       {isDashboard && (
         <div className="mt-6 bg-navy-light/40 border border-navy-light rounded-[12px] px-5 py-4">
@@ -294,10 +301,13 @@ const MyStack = () => {
         </button>
         <span className="text-foreground/40 mx-2">·</span>
         <button
-          onClick={() => setSaved(true)}
+          onClick={() => {
+            setLabelDraft(stackLabel ?? "");
+            setRenaming(true);
+          }}
           className="hover:underline transition-colors duration-150"
         >
-          Save my Stack
+          {stackLabel ? "Rename stack" : "Name this stack"}
         </button>
         <span className="text-foreground/40 mx-2">·</span>
         <button
@@ -310,10 +320,41 @@ const MyStack = () => {
         <a href="/stack#tools" className="hover:underline transition-colors duration-150">
           Browse all 17 tools ↓
         </a>
-        {saved && (
-          <p className="mt-3 italic text-foreground/75 text-[13px]">
-            Email save coming next — for now, take a screenshot.
-          </p>
+        {renaming && (
+          <div className="mt-4 flex flex-col sm:flex-row gap-2 items-start">
+            <input
+              type="text"
+              value={labelDraft}
+              onChange={(e) => setLabelDraft(e.target.value)}
+              placeholder="e.g. Research stack, Side project stack"
+              maxLength={60}
+              className="flex-1 h-10 rounded-[8px] border border-[hsl(var(--border))] bg-background px-3 text-[14px] focus:outline-none focus:border-navy"
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={async () => {
+                  const label = labelDraft.trim().slice(0, 60);
+                  if (!label || !sessionId) return;
+                  setSaving(true);
+                  await supabase.from("sessions").update({ stack_label: label }).eq("id", sessionId);
+                  setRenaming(false);
+                  setLabelDraft("");
+                  window.location.reload();
+                }}
+                disabled={!labelDraft.trim() || saving}
+                className="bg-navy text-primary-foreground rounded-[8px] px-4 h-10 text-[14px] font-medium disabled:opacity-40"
+              >
+                Save name
+              </button>
+              <button
+                onClick={() => { setRenaming(false); setLabelDraft(""); }}
+                className="text-navy hover:underline px-3 h-10 text-[14px]"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>

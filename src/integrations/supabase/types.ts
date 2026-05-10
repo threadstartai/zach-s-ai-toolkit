@@ -351,6 +351,7 @@ export type Database = {
           q4_confidence: string | null
           q5_learning_style: string | null
           result_payload: Json | null
+          stack_label: string | null
           user_id: string | null
         }
         Insert: {
@@ -367,6 +368,7 @@ export type Database = {
           q4_confidence?: string | null
           q5_learning_style?: string | null
           result_payload?: Json | null
+          stack_label?: string | null
           user_id?: string | null
         }
         Update: {
@@ -383,6 +385,7 @@ export type Database = {
           q4_confidence?: string | null
           q5_learning_style?: string | null
           result_payload?: Json | null
+          stack_label?: string | null
           user_id?: string | null
         }
         Relationships: []

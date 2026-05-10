@@ -28,6 +28,7 @@ export type LoadedSession = {
   ai_picked_tools?: string[] | null;
   ai_picked_at?: string | null;
   ai_pick_reasoning?: Record<string, string> | null;
+  stack_label?: string | null;
 };
 
 export type QuizStep = "intro" | "q1" | "q2" | "q3" | "q4" | "done";
