@@ -236,12 +236,24 @@ Deno.serve(async (req) => {
   const q3Other = sanitiseString(body.q3_other_text ?? "", 200);
   const q4 = body.q4_confidence;
   const q5 = body.q5_learning_style;
+  const role = body.onboarding_role;
+  const timeBudget = body.onboarding_time_budget;
+  const existingTools = body.onboarding_existing_tools;
 
   if (!isValidAudience(q2)) return json({ error: "Invalid audience" }, 400);
   if (!isValidUseCase(q3)) return json({ error: "Invalid use case" }, 400);
   if (!isValidConfidence(q4)) return json({ error: "Invalid confidence" }, 400);
   if (q5 !== null && q5 !== undefined && !isValidLearningStyle(q5)) {
     return json({ error: "Invalid learning style" }, 400);
+  }
+  if (role !== null && role !== undefined && !isValidRole(role)) {
+    return json({ error: "Invalid role" }, 400);
+  }
+  if (timeBudget !== null && timeBudget !== undefined && !isValidTimeBudget(timeBudget)) {
+    return json({ error: "Invalid time budget" }, 400);
+  }
+  if (existingTools !== null && existingTools !== undefined && !isValidExistingTools(existingTools)) {
+    return json({ error: "Invalid existing tools" }, 400);
   }
 
   const userId = await userIdFromAuthHeader(req);
@@ -256,6 +268,9 @@ Deno.serve(async (req) => {
       q4_confidence: q4,
       q5_learning_style: q5 ?? null,
       user_id: userId,
+      onboarding_role: (role as string | null) ?? null,
+      onboarding_time_budget: (timeBudget as string | null) ?? null,
+      onboarding_existing_tools: (existingTools as string[] | null) ?? null,
     })
     .select("id")
     .single();
@@ -273,6 +288,9 @@ Deno.serve(async (req) => {
         q3: q3 as string,
         q3Other,
         q4: q4 as string,
+        role: (role as string | null) ?? null,
+        timeBudget: (timeBudget as string | null) ?? null,
+        existingTools: (existingTools as string[] | null) ?? null,
       });
       if (pick) {
         const { error: updErr } = await admin
