@@ -16,7 +16,7 @@ const ToolCard = ({ tool }: { tool: CategoryTool }) => (
         rel="noopener noreferrer"
         className="mt-3 inline-block text-[12.5px] italic text-navy/65 hover:text-navy underline underline-offset-2"
       >
-        Download PDF ↓
+        Download doc ↓
       </a>
     )}
   </div>

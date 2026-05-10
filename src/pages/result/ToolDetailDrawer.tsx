@@ -86,7 +86,7 @@ export const ToolDetailDrawer = ({ open, onOpenChange, toolSlug }: Props) => {
                     rel="noopener noreferrer"
                     className="text-navy underline underline-offset-2 hover:opacity-80"
                   >
-                    Download PDF ↓
+                    Download doc ↓
                   </a>
                 )}
                 <button
