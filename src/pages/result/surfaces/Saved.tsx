@@ -4,6 +4,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ChunkBlock } from "../shared/ChunkBlock";
 import { SaveChunkButton } from "../shared/SaveChunkButton";
 import { useSavedChunks } from "../shared/useSavedChunks";
+import { useResultContext } from "../shared/useResultContext";
+import { TOOLS } from "../shared/tools";
 import type { Chunk } from "../shared/types";
 
 type SavedRow = Chunk & { savedAt: string; toolName: string | null };
@@ -11,8 +13,11 @@ type SavedRow = Chunk & { savedAt: string; toolName: string | null };
 const Saved = () => {
   const { user } = useAuth();
   const { savedChunkIds, toggleSave } = useSavedChunks();
+  const { picks } = useResultContext();
   const [chunks, setChunks] = useState<SavedRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [suggestions, setSuggestions] = useState<SavedRow[]>([]);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
 
   useEffect(() => {
     if (!user) { setLoading(false); return; }
@@ -47,6 +52,72 @@ const Saved = () => {
   // Filter the displayed list by current saved set so unsaving removes immediately
   const visible = chunks.filter((c) => savedChunkIds.has(c.id));
 
+  useEffect(() => {
+    if (loading || !user || picks.length === 0) return;
+    const visibleNow = chunks.filter((c) => savedChunkIds.has(c.id));
+    if (visibleNow.length > 0) return;
+
+    let cancelled = false;
+    setSuggestionsLoading(true);
+    (async () => {
+      const slugs = picks.map((k) => TOOLS[k]?.slug).filter(Boolean) as string[];
+      if (slugs.length === 0) {
+        setSuggestionsLoading(false);
+        return;
+      }
+
+      const { data: toolRows } = await supabase
+        .from("tools")
+        .select("id, slug, name")
+        .in("slug", slugs);
+      if (cancelled || !toolRows) {
+        setSuggestionsLoading(false);
+        return;
+      }
+
+      const toolMap = Object.fromEntries(toolRows.map((t: any) => [t.id, t]));
+      const toolIds = toolRows.map((t: any) => t.id);
+
+      const { data: chunkRows } = await supabase
+        .from("chunks")
+        .select("id, title, content, chunk_type, priority, tool_id")
+        .in("tool_id", toolIds)
+        .in("chunk_type", ["first-prompt", "setup", "workflow-example"])
+        .order("priority", { ascending: false });
+      if (cancelled) return;
+
+      const seen = new Set<string>();
+      const top: SavedRow[] = [];
+      for (const c of (chunkRows ?? [])) {
+        const tool = toolMap[(c as any).tool_id];
+        if (!tool || seen.has((c as any).tool_id)) continue;
+        seen.add((c as any).tool_id);
+        top.push({
+          id: (c as any).id,
+          tool_id: (c as any).tool_id,
+          chunk_type: (c as any).chunk_type,
+          title: (c as any).title,
+          content: (c as any).content,
+          priority: (c as any).priority,
+          savedAt: "",
+          toolName: (tool as any).name,
+        });
+      }
+      setSuggestions(top);
+      setSuggestionsLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [loading, user, picks, chunks, savedChunkIds]);
+
+  const handleSaveSuggestion = (chunk: SavedRow) => {
+    toggleSave(chunk.id);
+    setChunks((prev) => [
+      { ...chunk, savedAt: new Date().toISOString() },
+      ...prev.filter((c) => c.id !== chunk.id),
+    ]);
+    setSuggestions((prev) => prev.filter((s) => s.id !== chunk.id));
+  };
+
   return (
     <div>
       <h3 className="text-3xl font-bold tracking-[-0.02em]">Saved</h3>
@@ -59,11 +130,44 @@ const Saved = () => {
       )}
 
       {!loading && visible.length === 0 && (
-        <div className="mt-12 max-w-[480px] mx-auto text-center">
-          <p className="text-[14px] italic text-foreground/65">Nothing saved yet.</p>
-          <p className="mt-3 text-[15px] text-foreground/85 leading-[1.65]">
-            When you find a chunk worth coming back to, save it. They'll all live here.
+        <div className="mt-10">
+          <p className="text-[15px] text-foreground/85 leading-[1.65] max-w-[680px]">
+            Hit the bookmark on any chunk in your stack and it'll show up here. Want to start? Three worth saving from your stack:
           </p>
+
+          {suggestionsLoading && (
+            <p className="mt-8 text-[14px] italic text-foreground/60">Pulling suggestions…</p>
+          )}
+
+          {!suggestionsLoading && suggestions.length === 0 && picks.length === 0 && (
+            <p className="mt-6 text-[14px] italic text-foreground/60">
+              Nothing to suggest yet — finish your stack first.
+            </p>
+          )}
+
+          {!suggestionsLoading && suggestions.length > 0 && (
+            <div className="mt-6 flex flex-col gap-4">
+              {suggestions.map((ch) => (
+                <div
+                  key={ch.id}
+                  className="relative bg-background border border-[hsl(var(--border))] rounded-[12px] p-6 transition-colors duration-200 ease-out hover:border-navy/40"
+                >
+                  <SaveChunkButton
+                    saved={savedChunkIds.has(ch.id)}
+                    onClick={() => handleSaveSuggestion(ch)}
+                  />
+                  <div className="pr-10">
+                    {ch.toolName && (
+                      <div className="font-mono text-[11px] uppercase tracking-[0.08em] text-navy/60 mb-2">
+                        From {ch.toolName}
+                      </div>
+                    )}
+                    <ChunkBlock chunk={ch} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -72,7 +176,7 @@ const Saved = () => {
           {visible.map((ch) => (
             <div
               key={ch.id}
-              className="relative bg-background border border-[hsl(var(--border))] rounded-[12px] p-6 transition-colors duration-150 hover:border-navy/40"
+              className="relative bg-background border border-[hsl(var(--border))] rounded-[12px] p-6 transition-colors duration-200 ease-out hover:border-navy/40"
             >
               <SaveChunkButton
                 saved={savedChunkIds.has(ch.id)}
