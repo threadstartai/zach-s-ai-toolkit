@@ -11,7 +11,15 @@ const OPTIONS: { code: FeedbackReason; label: string }[] = [
   { code: "already-using", label: "Already using this" },
 ];
 
-export const ChunkFeedbackButton = ({ chunkId }: { chunkId: string }) => {
+export const ChunkFeedbackButton = ({
+  chunkId,
+  toolSlug,
+  sessionId,
+}: {
+  chunkId: string;
+  toolSlug: string;
+  sessionId?: string | null;
+}) => {
   const [open, setOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -20,7 +28,12 @@ export const ChunkFeedbackButton = ({ chunkId }: { chunkId: string }) => {
     if (submitting || submitted) return;
     setSubmitting(true);
     try {
-      await supabase.from("chunk_feedback").insert({ chunk_id: chunkId, reason } as never);
+      await supabase.from("chunk_feedback").insert({
+        chunk_id: chunkId,
+        tool_slug: toolSlug,
+        session_id: sessionId ?? null,
+        reason,
+      } as never);
       setSubmitted(true);
       setTimeout(() => setOpen(false), 1500);
     } catch {
