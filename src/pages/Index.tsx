@@ -46,10 +46,10 @@ const Index = () => {
         {/* Hero */}
         <section className="pt-10 md:pt-24 pb-10 md:pb-20">
           <div className="max-w-[760px]">
-            <h1 className="text-[40px] md:text-6xl font-extrabold text-navy tracking-[-0.02em] leading-[1.05]">
+            <h1 className="text-[40px] md:text-6xl font-extrabold tracking-[-0.02em] leading-[1.05]">
               My AI Stack.
             </h1>
-            <p className="mt-5 text-xl md:text-2xl font-normal text-navy leading-snug max-w-[600px] font-serif">
+            <p className="mt-5 text-xl md:text-2xl font-normal text-navy leading-snug max-w-[600px]">
               A guide to every AI tool worth using, written for the people I care about.
             </p>
             <p className="mt-5 text-foreground/80">
