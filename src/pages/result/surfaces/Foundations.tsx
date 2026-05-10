@@ -8,6 +8,7 @@ import { fullGuideUrl } from "@/lib/pdfs";
 const FOUNDATIONAL_ORDER = [
   "start-here",
   "master-prompt-guide",
+  "rules-with-ai",
   "the-process",
   "why-i-made-this",
   "how-this-was-built",
@@ -77,7 +78,7 @@ const Foundations = () => {
     <div>
       <h3 className="text-3xl font-bold text-navy tracking-[-0.02em]">Foundations</h3>
       <p className="mt-3 italic text-[15px] text-foreground/70">
-        The eight guides that make the rest of the Stack make sense. Start with the first two — they're the spine.
+        The nine guides that make the rest of the Stack make sense. Start with the first three — they're the spine.
       </p>
 
       {loading && (

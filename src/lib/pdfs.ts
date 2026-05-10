@@ -27,6 +27,7 @@ const FILENAME_MAP: Record<string, string> = {
   "building-things-overview": "Building Things Overview.docx",
   "master-prompt-guide": "Your Master Prompt Guide V1.docx",
   "power-ups": "Power Ups V1 (Bonus).docx",
+  "rules-with-ai": "Rules With AI.docx",
 };
 
 export const PDF_SLUGS = new Set<string>(Object.keys(FILENAME_MAP));
