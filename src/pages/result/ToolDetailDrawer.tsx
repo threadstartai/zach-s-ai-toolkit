@@ -21,6 +21,7 @@ type ToolRow = {
   source_doc: string | null;
   status: string;
   update_message: string | null;
+  when_not_to_use: string | null;
 };
 
 export const ToolDetailDrawer = ({ open, onOpenChange, toolSlug }: Props) => {
