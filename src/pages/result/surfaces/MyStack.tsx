@@ -408,6 +408,11 @@ const MyStack = () => {
           </div>
         )}
       </div>
+      <ToolDetailDrawer
+        open={detailSlug !== null}
+        onOpenChange={(o) => { if (!o) setDetailSlug(null); }}
+        toolSlug={detailSlug}
+      />
     </div>
   );
 };
