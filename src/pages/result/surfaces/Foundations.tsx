@@ -104,7 +104,7 @@ const Foundations = () => {
                   aria-expanded={isOpen}
                 >
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-[22px] font-bold text-navy">{t.name}</h4>
+                    <h4 className="text-[20px] font-bold text-navy">{t.name}</h4>
                     {t.tagline && (
                       <p className="mt-2 text-[15px] text-foreground/80 leading-[1.6]">{t.tagline}</p>
                     )}
