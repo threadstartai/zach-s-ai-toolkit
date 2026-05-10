@@ -128,7 +128,7 @@ const Index = () => {
         </section>
 
         {/* Chrome Consulting */}
-        <section className="py-14 md:py-20 border-t border-[hsl(var(--border))]/60">
+        <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]/60">
           <div className="max-w-[760px]">
             <h3 className="text-2xl text-navy font-bold tracking-tight">
               If you want help getting this set up properly
