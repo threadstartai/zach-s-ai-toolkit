@@ -217,7 +217,7 @@ const MyStack = () => {
                 <div className="flex items-baseline justify-between gap-3">
                   <div className="flex items-baseline gap-2.5 flex-wrap">
                     <span className="font-mono text-[13px] text-navy/60">{t.num}</span>
-                    <h4 className="text-[22px] font-bold text-navy">{t.name}</h4>
+                    <h4 className="text-[20px] font-bold text-navy">{t.name}</h4>
                     {toolStatusMap[t.slug]?.status === "update" && (
                       <span className="font-mono text-[10px] uppercase tracking-[0.1em] bg-navy-light/70 text-navy px-2 py-0.5 rounded-[4px] whitespace-nowrap">
                         Update available
