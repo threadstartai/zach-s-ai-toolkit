@@ -208,12 +208,28 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
 
   const isDashboard = chrome === "dashboard";
 
+  const dashboardSkeleton = (
+    <>
+      {[0, 1, 2].map((i) => (
+        <div key={i} className="bg-white border border-[hsl(var(--border))] rounded-[16px] p-8 mt-6 first:mt-0">
+          <div className="h-6 bg-navy-light/40 rounded-full w-1/3 animate-pulse" />
+          <div className="mt-3 h-4 bg-navy-light/30 rounded-full w-2/3 animate-pulse" />
+          <div className="mt-6 h-3 bg-navy-light/30 rounded-full w-full animate-pulse" />
+          <div className="mt-2 h-3 bg-navy-light/30 rounded-full w-5/6 animate-pulse" />
+          <div className="mt-2 h-3 bg-navy-light/30 rounded-full w-4/6 animate-pulse" />
+        </div>
+      ))}
+    </>
+  );
+
   const body = (
     <>
       {loading && (
-        <p className="text-[14px] text-foreground/60 italic">
-          One moment — loading this Stack.
-        </p>
+        chrome === "dashboard" ? dashboardSkeleton : (
+          <p className="text-[14px] text-foreground/60 italic">
+            One moment — loading this Stack.
+          </p>
+        )
       )}
       {!loading && error && (
         <div>
