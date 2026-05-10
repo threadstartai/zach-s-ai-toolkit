@@ -2,6 +2,7 @@ import { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 import { useResultContext } from "../shared/useResultContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { TOOLS, whyFor, whyForChatGPT } from "../shared/tools";
 import { audiencePhrase, useCasePhrase, confidencePhrase, whyThisTool, ladderLine } from "../shared/phrases";
 import { SECTION_LABELS, LADDER, groupChunks } from "../shared/chunks";
