@@ -6,7 +6,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Q2_FROM_CODE, Q3_FROM_CODE, codeQ2, codeQ3 } from "@/pages/result/shared/codes";
 import { audiencePhrase, useCasePhrase } from "@/pages/result/shared/phrases";
-import { TOOLS } from "@/pages/result/shared/tools";
 import { splitFirstPrompt } from "@/pages/result/shared/chunks";
 
 type StackRow = {
