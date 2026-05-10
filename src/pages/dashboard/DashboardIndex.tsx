@@ -7,6 +7,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Q2_FROM_CODE, Q3_FROM_CODE, codeQ2, codeQ3 } from "@/pages/result/shared/codes";
 import { audiencePhrase, useCasePhrase } from "@/pages/result/shared/phrases";
 import { splitFirstPrompt } from "@/pages/result/shared/chunks";
+import { caseStudyForRole } from "@/lib/caseStudies";
 
 type StackRow = {
   id: string;
