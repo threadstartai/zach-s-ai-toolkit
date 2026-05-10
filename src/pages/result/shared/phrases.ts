@@ -18,9 +18,9 @@ export const useCasePhrase = (q3: Q3Code, q3OtherText: string): string => {
     .replace(/<[^>]*>/g, "")
     .replace(/\s+/g, " ")
     .trim()
-    .toLowerCase()
-    .slice(0, 80);
-  return cleaned ? `"${cleaned}"` : "what you're working on";
+    .slice(0, 200);
+  if (!cleaned) return "what you're working on";
+  return cleaned.charAt(0).toLowerCase() + cleaned.slice(1);
 };
 
 export const confidencePhrase = (q4: Q4Code): string => {

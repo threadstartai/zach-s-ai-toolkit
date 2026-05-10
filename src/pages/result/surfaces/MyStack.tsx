@@ -244,6 +244,27 @@ const MyStack = () => {
       {/* Footer actions */}
       <div className="mt-14 text-[14px] text-navy">
         <button
+          onClick={() => {
+            const lines = [
+              "Hi Claude. I just got my personalised AI stack from MY AI STACK (Zach Z's friends-and-family AI guide).",
+              "",
+              `About me: ${audiencePhrase(c2)}, working on ${useCasePhrase(c3, q3OtherText)}, ${confidencePhrase(c4)}.`,
+              "",
+              "My three tools (in the order they were recommended):",
+              "",
+              ...picks.map((k, i) => `${i + 1}. ${TOOLS[k].name} — ${whyThisTool(TOOLS[k].slug, c2, c3, c4, q3OtherText)}`),
+              "",
+              "Help me think through how to actually use these tonight. Ask me clarifying questions before giving generic advice. Push back where I'm being lazy.",
+            ];
+            const url = `https://claude.ai/new?q=${encodeURIComponent(lines.join("\n"))}`;
+            window.open(url, "_blank", "noopener,noreferrer");
+          }}
+          className="hover:underline transition-colors duration-150"
+        >
+          Discuss your stack in Claude
+        </button>
+        <span className="text-foreground/40 mx-2">·</span>
+        <button
           onClick={handleCopyShareLink}
           disabled={!sessionId}
           className="hover:underline transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed disabled:no-underline"
