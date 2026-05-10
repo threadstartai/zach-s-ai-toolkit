@@ -14,6 +14,7 @@ import {
 import { SECTION_LABELS } from "./shared/chunks";
 import type { Chunk, LoadedSession, ToolKey, ToolStatus } from "./shared/types";
 import type { ResultContext } from "./shared/useResultContext";
+import { SkeletonHeroCard, SkeletonChunkList } from "@/components/ui-primitives/Skeletons";
 
 const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" } = {}) => {
   const { sessionId: routeSessionId } = useParams<{ sessionId: string }>();
