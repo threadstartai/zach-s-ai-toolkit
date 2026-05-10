@@ -74,6 +74,11 @@ const App = () => (
               <Route path="stacks/:sessionId" element={<ResultLayout chrome="dashboard" />}>
                 <Route index element={<Navigate to="my-stack" replace />} />
                 <Route path="my-stack" element={<MyStack />} />
+                <Route path="tonight" element={<Tonight />} />
+                <Route path="saved" element={<Saved />} />
+                <Route path="all-tools" element={<AllTools />} />
+                <Route path="foundations" element={<Foundations />} />
+                <Route path="work-with-zach" element={<WorkWithZach />} />
               </Route>
             </Route>
 
