@@ -233,29 +233,33 @@ Deno.serve(async (req) => {
 
   if (error) return json({ error: "Failed to save session" }, 500);
 
-  // AI tool selection — best effort, before returning.
-  try {
-    const pick = await pickToolsWithAi({
-      name,
-      q2: q2 as string,
-      q3: q3 as string,
-      q3Other,
-      q4: q4 as string,
-    });
-    if (pick) {
-      const { error: updErr } = await admin
-        .from("sessions")
-        .update({
-          ai_picked_tools: pick.tools,
-          ai_picked_at: new Date().toISOString(),
-          ai_pick_reasoning: pick.reasoning,
-        })
-        .eq("id", data.id);
-      if (updErr) console.log("ai-pick: update failed", updErr);
+  // AI tool selection — runs in background, frontend polls for the result.
+  const sessionIdForAi = data.id;
+  // @ts-expect-error EdgeRuntime is a Supabase Edge Functions global
+  EdgeRuntime.waitUntil((async () => {
+    try {
+      const pick = await pickToolsWithAi({
+        name,
+        q2: q2 as string,
+        q3: q3 as string,
+        q3Other,
+        q4: q4 as string,
+      });
+      if (pick) {
+        const { error: updErr } = await admin
+          .from("sessions")
+          .update({
+            ai_picked_tools: pick.tools,
+            ai_picked_at: new Date().toISOString(),
+            ai_pick_reasoning: pick.reasoning,
+          })
+          .eq("id", sessionIdForAi);
+        if (updErr) console.log("ai-pick: update failed", updErr);
+      }
+    } catch (e) {
+      console.log("ai-pick: unexpected error", e);
     }
-  } catch (e) {
-    console.log("ai-pick: unexpected error", e);
-  }
+  })());
 
   return json({ session_id: data.id });
 });

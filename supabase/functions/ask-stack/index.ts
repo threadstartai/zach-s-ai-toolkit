@@ -264,10 +264,6 @@ How to help them:
 
   const assistantMessageId = insertedMessages.find((m: any) => m.role === "assistant")?.id ?? null;
 
-  await admin
-    .from("conversations")
-    .update({ updated_at: new Date().toISOString() })
-    .eq("id", conversationId);
 
   return json({
     conversation_id: conversationId,
