@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useResultContext } from "../shared/useResultContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,7 +8,7 @@ import { audiencePhrase, useCasePhrase, confidencePhrase, whyThisTool } from "..
 import { SECTION_LABELS, LADDER, groupChunks } from "../shared/chunks";
 import { ChunkBlock } from "../shared/ChunkBlock";
 import { SaveChunkButton } from "../shared/SaveChunkButton";
-import type { ToolKey } from "../shared/types";
+import type { Chunk, ToolKey } from "../shared/types";
 import { fullGuideUrl } from "@/lib/pdfs";
 import { ToolDetailDrawer } from "../ToolDetailDrawer";
 
@@ -28,6 +28,37 @@ const MyStack = () => {
   const [labelDraft, setLabelDraft] = useState("");
   const [saving, setSaving] = useState(false);
   const [detailSlug, setDetailSlug] = useState<string | null>(null);
+
+  const modeKey = sessionId ? `myaistack_mode_${sessionId}` : null;
+  const indexKey = sessionId ? `myaistack_idx_${sessionId}` : null;
+
+  const [mode, setMode] = useState<"everything" | "guided">(() => {
+    if (typeof window === "undefined" || !modeKey) return "everything";
+    return (localStorage.getItem(modeKey) as "everything" | "guided") || "everything";
+  });
+  const [guidedIndex, setGuidedIndex] = useState<number>(() => {
+    if (typeof window === "undefined" || !indexKey) return 0;
+    const raw = localStorage.getItem(indexKey);
+    return raw ? Math.max(0, parseInt(raw, 10) || 0) : 0;
+  });
+  useEffect(() => { if (modeKey) localStorage.setItem(modeKey, mode); }, [mode, modeKey]);
+  useEffect(() => { if (indexKey) localStorage.setItem(indexKey, String(guidedIndex)); }, [guidedIndex, indexKey]);
+
+  const guidedSteps = useMemo(() => {
+    const steps: { toolKey: ToolKey; sectionKey: string; sectionLabel: string; chunk: Chunk }[] = [];
+    for (const k of picks) {
+      const t = TOOLS[k];
+      const grouped = groupChunks(chunksByTool[t.slug] ?? []);
+      for (const s of SECTION_LABELS) {
+        const items = grouped[s.key];
+        if (!items) continue;
+        for (const ch of items) {
+          steps.push({ toolKey: k, sectionKey: s.key, sectionLabel: s.label, chunk: ch });
+        }
+      }
+    }
+    return steps;
+  }, [picks, chunksByTool]);
 
   const stageFromConfidence = (() => {
     switch (c4) {
@@ -79,6 +110,32 @@ const MyStack = () => {
           </p>
         </div>
       )}
+      <div className="mt-6 flex flex-wrap items-center gap-2 text-[13px]">
+        <span className="text-navy/65 font-mono text-[11px] tracking-[0.12em] uppercase">View</span>
+        <div className="ml-1 flex gap-1.5">
+          <button
+            onClick={() => setMode("everything")}
+            className={`px-3 py-1.5 rounded-[8px] transition-colors duration-150 ${
+              mode === "everything"
+                ? "bg-navy text-primary-foreground"
+                : "bg-background border border-[hsl(var(--border))] text-navy hover:border-navy/40"
+            }`}
+          >
+            Show me everything
+          </button>
+          <button
+            onClick={() => setMode("guided")}
+            className={`px-3 py-1.5 rounded-[8px] transition-colors duration-150 ${
+              mode === "guided"
+                ? "bg-navy text-primary-foreground"
+                : "bg-background border border-[hsl(var(--border))] text-navy hover:border-navy/40"
+            }`}
+          >
+            Guide me step by step
+          </button>
+        </div>
+      </div>
+
       <div className="mt-8 font-mono text-[11px] tracking-[0.12em] text-navy/55 uppercase">Your situation</div>
       <div className="mt-1 mb-1 h-px w-10 bg-navy/30" />
       <p className="mt-3 text-navy text-[17px] leading-[1.7]">
@@ -92,7 +149,7 @@ const MyStack = () => {
       </p>
 
       {/* Jump-to nav strip */}
-      {picks.length > 1 && (
+      {mode === "everything" && picks.length > 1 && (
         <div className="mt-8 border-t border-b border-foreground/15 py-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[14px]">
           <span className="font-mono text-navy">Jump to —</span>
           {picks.map((k, i) => {
@@ -127,6 +184,7 @@ const MyStack = () => {
       )}
 
       {/* Tool cards */}
+      {mode === "everything" && (
       <div className="mt-10 flex flex-col gap-7">
         {picks.map((k, i) => {
           const t = TOOLS[k];
@@ -266,6 +324,75 @@ const MyStack = () => {
           );
         })}
       </div>
+      )}
+
+      {mode === "guided" && (
+        <div className="mt-10">
+          {guidedSteps.length === 0 ? (
+            <p className="italic text-foreground/60">Loading your stack…</p>
+          ) : guidedIndex >= guidedSteps.length ? (
+            <div className="bg-background border border-[hsl(var(--border))] rounded-[16px] p-8 text-center">
+              <h4 className="text-[22px] font-bold text-navy">You've worked through your stack.</h4>
+              <p className="mt-3 text-foreground/85 text-[15px] leading-[1.65]">
+                That's everything in priority order. Now go try one of the prompts in real life.
+              </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-2">
+                <button
+                  onClick={() => { setGuidedIndex(0); }}
+                  className="bg-navy text-primary-foreground px-4 py-2 rounded-[8px] text-[14px] font-medium"
+                >
+                  Take it from the top
+                </button>
+                <button
+                  onClick={() => { setMode("everything"); }}
+                  className="border border-[hsl(var(--border))] text-navy hover:border-navy/40 px-4 py-2 rounded-[8px] text-[14px] font-medium"
+                >
+                  Switch to everything view
+                </button>
+              </div>
+            </div>
+          ) : (
+            (() => {
+              const step = guidedSteps[guidedIndex];
+              const tool = TOOLS[step.toolKey];
+              return (
+                <div className="bg-background border border-[hsl(var(--border))] rounded-[16px] p-6 sm:p-8">
+                  <div className="font-mono text-[11px] tracking-[0.08em] text-navy/65 uppercase">
+                    Step {guidedIndex + 1} of {guidedSteps.length} · {tool.name} · {step.sectionLabel}
+                  </div>
+                  <div className="mt-1 mb-4 h-px w-12 bg-navy/30" />
+                  <ChunkBlock chunk={step.chunk} />
+                  <div className="mt-7 flex items-center justify-between gap-3">
+                    <button
+                      onClick={() => setGuidedIndex((i) => Math.max(0, i - 1))}
+                      disabled={guidedIndex === 0}
+                      className="text-[13px] text-navy/70 hover:text-navy disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      ← Back
+                    </button>
+                    <div className="flex gap-1.5">
+                      {guidedSteps.map((_, i) => (
+                        <span
+                          key={i}
+                          className={`h-1.5 w-1.5 rounded-full ${
+                            i === guidedIndex ? "bg-navy" : i < guidedIndex ? "bg-navy/50" : "bg-navy/15"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => setGuidedIndex((i) => i + 1)}
+                      className="bg-navy text-primary-foreground px-4 py-2 rounded-[8px] text-[14px] font-medium"
+                    >
+                      Done — next →
+                    </button>
+                  </div>
+                </div>
+              );
+            })()
+          )}
+        </div>
+      )}
 
       {/* Section break */}
       <div className="mt-20 mb-2 flex items-center justify-center gap-3 text-navy/30">
