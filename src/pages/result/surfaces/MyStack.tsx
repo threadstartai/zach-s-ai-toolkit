@@ -253,7 +253,7 @@ const MyStack = () => {
               "",
               "My three tools (in the order they were recommended):",
               "",
-              ...picks.map((k, i) => `${i + 1}. ${TOOLS[k].name} — ${whyThisTool(TOOLS[k].slug, c2, c3, c4, q3OtherText)}`),
+              ...picks.map((k, i) => `${i + 1}. ${TOOLS[k].name} — ${whyThisTool(TOOLS[k].slug, c2, c3, c4, q3OtherText, aiPickReasoning?.[TOOLS[k].slug])}`),
               "",
               "Help me think through how to actually use these tonight. Ask me clarifying questions before giving generic advice. Push back where I'm being lazy.",
             ];
