@@ -98,7 +98,7 @@ const DashboardIndex = () => {
           to="/onboarding"
           className="inline-flex items-center justify-center bg-navy text-primary-foreground rounded-[8px] px-5 h-11 text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150"
         >
-          + Take another quiz
+          + Start new onboarding
         </Link>
       </div>
     </div>
