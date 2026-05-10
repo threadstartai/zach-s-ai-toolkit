@@ -38,7 +38,7 @@ export const ToolDetailDrawer = ({ open, onOpenChange, toolSlug }: Props) => {
     (async () => {
       const { data: t } = await supabase
         .from("tools")
-        .select("id, slug, name, tagline, source_doc, status, update_message")
+        .select("id, slug, name, tagline, source_doc, status, update_message, when_not_to_use")
         .eq("slug", toolSlug)
         .maybeSingle();
       if (cancelled || !t) {
