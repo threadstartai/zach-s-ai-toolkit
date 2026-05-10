@@ -73,3 +73,42 @@ export const isMeaningfulName = (raw: string) => {
 };
 
 export const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const ROLE_LABEL_TO_CODE: Record<string, string> = {
+  "Founder / CEO": "founder",
+  "Solo / freelance": "solo",
+  "Team lead or manager": "team-lead",
+  "Individual contributor": "ic",
+  "Student": "student",
+  "Personal life / family": "personal",
+  "Retired or exploring": "retired",
+};
+export const codeRole = (label: string | null): string | null => {
+  if (!label) return null;
+  return ROLE_LABEL_TO_CODE[label] ?? null;
+};
+
+const TIME_LABEL_TO_CODE: Record<string, string> = {
+  "About 15 minutes a week": "15min",
+  "About 30 minutes a week": "30min",
+  "About 1 hour a week": "1hr",
+  "Several hours a week": "several",
+  "Open-ended — I'll go as deep as it's worth": "open",
+};
+export const codeTimeBudget = (label: string | null): string | null => {
+  if (!label) return null;
+  return TIME_LABEL_TO_CODE[label] ?? null;
+};
+
+const TOOL_LABEL_TO_CODE: Record<string, string> = {
+  "ChatGPT": "chatgpt",
+  "Claude": "claude",
+  "Gemini": "gemini",
+  "GitHub Copilot": "copilot",
+  "Perplexity": "perplexity",
+  "Other AI tool": "other-ai",
+  "Nothing yet": "nothing-yet",
+};
+export const codeExistingTool = (label: string): string => {
+  return TOOL_LABEL_TO_CODE[label] ?? "other-ai";
+};
