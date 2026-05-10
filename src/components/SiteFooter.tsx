@@ -4,8 +4,8 @@ import { useAuth } from "@/contexts/AuthContext";
 const SiteFooter = () => {
   const { user } = useAuth();
   return (
-    <footer className="mt-24 border-t border-[hsl(var(--border))] bg-background">
-      <div className="mx-auto max-w-[1100px] px-6 py-12 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-10 md:gap-16 text-[14px] leading-relaxed text-foreground/75">
+    <footer className="mt-16 md:mt-24 border-t border-[hsl(var(--border))] bg-background">
+      <div className="mx-auto max-w-[1100px] px-6 py-10 md:py-12 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-10 md:gap-16 text-[14px] leading-relaxed text-foreground/75">
         <div className="max-w-[640px]">
           <p className="italic">
             Created by Zach Z. Made for friends &amp; family. If you know someone whose business or team would benefit from a proper AI setup, send them my way:{" "}

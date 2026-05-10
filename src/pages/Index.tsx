@@ -15,7 +15,7 @@ const CATEGORIES = [
 ];
 
 const processCardCls =
-  "bg-background border border-[hsl(var(--border))] rounded-[12px] p-6 hover:border-navy/40 transition-colors duration-150";
+  "bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6 hover:border-navy/40 transition-colors duration-150";
 
 const PROCESS = [
   {
@@ -44,9 +44,9 @@ const Index = () => {
     <SiteLayout>
       <div className="mx-auto max-w-[1100px] px-6">
         {/* Hero */}
-        <section className="pt-16 md:pt-24 pb-14 md:pb-20">
+        <section className="pt-10 md:pt-24 pb-10 md:pb-20">
           <div className="max-w-[760px]">
-            <h1 className="text-5xl md:text-6xl font-extrabold text-navy tracking-[-0.02em] leading-[1.05]">
+            <h1 className="text-[40px] md:text-6xl font-extrabold text-navy tracking-[-0.02em] leading-[1.05]">
               My AI Stack.
             </h1>
             <p className="mt-5 text-xl md:text-2xl font-normal text-navy leading-snug max-w-[600px]">
@@ -56,24 +56,24 @@ const Index = () => {
               Free. Mine to keep updated. No course at the end.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <Link to={startHref} className={primaryBtn}>
+              <Link to={startHref} className={`${primaryBtn} w-full sm:w-auto`}>
                 Get my stack →
               </Link>
-              <Link to="/stack" className={outlineBtn}>
+              <Link to="/stack" className={`${outlineBtn} w-full sm:w-auto`}>
                 Browse the 17 tools
               </Link>
             </div>
           </div>
 
           {/* Trust strip */}
-          <p className="mt-10 italic text-[14px] text-navy/70">
+          <p className="mt-6 md:mt-10 italic text-[14px] text-navy/70">
             17 AI tools. 346 paragraphs of guidance. No affiliate links. No course at the end.
           </p>
         </section>
 
         {/* What this is — 2 column */}
-        <section className="py-14 md:py-20 border-t border-[hsl(var(--border))]/60">
-          <div className="grid grid-cols-1 md:grid-cols-[1.1fr_1fr] gap-10 md:gap-16 items-start">
+        <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]/60">
+          <div className="grid grid-cols-1 md:grid-cols-[1.1fr_1fr] gap-6 md:gap-10 lg:gap-16 items-start">
             <div>
               <h2 className="text-3xl md:text-4xl text-navy font-bold tracking-tight">What this is</h2>
               <div className="mt-5 space-y-4 text-foreground/85 text-[16.5px] leading-[1.7]">
@@ -88,7 +88,7 @@ const Index = () => {
                 </p>
               </div>
             </div>
-            <div className="self-start bg-navy-light/40 border border-navy-light rounded-[16px] p-8">
+            <div className="self-start bg-navy-light/40 border border-navy-light rounded-[16px] p-6 md:p-8">
               <p className="text-[15px] font-bold text-navy">Four ways AI shows up.</p>
               <ul className="mt-4 flex flex-col gap-2.5">
                 {CATEGORIES.map((c) => (
@@ -103,14 +103,14 @@ const Index = () => {
         </section>
 
         {/* The Process — 2x2 grid */}
-        <section className="py-14 md:py-20 border-t border-[hsl(var(--border))]/60">
+        <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]/60">
           <div className="max-w-[760px]">
             <h2 className="text-3xl md:text-4xl text-navy font-bold tracking-tight">The way I use AI</h2>
             <p className="mt-5 text-foreground/85 text-[16.5px] leading-[1.7]">
               The tools matter less than the loop. Here's the four-step process I use for almost everything:
             </p>
           </div>
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {PROCESS.map((item, i) => (
               <div key={i} className={processCardCls}>
                 <span className="font-mono text-[12px] text-navy/60 tabular-nums">{`0${i + 1}.`}</span>
@@ -128,7 +128,7 @@ const Index = () => {
         </section>
 
         {/* Chrome Consulting */}
-        <section className="py-14 md:py-20 border-t border-[hsl(var(--border))]/60">
+        <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]/60">
           <div className="max-w-[760px]">
             <h3 className="text-2xl text-navy font-bold tracking-tight">
               If you want help getting this set up properly

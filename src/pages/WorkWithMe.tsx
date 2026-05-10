@@ -20,11 +20,11 @@ const WorkWithMe = () => {
     <SiteLayout>
       <article className="mx-auto max-w-[900px] px-6">
         {/* Hero */}
-        <section className="pt-16 md:pt-20 pb-10">
-          <h1 className="text-5xl md:text-6xl font-extrabold text-navy tracking-[-0.02em] leading-[1.05]">
+        <section className="pt-10 md:pt-20 pb-10">
+          <h1 className="text-[40px] md:text-6xl font-extrabold text-navy tracking-[-0.02em] leading-[1.05]">
             Work with me
           </h1>
-          <p className="mt-5 text-xl md:text-2xl font-normal text-foreground/70 leading-snug max-w-[620px]">
+          <p className="mt-5 text-lg md:text-2xl font-normal text-foreground/70 leading-snug max-w-[620px]">
             If you'd rather have someone do this properly.
           </p>
         </section>
@@ -38,9 +38,9 @@ const WorkWithMe = () => {
 
         {/* Pillars */}
         <section className="pb-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
             {PILLARS.map((p) => (
-              <div key={p.title} className="bg-background border border-[hsl(var(--border))] rounded-[12px] p-6">
+              <div key={p.title} className="bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6">
                 <h3 className="text-[17px] font-bold text-navy">{p.title}</h3>
                 <p className="mt-3 text-[15px] leading-[1.65] text-foreground/85">{p.body}</p>
               </div>
@@ -49,7 +49,7 @@ const WorkWithMe = () => {
         </section>
 
         {/* Contact */}
-        <section className="border-t border-[hsl(var(--border))] pt-12 mt-16 pb-20">
+        <section className="border-t border-[hsl(var(--border))] pt-10 mt-12 md:pt-12 md:mt-16 pb-16 md:pb-20">
           <p className="text-[16px] leading-[1.7] text-foreground/85">
             Drop me a line:{" "}
             <a href="mailto:zach@chromeconsulting.xyz" className="text-navy underline underline-offset-4 hover:text-navy/80">
