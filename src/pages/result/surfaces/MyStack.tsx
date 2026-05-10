@@ -4,12 +4,13 @@ import { useResultContext } from "../shared/useResultContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { TOOLS, whyFor, whyForChatGPT } from "../shared/tools";
-import { audiencePhrase, useCasePhrase, confidencePhrase, whyThisTool, ladderLine } from "../shared/phrases";
+import { audiencePhrase, useCasePhrase, confidencePhrase, whyThisTool } from "../shared/phrases";
 import { SECTION_LABELS, LADDER, groupChunks } from "../shared/chunks";
 import { ChunkBlock } from "../shared/ChunkBlock";
 import { SaveChunkButton } from "../shared/SaveChunkButton";
 import type { ToolKey } from "../shared/types";
 import { fullGuideUrl } from "@/lib/pdfs";
+import { ToolDetailDrawer } from "../ToolDetailDrawer";
 
 const MyStack = () => {
   const {
@@ -26,6 +27,16 @@ const MyStack = () => {
   const [renaming, setRenaming] = useState(false);
   const [labelDraft, setLabelDraft] = useState("");
   const [saving, setSaving] = useState(false);
+  const [detailSlug, setDetailSlug] = useState<string | null>(null);
+
+  const stageFromConfidence = (() => {
+    switch (c4) {
+      case "tried": return 2;
+      case "weekly": return 3;
+      case "confident": return 4;
+      default: return 1;
+    }
+  })();
 
   const why = (k: ToolKey) => k === "04" ? whyForChatGPT(c4) : whyFor(k, c2);
 
@@ -68,7 +79,9 @@ const MyStack = () => {
           </p>
         </div>
       )}
-      <p className="mt-6 text-navy text-[17px] leading-[1.7]">
+      <div className="mt-8 font-mono text-[11px] tracking-[0.12em] text-navy/55 uppercase">Your situation</div>
+      <div className="mt-1 mb-1 h-px w-10 bg-navy/30" />
+      <p className="mt-3 text-navy text-[17px] leading-[1.7]">
         Here's what I'm reading: {audiencePhrase(c2)}, working on {useCasePhrase(c3, q3OtherText)}, {confidencePhrase(c4)}. Three tools, and what's worth doing tonight. If that's slightly off,{" "}
         <button
           onClick={handleStartOver}
@@ -123,17 +136,27 @@ const MyStack = () => {
           return (
             <Fragment key={k}>
               {i === 0 && (
-                <p className="mb-3 mt-2 italic text-[14px] text-navy/75 font-medium">
-                  Start here tonight ↓
-                </p>
+                <div className="mb-3 mt-2">
+                  <div className="font-mono text-[10px] tracking-[0.15em] text-navy/55 uppercase">Begin</div>
+                  <p className="mt-1 italic text-[14px] text-navy/80 font-medium">
+                    Start here tonight ↓
+                  </p>
+                </div>
               )}
               <div
                 id={`tool-${t.slug}`}
-                className="bg-background border border-[hsl(var(--border))] rounded-[16px] p-6 sm:p-8 scroll-mt-[80px] transition-colors duration-150 hover:border-navy/30"
+                onClick={() => setDetailSlug(t.slug)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === "Enter") setDetailSlug(t.slug); }}
+                className="bg-background border border-[hsl(var(--border))] rounded-[16px] p-6 sm:p-8 scroll-mt-[80px] transition-colors duration-150 hover:border-navy/30 cursor-pointer"
               >
-                <div className="flex items-baseline gap-2.5">
-                  <span className="font-mono text-[13px] text-navy/60">{t.num}</span>
-                  <h4 className="text-[22px] font-bold text-navy">{t.name}</h4>
+                <div className="flex items-baseline justify-between gap-3">
+                  <div className="flex items-baseline gap-2.5">
+                    <span className="font-mono text-[13px] text-navy/60">{t.num}</span>
+                    <h4 className="text-[22px] font-bold text-navy">{t.name}</h4>
+                  </div>
+                  <span className="font-mono text-[11px] tracking-[0.05em] text-navy/45 shrink-0">Tool {i + 1} of {picks.length}</span>
                 </div>
                 {statusByTool[t.slug]?.status === "update" && statusByTool[t.slug]?.update_message && (
                   <div className="mt-4 bg-navy text-primary-foreground rounded-[8px] px-4 py-3 text-[14px] leading-[1.55]">
@@ -167,7 +190,8 @@ const MyStack = () => {
                             {items.map((ch) => (
                               <div
                                 key={ch.id}
-                                className="relative bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6 transition-colors duration-150 hover:border-navy/40"
+                                onClick={(e) => e.stopPropagation()}
+                                className="relative bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6 transition-colors duration-150 hover:border-navy/40 cursor-default"
                               >
                                 {user && (
                                   <SaveChunkButton
@@ -187,7 +211,10 @@ const MyStack = () => {
                   </div>
                 )}
 
-                <div className="mt-6 pt-4 border-t border-foreground/10">
+                <div
+                  className="mt-6 pt-4 border-t border-foreground/10"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   {fullGuideUrl(t.slug) && (
                     <a href={fullGuideUrl(t.slug)!} target="_blank" rel="noopener noreferrer"
                        className="block text-[13px] italic text-navy/70 hover:text-navy underline underline-offset-2 mb-3">
@@ -227,39 +254,63 @@ const MyStack = () => {
                     <p className="text-[13px] italic text-navy/60">Thanks — noted.</p>
                   )}
                 </div>
+
+                <button
+                  onClick={(e) => { e.stopPropagation(); setDetailSlug(t.slug); }}
+                  className="mt-5 italic text-[13px] text-navy/70 hover:text-navy underline underline-offset-2"
+                >
+                  Read the full guide for {t.name} →
+                </button>
               </div>
             </Fragment>
           );
         })}
       </div>
 
+      {/* Section break */}
+      <div className="mt-20 mb-2 flex items-center justify-center gap-3 text-navy/30">
+        <div className="h-px w-12 bg-navy/30" />
+        <span className="font-mono text-[10px] tracking-[0.2em]">●</span>
+        <div className="h-px w-12 bg-navy/30" />
+      </div>
+
       {/* Where this leads — ladder */}
-      <div className="mt-20">
+      <div className="mt-6">
         <h4 className="text-[24px] font-bold text-navy">Where this leads</h4>
         <p className="mt-3 text-foreground/85 text-[16px] leading-[1.7]">
           Using AI well isn't a list of tools. It's a skill that builds in stages. Here's the ladder:
         </p>
         <ol className="mt-7 space-y-5">
-          {LADDER.map((s, i) => (
-            <li key={i} className="flex gap-4">
-              <span className="shrink-0 w-8 h-8 rounded-full bg-navy text-primary-foreground flex items-center justify-center text-[14px] font-semibold">
-                {i + 1}
-              </span>
-              <div>
-                <p className="font-bold text-navy text-[16px]">{s.name}</p>
-                <p className="mt-1 text-foreground/85 text-[15px] leading-[1.65]">{s.desc}</p>
-              </div>
-            </li>
-          ))}
+          {LADDER.map((s, i) => {
+            const isCurrent = i + 1 === stageFromConfidence;
+            return (
+              <li
+                key={i}
+                className={`flex gap-4 py-2 ${isCurrent ? "bg-navy-light/40 -mx-3 px-3 rounded-[8px]" : ""}`}
+              >
+                <span className="shrink-0 w-8 h-8 rounded-full bg-navy text-primary-foreground flex items-center justify-center text-[14px] font-semibold">
+                  {i + 1}
+                </span>
+                <div className="flex-1">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <p className="font-bold text-navy text-[16px]">{s.name}</p>
+                    {isCurrent && (
+                      <span className="font-mono text-[11px] tracking-[0.08em] text-navy shrink-0">You're here</span>
+                    )}
+                  </div>
+                  <p className="mt-1 text-foreground/85 text-[15px] leading-[1.65]">{s.desc}</p>
+                </div>
+              </li>
+            );
+          })}
         </ol>
-        <p className="mt-7 italic text-navy text-[15px]">
-          {ladderLine(c4)}
-        </p>
       </div>
 
-      <p className="mt-12 text-navy/80 text-[16px] leading-[1.7] italic">
-        That's the stack. If you do one thing tonight, take the prompt at the top of the first card. If you want to come back to this — save your link, or just take a screenshot.
-      </p>
+      <div className="mt-12 bg-navy-light/30 border border-navy-light rounded-[16px] px-6 py-5">
+        <p className="text-navy/80 text-[16px] leading-[1.7] italic">
+          That's the stack. If you do one thing tonight, take the prompt at the top of the first card. If you want to come back to this — save your link, or just take a screenshot.
+        </p>
+      </div>
 
       {/* Footer actions */}
       <div className="mt-14 text-[14px] text-navy">
@@ -357,6 +408,11 @@ const MyStack = () => {
           </div>
         )}
       </div>
+      <ToolDetailDrawer
+        open={detailSlug !== null}
+        onOpenChange={(o) => { if (!o) setDetailSlug(null); }}
+        toolSlug={detailSlug}
+      />
     </div>
   );
 };
