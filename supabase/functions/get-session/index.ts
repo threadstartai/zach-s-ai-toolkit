@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
 
   const { data, error } = await supabase
     .from("sessions")
-    .select("name, q2_audience, q3_use_case, q3_other_text, q4_confidence, q5_learning_style, created_at, ai_picked_tools, ai_picked_at, ai_pick_reasoning")
+    .select("name, q2_audience, q3_use_case, q3_other_text, q4_confidence, q5_learning_style, created_at, ai_picked_tools, ai_picked_at, ai_pick_reasoning, stack_label")
     .eq("id", sessionId)
     .maybeSingle();
 
