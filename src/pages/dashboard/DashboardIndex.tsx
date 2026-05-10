@@ -293,6 +293,7 @@ const DashboardIndex = () => {
   const recentId = mostRecent!.id;
   const stackHome = `/dashboard/stacks/${recentId}/my-stack`;
   const divider = "border-t border-[hsl(var(--border))]";
+  const caseStudy = caseStudyForRole(mostRecent?.onboarding_role ?? null);
 
   return (
     <div className="max-w-[800px] mx-auto px-5 sm:px-8 py-8 md:py-10">
