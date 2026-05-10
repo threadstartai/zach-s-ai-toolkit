@@ -125,6 +125,11 @@ const Onboarding = () => {
         {/* Question eyebrow + heading */}
         {current && (
           <div className="mt-8">
+            {step === "q1" && (
+              <p className="mb-6 italic text-[14px] text-navy/75 leading-relaxed">
+                Four quick questions, then your stack. 100% free. Made for friends and family — so nobody gets left behind by AI. The sign-up was just so I can remember you when you come back.
+              </p>
+            )}
             <p className="text-[12px] uppercase tracking-wider text-navy/60 font-medium">
               Question {questionNumber} of 4
             </p>
