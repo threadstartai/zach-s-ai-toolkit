@@ -83,6 +83,8 @@ const App = () => (
                 <Route path="tonight" element={<Tonight />} />
                 <Route path="saved" element={<Saved />} />
                 <Route path="all-tools" element={<AllTools />} />
+                <Route path="briefing-method" element={<BriefingMethod />} />
+                <Route path="check-before-trust" element={<CheckBeforeTrust />} />
                 <Route path="foundations" element={<Foundations />} />
                 <Route path="work-with-zach" element={<WorkWithZach />} />
               </Route>
