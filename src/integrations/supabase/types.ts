@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       chunk_feedback: {
         Row: {
+          chunk_id: string | null
           created_at: string
           id: string
           reason: string
@@ -23,6 +24,7 @@ export type Database = {
           tool_slug: string
         }
         Insert: {
+          chunk_id?: string | null
           created_at?: string
           id?: string
           reason: string
@@ -30,6 +32,7 @@ export type Database = {
           tool_slug: string
         }
         Update: {
+          chunk_id?: string | null
           created_at?: string
           id?: string
           reason?: string
