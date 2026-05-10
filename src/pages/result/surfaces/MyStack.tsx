@@ -17,12 +17,15 @@ const MyStack = () => {
     chunksByTool, statusByTool, showSlowMessage,
     feedbackOpen, feedbackSubmitted, setFeedbackOpen, submitFeedback,
     sessionId, linkCopied, handleCopyShareLink, handleStartOver,
-    saved, setSaved,
     savedChunkIds, toggleSave,
     aiPickReasoning,
     isDashboard,
+    stackLabel,
   } = useResultContext();
   const { user } = useAuth();
+  const [renaming, setRenaming] = useState(false);
+  const [labelDraft, setLabelDraft] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const why = (k: ToolKey) => k === "04" ? whyForChatGPT(c4) : whyFor(k, c2);
 
