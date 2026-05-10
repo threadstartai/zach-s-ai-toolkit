@@ -3,7 +3,7 @@ import { fullGuideUrl } from "@/lib/pdfs";
 
 const ToolCard = ({ tool }: { tool: CategoryTool }) => (
   <div
-    className="block bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 hover:border-navy/40 transition-colors duration-150"
+    className="block bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 hover:border-navy/40 transition-colors duration-200 ease-out"
   >
     {tool.num && <div className="font-mono text-xs text-navy/60">{tool.num}</div>}
     <h4 className="text-lg font-bold text-navy mt-1">{tool.name}</h4>
@@ -13,7 +13,7 @@ const ToolCard = ({ tool }: { tool: CategoryTool }) => (
         href={fullGuideUrl(tool.slug)!}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-3 inline-block text-[12.5px] italic text-navy/65 hover:text-navy underline underline-offset-2"
+        className="mt-3 inline-block text-[12.5px] italic text-navy/65 hover:text-navy underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm"
       >
         Download doc ↓
       </a>

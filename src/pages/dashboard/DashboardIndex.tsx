@@ -270,7 +270,8 @@ const DashboardIndex = () => {
   const greetingName = useMemo(() => {
     const fromStack = mostRecent?.name?.trim();
     const meta = (user?.user_metadata as { display_name?: string } | undefined)?.display_name?.trim();
-    const raw = fromStack || meta || "";
+    const fromStackClean = fromStack && fromStack.toLowerCase() !== "anonymous" ? fromStack : "";
+    const raw = fromStackClean || meta || "";
     if (!raw) return "there";
     return raw.split(/\s+/)[0];
   }, [mostRecent, user]);
@@ -330,9 +331,24 @@ const DashboardIndex = () => {
                   {focus.title}
                 </h3>
               )}
-              <p className="mt-3 text-[15px] text-foreground/85 leading-[1.65] whitespace-pre-wrap">
-                {focus.content}
-              </p>
+              {(() => {
+                const split = splitFirstPrompt(focus.content ?? "");
+                return (
+                  <>
+                    {split.before && (
+                      <p className="mt-3 text-[15px] text-foreground/85 leading-[1.65] whitespace-pre-wrap">{split.before}</p>
+                    )}
+                    {split.prompt && (
+                      <div className="my-3 bg-background border border-navy/[0.12] border-l-[3px] border-l-navy rounded-[8px] px-5 py-4">
+                        <pre className="whitespace-pre-wrap font-mono text-[13.5px] leading-[1.7] text-foreground/90">{split.prompt}</pre>
+                      </div>
+                    )}
+                    {split.after && (
+                      <p className="mt-3 text-[15px] text-foreground/85 leading-[1.65] whitespace-pre-wrap">{split.after}</p>
+                    )}
+                  </>
+                );
+              })()}
               {focus.prompt && (
                 <a
                   href={claudeDeeplink(focus.prompt)}
