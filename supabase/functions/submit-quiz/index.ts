@@ -84,6 +84,9 @@ async function pickToolsWithAi(profile: {
   q3: string;
   q3Other: string;
   q4: string;
+  role: string | null;
+  timeBudget: string | null;
+  existingTools: string[] | null;
 }): Promise<AiPick | null> {
   if (!LOVABLE_API_KEY) {
     console.log("ai-pick: LOVABLE_API_KEY missing, skipping");
@@ -110,12 +113,15 @@ async function pickToolsWithAi(profile: {
     ? `free text — "${profile.q3Other}"`
     : `${profile.q3} (${Q3_LABELS[profile.q3] ?? profile.q3})`;
 
-  const system = `You're recommending the 3 best AI tools for a user of MY AI STACK. The user just answered an onboarding quiz. Pick from the catalogue ONLY — exact slugs.
+  const system = `You're recommending the 3 best AI tools for a user of MY AI STACK. The user just answered an onboarding flow. Pick from the catalogue ONLY — exact slugs.
 
 User profile:
 - Audience: ${profile.q2} (${Q2_LABELS[profile.q2] ?? profile.q2})
+- Role/situation: ${profile.role ? (ROLE_LABELS[profile.role] ?? profile.role) : "not specified"}
 - Use case: ${useCase}
+- Already using: ${profile.existingTools && profile.existingTools.length ? profile.existingTools.join(", ") : "nothing yet"}
 - AI confidence: ${profile.q4} (${Q4_LABELS[profile.q4] ?? profile.q4})
+- Time budget: ${profile.timeBudget ? (TIME_LABELS[profile.timeBudget] ?? profile.timeBudget) : "not specified"}
 - Name: ${profile.name || "anonymous"}
 
 Tool catalogue:
@@ -138,7 +144,11 @@ Rules:
 - For free-text use cases, pick tools that genuinely fit what they wrote. Don't force-fit.
 - Each reasoning sentence should reference the user's specific situation, not generic claims.
 - Use UK English. No hype words.
-- The Master Prompt Guide is the foundational teaching piece. When users have low confidence ('never' or 'tried'), make sure at least one of the 3 picks is a tool that pairs naturally with the briefing skill (Claude is the strongest match — it rewards good prompts most directly). For confident users, prefer tool combinations that show the relay habit (e.g. Claude + ChatGPT, or Claude + Perplexity).`;
+- The Master Prompt Guide is the foundational teaching piece. When users have low confidence ('never' or 'tried'), make sure at least one of the 3 picks is a tool that pairs naturally with the briefing skill (Claude is the strongest match — it rewards good prompts most directly). For confident users, prefer tool combinations that show the relay habit (e.g. Claude + ChatGPT, or Claude + Perplexity).
+- Time-budget signal: if time budget is "15min" or "30min", AVOID tools needing deep setup (avoid Manus, Lovable, Base44 unless clearly the best fit). Prefer fast-payoff tools (Claude, ChatGPT, Wispr Flow, Granola).
+- Existing-tool deprioritisation: if a tool slug appears in the user's existing-tools list, only recommend it if it's clearly the best fit AND the reasoning explicitly explains the upgrade angle ("you're already using X — here's how to push it further"). Otherwise prefer a different tool.
+- Role bias: founders / solo lean toward Claude + Lovable + ChatGPT. Team leads lean toward Granola + Claude + Manus. Individual contributors lean toward Wispr Flow + Claude + Notion-equivalents. Students lean toward NotebookLM + Perplexity + Gemini.
+- Each reasoning sentence should reference the user's role and time budget where it naturally fits — don't force it.`;
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
