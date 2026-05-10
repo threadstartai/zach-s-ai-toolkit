@@ -5,6 +5,8 @@ import { ChunkBlock } from "../shared/ChunkBlock";
 import { ChunkFeedbackButton } from "../shared/ChunkFeedbackButton";
 import { fullGuideUrl } from "@/lib/pdfs";
 import type { Chunk } from "../shared/types";
+import { SkeletonChunkList } from "@/components/ui-primitives/Skeletons";
+import { EmptyState } from "@/components/ui-primitives/EmptyState";
 
 const SLUG = "master-prompt-guide";
 const PAGE_TITLE = "Briefing method";
