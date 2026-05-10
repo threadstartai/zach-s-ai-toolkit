@@ -250,7 +250,7 @@ const DashboardIndex = () => {
   if (stacks.length === 0) return <Navigate to="/onboarding" replace />;
 
   const recentId = mostRecent!.id;
-  const stackHome = `/dashboard/stacks/${recentId}/my-stack`;
+  
   const divider = "border-t border-[hsl(var(--border))]";
   const caseStudy = caseStudyForRole(mostRecent?.onboarding_role ?? null);
 
