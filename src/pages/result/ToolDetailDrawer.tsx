@@ -21,6 +21,7 @@ type ToolRow = {
   source_doc: string | null;
   status: string;
   update_message: string | null;
+  when_not_to_use: string | null;
 };
 
 export const ToolDetailDrawer = ({ open, onOpenChange, toolSlug }: Props) => {
@@ -37,7 +38,7 @@ export const ToolDetailDrawer = ({ open, onOpenChange, toolSlug }: Props) => {
     (async () => {
       const { data: t } = await supabase
         .from("tools")
-        .select("id, slug, name, tagline, source_doc, status, update_message")
+        .select("id, slug, name, tagline, source_doc, status, update_message, when_not_to_use")
         .eq("slug", toolSlug)
         .maybeSingle();
       if (cancelled || !t) {
@@ -101,6 +102,17 @@ export const ToolDetailDrawer = ({ open, onOpenChange, toolSlug }: Props) => {
               {tool.status === "update" && tool.update_message && (
                 <div className="mt-5 bg-navy text-primary-foreground rounded-[8px] px-4 py-3 text-[14px] leading-[1.55]">
                   <span className="font-semibold">Update:</span> {tool.update_message}
+                </div>
+              )}
+
+              {tool.when_not_to_use && (
+                <div className="mt-5 bg-navy-light/60 border-l-[3px] border-l-navy rounded-[8px] px-4 py-3">
+                  <p className="font-mono text-[11px] tracking-[0.12em] uppercase text-navy">
+                    When not to use
+                  </p>
+                  <p className="mt-1.5 text-[14px] leading-[1.55] text-foreground/85">
+                    {tool.when_not_to_use}
+                  </p>
                 </div>
               )}
 
