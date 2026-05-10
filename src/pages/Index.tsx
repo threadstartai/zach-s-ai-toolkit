@@ -78,7 +78,7 @@ const Index = () => {
         <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]/60">
           <div className="grid grid-cols-1 md:grid-cols-[1.1fr_1fr] gap-6 md:gap-10 lg:gap-16 items-start">
             <div>
-              <h2 className="text-3xl md:text-4xl text-navy font-bold tracking-tight">What this is</h2>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight">What this is</h2>
               <div className="mt-5 space-y-4 text-foreground/85 text-[16.5px] leading-[1.7]">
                 <p>
                   17 AI tools, one place, written like a friend would explain them. No
