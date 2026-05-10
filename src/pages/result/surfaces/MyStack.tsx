@@ -251,7 +251,7 @@ const MyStack = () => {
                               <div
                                 key={ch.id}
                                 onClick={(e) => e.stopPropagation()}
-                                className="relative bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6 transition-colors duration-150 hover:border-navy/40 cursor-default"
+                                className="relative bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6 transition-colors duration-200 ease-out hover:border-navy/40 cursor-default"
                               >
                                 {user && (
                                   <SaveChunkButton
@@ -259,9 +259,15 @@ const MyStack = () => {
                                     onClick={() => toggleSave(ch.id)}
                                   />
                                 )}
-                                <div className={user ? "pr-10" : undefined}>
-                                  <ChunkBlock chunk={ch} />
-                                </div>
+                                <Collapsible defaultOpen={ch.chunk_type === "first-prompt"} className="pr-10">
+                                  <CollapsibleTrigger className="group flex w-full items-center justify-between text-left rounded-[6px] -mx-1 px-1 py-1 hover:bg-navy-light/30 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2">
+                                    <span className="text-[15px] font-semibold text-navy">{ch.title || ch.chunk_type}</span>
+                                    <ChevronDown className="h-4 w-4 text-navy/60 transition-transform duration-200 ease-out group-data-[state=open]:rotate-180 shrink-0 ml-3" />
+                                  </CollapsibleTrigger>
+                                  <CollapsibleContent className="pt-3 data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
+                                    <ChunkBlock chunk={ch} showTitle={false} />
+                                  </CollapsibleContent>
+                                </Collapsible>
                               </div>
                             ))}
                           </div>
