@@ -248,18 +248,21 @@ How to help them:
     return json({ error: "Couldn't reach the assistant. Try again." }, 502);
   }
 
-  // Persist user + assistant messages
-  const { error: insErr } = await admin.from("messages").insert([
-    { conversation_id: conversationId, role: "user", content: messageText },
-  ]);
-  if (insErr) console.log("ask-stack: user msg insert failed", insErr);
-
-  const { data: assistantMsg, error: aErr } = await admin
+  const { data: insertedMessages, error: msgErr } = await admin
     .from("messages")
-    .insert({ conversation_id: conversationId, role: "assistant", content: assistantContent })
-    .select("id")
-    .single();
-  if (aErr) console.log("ask-stack: assistant msg insert failed", aErr);
+    .insert([
+      { conversation_id: conversationId, role: "user", content: messageText },
+      { conversation_id: conversationId, role: "assistant", content: assistantContent },
+    ])
+    .select("id, role, created_at")
+    .order("created_at", { ascending: true });
+
+  if (msgErr || !insertedMessages || insertedMessages.length !== 2) {
+    console.error("ask-stack: message persistence failed", msgErr);
+    return json({ error: "Failed to save message. Try again." }, 500);
+  }
+
+  const assistantMessageId = insertedMessages.find((m: any) => m.role === "assistant")?.id ?? null;
 
   await admin
     .from("conversations")
@@ -268,7 +271,7 @@ How to help them:
 
   return json({
     conversation_id: conversationId,
-    message_id: assistantMsg?.id ?? null,
+    message_id: assistantMessageId,
     content: assistantContent,
   });
 });
