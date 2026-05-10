@@ -30,6 +30,35 @@ export const confidencePhrase = (q4: Q4Code): string => {
   return "comfortable enough to push it further";
 };
 
+export const rolePhrase = (role: string | null | undefined): string => {
+  if (!role) return "";
+  if (role === "founder") return "a founder";
+  if (role === "solo") return "freelance";
+  if (role === "team-lead") return "leading a team";
+  if (role === "ic") return "in an individual role";
+  if (role === "student") return "a student";
+  if (role === "personal") return "using this for personal life";
+  if (role === "retired") return "exploring";
+  return "";
+};
+
+export const timeBudgetPhrase = (tb: string | null | undefined): string => {
+  if (!tb) return "";
+  if (tb === "15min") return "about 15 minutes a week";
+  if (tb === "30min") return "about 30 minutes a week";
+  if (tb === "1hr") return "about an hour a week";
+  if (tb === "several") return "several hours a week";
+  if (tb === "open") return "open-ended time";
+  return "";
+};
+
+const _confidencePlaceholder = (q4: Q4Code): string => {
+  if (q4 === "never") return "starting from scratch";
+  if (q4 === "tried") return "with a bit of experience";
+  if (q4 === "weekly") return "using AI regularly";
+  return "comfortable enough to push it further";
+};
+
 export const whyThisTool = (
   slug: string,
   q2: Q2Code,
