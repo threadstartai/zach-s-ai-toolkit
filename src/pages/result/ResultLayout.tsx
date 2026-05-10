@@ -3,6 +3,8 @@ import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
 import SiteLayout from "@/components/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { ResultSidebar } from "./ResultSidebar";
+import { AskDrawer } from "./AskDrawer";
+import { useAuth } from "@/contexts/AuthContext";
 import { useSavedChunks } from "./shared/useSavedChunks";
 import { TOOLS, recommend } from "./shared/tools";
 import {
