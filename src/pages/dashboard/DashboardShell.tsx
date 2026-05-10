@@ -15,6 +15,7 @@ const DashboardShell = () => {
   const { user } = useAuth();
   const { sessionId } = useParams<{ sessionId: string }>();
   const [stacks, setStacks] = useState<StackLite[]>([]);
+  const [savedCount, setSavedCount] = useState<number>(0);
 
   useEffect(() => {
     if (!user) return;
@@ -25,6 +26,19 @@ const DashboardShell = () => {
         .select("id, stack_label, created_at")
         .order("created_at", { ascending: false });
       if (!cancelled && data) setStacks(data as StackLite[]);
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const { count } = await supabase
+        .from("saved_chunks")
+        .select("chunk_id", { count: "exact", head: true })
+        .eq("user_id", user.id);
+      if (!cancelled && typeof count === "number") setSavedCount(count);
     })();
     return () => { cancelled = true; };
   }, [user]);
@@ -43,6 +57,7 @@ const DashboardShell = () => {
           currentStackId={current?.id ?? null}
           currentStackLabel={current?.stack_label ?? null}
           currentStackCreatedAt={current?.created_at ?? null}
+          savedCount={savedCount}
         />
         <main className="flex-1 min-w-0">
           <Outlet />
