@@ -5,6 +5,7 @@ import { ChunkBlock } from "./shared/ChunkBlock";
 import { SECTION_LABELS, groupChunks } from "./shared/chunks";
 import { fullGuideUrl } from "@/lib/pdfs";
 import type { Chunk } from "./shared/types";
+import { ChunkFeedbackButton } from "./shared/ChunkFeedbackButton";
 
 type Props = {
   open: boolean;
