@@ -341,7 +341,7 @@ const DashboardIndex = () => {
                 From {focus.toolName}
               </p>
               {focus.title && (
-                <h3 className="mt-2 text-[18px] font-bold text-foreground leading-[1.3]">
+                <h3 className="mt-2 text-[20px] font-bold text-foreground leading-[1.3]">
                   {focus.title}
                 </h3>
               )}
