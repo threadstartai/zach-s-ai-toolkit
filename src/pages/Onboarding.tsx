@@ -104,7 +104,7 @@ const Onboarding = () => {
   const current = headings[step as keyof typeof headings];
 
   return (
-    <div className="min-h-screen bg-offwhite flex flex-col items-center px-5">
+    <div className="min-h-screen bg-background flex flex-col items-center px-5">
       <Link to="/" className="font-bold text-navy text-lg mt-12 mb-8">
         My AI Stack
       </Link>

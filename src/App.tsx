@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index.tsx";
 import Stack from "./pages/Stack.tsx";
@@ -23,11 +24,13 @@ import Saved from "./pages/result/surfaces/Saved.tsx";
 import AllTools from "./pages/result/surfaces/AllTools.tsx";
 import Foundations from "./pages/result/surfaces/Foundations.tsx";
 import WorkWithZach from "./pages/result/surfaces/WorkWithZach.tsx";
+import Settings from "./pages/dashboard/Settings.tsx";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <ThemeProvider>
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -71,6 +74,7 @@ const App = () => (
               }
             >
               <Route index element={<DashboardIndex />} />
+              <Route path="settings" element={<Settings />} />
               <Route path="stacks/:sessionId" element={<ResultLayout chrome="dashboard" />}>
                 <Route index element={<Navigate to="my-stack" replace />} />
                 <Route path="my-stack" element={<MyStack />} />
@@ -88,6 +92,7 @@ const App = () => (
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
