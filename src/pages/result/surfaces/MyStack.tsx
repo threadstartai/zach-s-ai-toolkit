@@ -19,6 +19,7 @@ const MyStack = () => {
     saved, setSaved,
     savedChunkIds, toggleSave,
     aiPickReasoning,
+    isDashboard,
   } = useResultContext();
   const { user } = useAuth();
 
