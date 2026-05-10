@@ -14,7 +14,6 @@ type StackRow = {
   q4_confidence: string | null;
   ai_picked_tools: string[] | null;
   created_at: string;
-  updated_at: string | null;
 };
 
 const formatDate = (iso: string) => {
