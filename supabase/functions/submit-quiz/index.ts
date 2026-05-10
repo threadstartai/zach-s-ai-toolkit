@@ -4,7 +4,10 @@ import {
   getClientIP,
   isValidAudience,
   isValidConfidence,
+  isValidExistingTools,
   isValidLearningStyle,
+  isValidRole,
+  isValidTimeBudget,
   isValidUseCase,
   sanitiseString,
 } from "../_shared/validation.ts";
@@ -34,6 +37,22 @@ const Q4_LABELS: Record<string, string> = {
   tried: "has tried AI a bit",
   weekly: "uses AI regularly",
   confident: "is confident with AI",
+};
+const ROLE_LABELS: Record<string, string> = {
+  "founder": "a founder or CEO",
+  "solo": "solo / freelance",
+  "team-lead": "a team lead or manager",
+  "ic": "an individual contributor",
+  "student": "a student",
+  "personal": "using AI in personal life",
+  "retired": "retired or exploring",
+};
+const TIME_LABELS: Record<string, string> = {
+  "15min": "about 15 minutes a week",
+  "30min": "about 30 minutes a week",
+  "1hr": "about 1 hour a week",
+  "several": "several hours a week",
+  "open": "open-ended time budget",
 };
 
 function json(body: unknown, status = 200) {
@@ -65,6 +84,9 @@ async function pickToolsWithAi(profile: {
   q3: string;
   q3Other: string;
   q4: string;
+  role: string | null;
+  timeBudget: string | null;
+  existingTools: string[] | null;
 }): Promise<AiPick | null> {
   if (!LOVABLE_API_KEY) {
     console.log("ai-pick: LOVABLE_API_KEY missing, skipping");
@@ -91,12 +113,15 @@ async function pickToolsWithAi(profile: {
     ? `free text — "${profile.q3Other}"`
     : `${profile.q3} (${Q3_LABELS[profile.q3] ?? profile.q3})`;
 
-  const system = `You're recommending the 3 best AI tools for a user of MY AI STACK. The user just answered an onboarding quiz. Pick from the catalogue ONLY — exact slugs.
+  const system = `You're recommending the 3 best AI tools for a user of MY AI STACK. The user just answered an onboarding flow. Pick from the catalogue ONLY — exact slugs.
 
 User profile:
 - Audience: ${profile.q2} (${Q2_LABELS[profile.q2] ?? profile.q2})
+- Role/situation: ${profile.role ? (ROLE_LABELS[profile.role] ?? profile.role) : "not specified"}
 - Use case: ${useCase}
+- Already using: ${profile.existingTools && profile.existingTools.length ? profile.existingTools.join(", ") : "nothing yet"}
 - AI confidence: ${profile.q4} (${Q4_LABELS[profile.q4] ?? profile.q4})
+- Time budget: ${profile.timeBudget ? (TIME_LABELS[profile.timeBudget] ?? profile.timeBudget) : "not specified"}
 - Name: ${profile.name || "anonymous"}
 
 Tool catalogue:
@@ -119,7 +144,11 @@ Rules:
 - For free-text use cases, pick tools that genuinely fit what they wrote. Don't force-fit.
 - Each reasoning sentence should reference the user's specific situation, not generic claims.
 - Use UK English. No hype words.
-- The Master Prompt Guide is the foundational teaching piece. When users have low confidence ('never' or 'tried'), make sure at least one of the 3 picks is a tool that pairs naturally with the briefing skill (Claude is the strongest match — it rewards good prompts most directly). For confident users, prefer tool combinations that show the relay habit (e.g. Claude + ChatGPT, or Claude + Perplexity).`;
+- The Master Prompt Guide is the foundational teaching piece. When users have low confidence ('never' or 'tried'), make sure at least one of the 3 picks is a tool that pairs naturally with the briefing skill (Claude is the strongest match — it rewards good prompts most directly). For confident users, prefer tool combinations that show the relay habit (e.g. Claude + ChatGPT, or Claude + Perplexity).
+- Time-budget signal: if time budget is "15min" or "30min", AVOID tools needing deep setup (avoid Manus, Lovable, Base44 unless clearly the best fit). Prefer fast-payoff tools (Claude, ChatGPT, Wispr Flow, Granola).
+- Existing-tool deprioritisation: if a tool slug appears in the user's existing-tools list, only recommend it if it's clearly the best fit AND the reasoning explicitly explains the upgrade angle ("you're already using X — here's how to push it further"). Otherwise prefer a different tool.
+- Role bias: founders / solo lean toward Claude + Lovable + ChatGPT. Team leads lean toward Granola + Claude + Manus. Individual contributors lean toward Wispr Flow + Claude + Notion-equivalents. Students lean toward NotebookLM + Perplexity + Gemini.
+- Each reasoning sentence should reference the user's role and time budget where it naturally fits — don't force it.`;
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
@@ -207,12 +236,24 @@ Deno.serve(async (req) => {
   const q3Other = sanitiseString(body.q3_other_text ?? "", 200);
   const q4 = body.q4_confidence;
   const q5 = body.q5_learning_style;
+  const role = body.onboarding_role;
+  const timeBudget = body.onboarding_time_budget;
+  const existingTools = body.onboarding_existing_tools;
 
   if (!isValidAudience(q2)) return json({ error: "Invalid audience" }, 400);
   if (!isValidUseCase(q3)) return json({ error: "Invalid use case" }, 400);
   if (!isValidConfidence(q4)) return json({ error: "Invalid confidence" }, 400);
   if (q5 !== null && q5 !== undefined && !isValidLearningStyle(q5)) {
     return json({ error: "Invalid learning style" }, 400);
+  }
+  if (role !== null && role !== undefined && !isValidRole(role)) {
+    return json({ error: "Invalid role" }, 400);
+  }
+  if (timeBudget !== null && timeBudget !== undefined && !isValidTimeBudget(timeBudget)) {
+    return json({ error: "Invalid time budget" }, 400);
+  }
+  if (existingTools !== null && existingTools !== undefined && !isValidExistingTools(existingTools)) {
+    return json({ error: "Invalid existing tools" }, 400);
   }
 
   const userId = await userIdFromAuthHeader(req);
@@ -227,6 +268,9 @@ Deno.serve(async (req) => {
       q4_confidence: q4,
       q5_learning_style: q5 ?? null,
       user_id: userId,
+      onboarding_role: (role as string | null) ?? null,
+      onboarding_time_budget: (timeBudget as string | null) ?? null,
+      onboarding_existing_tools: (existingTools as string[] | null) ?? null,
     })
     .select("id")
     .single();
@@ -244,6 +288,9 @@ Deno.serve(async (req) => {
         q3: q3 as string,
         q3Other,
         q4: q4 as string,
+        role: (role as string | null) ?? null,
+        timeBudget: (timeBudget as string | null) ?? null,
+        existingTools: (existingTools as string[] | null) ?? null,
       });
       if (pick) {
         const { error: updErr } = await admin

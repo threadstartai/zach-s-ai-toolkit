@@ -35,6 +35,17 @@ export function isValidLearningStyle(input: unknown): input is typeof LEARNING_S
   return typeof input === "string" && (LEARNING_STYLES as readonly string[]).includes(input);
 }
 
+export const ROLE_VALUES = ["founder", "solo", "team-lead", "ic", "student", "personal", "retired"] as const;
+export const TIME_BUDGET_VALUES = ["15min", "30min", "1hr", "several", "open"] as const;
+export const EXISTING_TOOL_VALUES = ["chatgpt", "claude", "gemini", "copilot", "perplexity", "other-ai", "nothing-yet"] as const;
+
+export const isValidRole = (v: unknown): v is typeof ROLE_VALUES[number] =>
+  typeof v === "string" && (ROLE_VALUES as readonly string[]).includes(v);
+export const isValidTimeBudget = (v: unknown): v is typeof TIME_BUDGET_VALUES[number] =>
+  typeof v === "string" && (TIME_BUDGET_VALUES as readonly string[]).includes(v);
+export const isValidExistingTools = (v: unknown): v is string[] =>
+  Array.isArray(v) && v.length <= 7 && v.every((s) => typeof s === "string" && (EXISTING_TOOL_VALUES as readonly string[]).includes(s));
+
 export function isValidUuid(input: unknown): input is string {
   return typeof input === "string"
     && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(input);

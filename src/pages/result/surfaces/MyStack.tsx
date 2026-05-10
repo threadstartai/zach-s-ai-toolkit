@@ -4,7 +4,7 @@ import { useResultContext } from "../shared/useResultContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { TOOLS, whyFor, whyForChatGPT } from "../shared/tools";
-import { audiencePhrase, useCasePhrase, confidencePhrase, whyThisTool } from "../shared/phrases";
+import { audiencePhrase, useCasePhrase, confidencePhrase, whyThisTool, rolePhrase, timeBudgetPhrase } from "../shared/phrases";
 import { SECTION_LABELS, LADDER, groupChunks } from "../shared/chunks";
 import { ChunkBlock } from "../shared/ChunkBlock";
 import { SaveChunkButton } from "../shared/SaveChunkButton";
@@ -24,6 +24,8 @@ const MyStack = () => {
     aiPickReasoning,
     isDashboard,
     stackLabel,
+    onboardingRole,
+    onboardingTimeBudget,
   } = useResultContext();
   const { user } = useAuth();
   const [renaming, setRenaming] = useState(false);
@@ -141,7 +143,7 @@ const MyStack = () => {
       <div className="mt-8 font-mono text-[11px] tracking-[0.12em] text-navy/55 uppercase">Your situation</div>
       <div className="mt-1 mb-1 h-px w-10 bg-navy/30" />
       <p className="mt-3 text-navy text-[17px] leading-[1.7]">
-        Here's what I'm reading: {audiencePhrase(c2)}, working on {useCasePhrase(c3, q3OtherText)}, {confidencePhrase(c4)}. Three tools, and what's worth doing tonight. If that's slightly off,{" "}
+        Here's what I'm reading: you're {onboardingRole ? rolePhrase(onboardingRole) : audiencePhrase(c2)}{onboardingTimeBudget ? `, with ${timeBudgetPhrase(onboardingTimeBudget)}` : ""}, working on {useCasePhrase(c3, q3OtherText)}, {confidencePhrase(c4)}. Three tools, and what's worth doing tonight. If that's slightly off,{" "}
         <button
           onClick={handleStartOver}
           className="text-navy underline underline-offset-2 hover:opacity-80"

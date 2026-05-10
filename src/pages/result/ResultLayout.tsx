@@ -264,6 +264,9 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
     aiPickReasoning,
     isDashboard: chrome === "dashboard",
     stackLabel: session?.stack_label ?? null,
+    onboardingRole: (session as any)?.onboarding_role ?? null,
+    onboardingTimeBudget: (session as any)?.onboarding_time_budget ?? null,
+    onboardingExistingTools: (session as any)?.onboarding_existing_tools ?? null,
   };
 
   const isDashboard = chrome === "dashboard";

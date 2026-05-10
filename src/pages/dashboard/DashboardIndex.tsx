@@ -72,7 +72,7 @@ const DashboardIndex = () => {
     <div className="max-w-[900px] mx-auto px-5 sm:px-8 py-10 md:py-12">
       <h1 className="text-[32px] font-bold">My stacks</h1>
       <p className="mt-3 italic text-navy/75 text-[15px] leading-[1.6]">
-        Each stack is a quiz answer set. You can have one for research, one for a side project, one for daily life.
+        Each stack is an onboarding answer set. You can have one for research, one for a side project, one for daily life.
       </p>
 
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -98,7 +98,7 @@ const DashboardIndex = () => {
           to="/onboarding"
           className="inline-flex items-center justify-center bg-navy text-primary-foreground rounded-[8px] px-5 h-11 text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150"
         >
-          + Take another quiz
+          + Start new onboarding
         </Link>
       </div>
     </div>

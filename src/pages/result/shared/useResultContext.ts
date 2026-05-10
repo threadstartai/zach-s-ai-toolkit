@@ -32,6 +32,9 @@ export type ResultContext = {
   aiPickReasoning: Record<string, string> | null;
   isDashboard: boolean;
   stackLabel: string | null;
+  onboardingRole: string | null;
+  onboardingTimeBudget: string | null;
+  onboardingExistingTools: string[] | null;
 };
 
 export const useResultContext = () => useOutletContext<ResultContext>();
