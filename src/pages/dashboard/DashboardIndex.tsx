@@ -307,6 +307,17 @@ const DashboardIndex = () => {
         </p>
       </header>
 
+      {caseStudy && (
+        <section className="mt-8">
+          <p className="font-mono text-[11px] tracking-[0.12em] uppercase text-navy mb-2">
+            For someone like you
+          </p>
+          <p className="text-[15px] leading-[1.6] text-foreground/85 max-w-[680px]">
+            {caseStudy}
+          </p>
+        </section>
+      )}
+
       {/* Tonight */}
       <section className={`mt-8 ${divider} pt-2`}>
         <SectionShell label="Tonight" open={sections.tonight} onOpenChange={(v) => setOpen("tonight", v)}>
