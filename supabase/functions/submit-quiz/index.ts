@@ -4,7 +4,10 @@ import {
   getClientIP,
   isValidAudience,
   isValidConfidence,
+  isValidExistingTools,
   isValidLearningStyle,
+  isValidRole,
+  isValidTimeBudget,
   isValidUseCase,
   sanitiseString,
 } from "../_shared/validation.ts";
