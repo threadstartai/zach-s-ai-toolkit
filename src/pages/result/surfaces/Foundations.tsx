@@ -74,7 +74,7 @@ const Foundations = () => {
 
   return (
     <div>
-      <h3 className="text-3xl font-bold tracking-[-0.02em]">Foundations</h3>
+      <h3 className="text-[32px] font-bold tracking-[-0.02em]">Foundations</h3>
       <p className="mt-3 italic text-[15px] text-foreground/70 max-w-[640px]">
         Field guide. Background reading on how this stack came together and how to pass it on. The backbone of how to actually use AI well lives in Briefing method and Check before trust above.
       </p>
