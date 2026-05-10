@@ -31,7 +31,7 @@ const markdownComponents = {
   ),
 };
 
-export const ChunkBlock = ({ chunk }: { chunk: Chunk }) => {
+export const ChunkBlock = ({ chunk, showTitle = true }: { chunk: Chunk; showTitle?: boolean }) => {
   const [copied, setCopied] = useState(false);
 
   const isFirstPrompt = chunk.chunk_type === "first-prompt";
@@ -52,7 +52,7 @@ export const ChunkBlock = ({ chunk }: { chunk: Chunk }) => {
 
   return (
     <div>
-      {chunk.title && (
+      {showTitle && chunk.title && (
         <h5 className="text-[15px] font-semibold text-navy mb-2">{chunk.title}</h5>
       )}
       {isFirstPrompt && split && split.prompt ? (
@@ -65,12 +65,22 @@ export const ChunkBlock = ({ chunk }: { chunk: Chunk }) => {
           <div className="my-3 bg-background border border-navy/[0.12] border-l-[3px] border-l-navy rounded-[8px] px-5 py-4">
             <pre className="whitespace-pre-wrap font-mono text-[13.5px] leading-[1.7] text-foreground/90">{split.prompt}</pre>
           </div>
-          <button
-            onClick={() => handleCopy(split.prompt!)}
-            className="mt-4 inline-flex items-center justify-center border border-navy text-navy px-3.5 py-1.5 rounded-[8px] text-[13px] font-medium hover:bg-background/60 transition-colors duration-150"
-          >
-            {copied ? "Copied" : "Copy prompt"}
-          </button>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <a
+              href={`https://claude.ai/new?q=${encodeURIComponent(split.prompt)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center bg-navy text-primary-foreground px-3.5 py-1.5 rounded-[8px] text-[13px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
+            >
+              Try this prompt in Claude →
+            </a>
+            <button
+              onClick={() => handleCopy(split.prompt!)}
+              className="inline-flex items-center justify-center border border-navy text-navy px-3.5 py-1.5 rounded-[8px] text-[13px] font-medium hover:bg-background/60 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
+            >
+              {copied ? "Copied" : "Copy prompt"}
+            </button>
+          </div>
           {split.after && (
             <div className="mt-3">
               <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>

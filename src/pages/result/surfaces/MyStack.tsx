@@ -11,6 +11,8 @@ import { SaveChunkButton } from "../shared/SaveChunkButton";
 import type { Chunk, ToolKey } from "../shared/types";
 import { fullGuideUrl } from "@/lib/pdfs";
 import { ToolDetailDrawer } from "../ToolDetailDrawer";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 
 const MyStack = () => {
   const {
@@ -82,14 +84,14 @@ const MyStack = () => {
   return (
     <div>
       {showWelcome && (
-        <div className="bg-navy-light/40 border border-navy-light rounded-[16px] p-6 mb-8">
+        <div className="bg-navy-light/40 border border-navy-light rounded-[12px] p-6 mb-8">
           <h2 className="text-[18px] font-bold text-navy">Welcome.</h2>
           <p className="mt-2 text-navy text-[15px] leading-[1.6]">
             This is your Stack. Three tools picked from the 17 I use, based on what you told me. Read the cards. Try the prompts. The bookmark on each card saves it for later. <em>— Zach</em>
           </p>
           <button
             onClick={dismissWelcome}
-            className="mt-4 inline-flex items-center justify-center border border-navy text-navy px-4 py-2 rounded-[8px] text-[13.5px] font-medium hover:bg-navy/5 transition-colors duration-150"
+            className="mt-4 inline-flex items-center justify-center border border-navy text-navy px-4 py-2 rounded-[8px] text-[13.5px] font-medium hover:bg-navy/5 transition-colors duration-200 ease-out"
           >
             Got it →
           </button>
@@ -115,7 +117,7 @@ const MyStack = () => {
         <div className="ml-1 flex gap-1.5">
           <button
             onClick={() => setMode("everything")}
-            className={`px-3 py-1.5 rounded-[8px] transition-colors duration-150 ${
+            className={`px-3 py-1.5 rounded-[8px] transition-colors duration-200 ease-out ${
               mode === "everything"
                 ? "bg-navy text-primary-foreground"
                 : "bg-background border border-[hsl(var(--border))] text-navy hover:border-navy/40"
@@ -125,7 +127,7 @@ const MyStack = () => {
           </button>
           <button
             onClick={() => setMode("guided")}
-            className={`px-3 py-1.5 rounded-[8px] transition-colors duration-150 ${
+            className={`px-3 py-1.5 rounded-[8px] transition-colors duration-200 ease-out ${
               mode === "guided"
                 ? "bg-navy text-primary-foreground"
                 : "bg-background border border-[hsl(var(--border))] text-navy hover:border-navy/40"
@@ -207,7 +209,7 @@ const MyStack = () => {
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => { if (e.key === "Enter") setDetailSlug(t.slug); }}
-                className="bg-background border border-[hsl(var(--border))] rounded-[16px] p-6 sm:p-8 scroll-mt-[80px] transition-colors duration-150 hover:border-navy/30 cursor-pointer"
+                className="bg-background border border-[hsl(var(--border))] rounded-[12px] p-6 sm:p-8 scroll-mt-[80px] transition-colors duration-200 ease-out hover:border-navy/30 cursor-pointer"
               >
                 <div className="flex items-baseline justify-between gap-3">
                   <div className="flex items-baseline gap-2.5">
@@ -249,7 +251,7 @@ const MyStack = () => {
                               <div
                                 key={ch.id}
                                 onClick={(e) => e.stopPropagation()}
-                                className="relative bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6 transition-colors duration-150 hover:border-navy/40 cursor-default"
+                                className="relative bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6 transition-colors duration-200 ease-out hover:border-navy/40 cursor-default"
                               >
                                 {user && (
                                   <SaveChunkButton
@@ -257,9 +259,15 @@ const MyStack = () => {
                                     onClick={() => toggleSave(ch.id)}
                                   />
                                 )}
-                                <div className={user ? "pr-10" : undefined}>
-                                  <ChunkBlock chunk={ch} />
-                                </div>
+                                <Collapsible defaultOpen={ch.chunk_type === "first-prompt"} className="pr-10">
+                                  <CollapsibleTrigger className="group flex w-full items-center justify-between text-left rounded-[6px] -mx-1 px-1 py-1 hover:bg-navy-light/30 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2">
+                                    <span className="text-[15px] font-semibold text-navy">{ch.title || ch.chunk_type}</span>
+                                    <ChevronDown className="h-4 w-4 text-navy/60 transition-transform duration-200 ease-out group-data-[state=open]:rotate-180 shrink-0 ml-3" />
+                                  </CollapsibleTrigger>
+                                  <CollapsibleContent className="pt-3 data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
+                                    <ChunkBlock chunk={ch} showTitle={false} />
+                                  </CollapsibleContent>
+                                </Collapsible>
                               </div>
                             ))}
                           </div>
@@ -331,7 +339,7 @@ const MyStack = () => {
           {guidedSteps.length === 0 ? (
             <p className="italic text-foreground/60">Loading your stack…</p>
           ) : guidedIndex >= guidedSteps.length ? (
-            <div className="bg-background border border-[hsl(var(--border))] rounded-[16px] p-8 text-center">
+            <div className="bg-background border border-[hsl(var(--border))] rounded-[12px] p-8 text-center">
               <h4 className="text-[22px] font-bold text-navy">You've worked through your stack.</h4>
               <p className="mt-3 text-foreground/85 text-[15px] leading-[1.65]">
                 That's everything in priority order. Now go try one of the prompts in real life.
@@ -356,7 +364,7 @@ const MyStack = () => {
               const step = guidedSteps[guidedIndex];
               const tool = TOOLS[step.toolKey];
               return (
-                <div className="bg-background border border-[hsl(var(--border))] rounded-[16px] p-6 sm:p-8">
+                <div className="bg-background border border-[hsl(var(--border))] rounded-[12px] p-6 sm:p-8">
                   <div className="font-mono text-[11px] tracking-[0.08em] text-navy/65 uppercase">
                     Step {guidedIndex + 1} of {guidedSteps.length} · {tool.name} · {step.sectionLabel}
                   </div>
@@ -433,7 +441,7 @@ const MyStack = () => {
         </ol>
       </div>
 
-      <div className="mt-12 bg-navy-light/30 border border-navy-light rounded-[16px] px-6 py-5">
+      <div className="mt-12 bg-navy-light/30 border border-navy-light rounded-[12px] px-6 py-5">
         <p className="text-navy/80 text-[16px] leading-[1.7] italic">
           That's the stack. If you do one thing tonight, take the prompt at the top of the first card. If you want to come back to this — save your link, or just take a screenshot.
         </p>
@@ -465,7 +473,7 @@ const MyStack = () => {
             const url = `https://claude.ai/new?q=${encodeURIComponent(lines.join("\n"))}`;
             window.open(url, "_blank", "noopener,noreferrer");
           }}
-          className="hover:underline transition-colors duration-150"
+          className="hover:underline transition-colors duration-200 ease-out"
         >
           Discuss your stack in Claude
         </button>
@@ -473,7 +481,7 @@ const MyStack = () => {
         <button
           onClick={handleCopyShareLink}
           disabled={!sessionId}
-          className="hover:underline transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed disabled:no-underline"
+          className="hover:underline transition-colors duration-200 ease-out disabled:opacity-40 disabled:cursor-not-allowed disabled:no-underline"
         >
           {linkCopied ? "Copied" : "Copy share link"}
         </button>
@@ -483,19 +491,19 @@ const MyStack = () => {
             setLabelDraft(stackLabel ?? "");
             setRenaming(true);
           }}
-          className="hover:underline transition-colors duration-150"
+          className="hover:underline transition-colors duration-200 ease-out"
         >
           {stackLabel ? "Rename stack" : "Name this stack"}
         </button>
         <span className="text-foreground/40 mx-2">·</span>
         <button
           onClick={handleStartOver}
-          className="hover:underline transition-colors duration-150"
+          className="hover:underline transition-colors duration-200 ease-out"
         >
           Start over
         </button>
         <span className="text-foreground/40 mx-2">·</span>
-        <a href="/stack#tools" className="hover:underline transition-colors duration-150">
+        <a href="/stack#tools" className="hover:underline transition-colors duration-200 ease-out">
           Browse all 17 tools ↓
         </a>
         {renaming && (
