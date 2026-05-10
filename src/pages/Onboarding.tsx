@@ -131,7 +131,7 @@ const Onboarding = () => {
   const segmentCount = 7;
 
   const optionBase =
-    "w-full text-left p-5 rounded-[12px] bg-background border text-[16px] transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2";
+    "w-full text-left p-5 rounded-[12px] bg-background border text-[16px] break-words transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2";
   const optionCls = (selected: boolean) =>
     `${optionBase} ${
       selected
