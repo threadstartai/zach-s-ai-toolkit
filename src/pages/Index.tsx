@@ -46,10 +46,10 @@ const Index = () => {
         {/* Hero */}
         <section className="pt-10 md:pt-24 pb-10 md:pb-20">
           <div className="max-w-[760px]">
-            <h1 className="text-[40px] md:text-6xl font-extrabold text-navy tracking-[-0.02em] leading-[1.05]">
+            <h1 className="text-[40px] md:text-6xl font-extrabold tracking-[-0.02em] leading-[1.05]">
               My AI Stack.
             </h1>
-            <p className="mt-5 text-xl md:text-2xl font-normal text-navy leading-snug max-w-[600px] font-serif">
+            <p className="mt-5 text-xl md:text-2xl font-normal text-navy leading-snug max-w-[600px]">
               A guide to every AI tool worth using, written for the people I care about.
             </p>
             <p className="mt-5 text-foreground/80">
@@ -69,7 +69,7 @@ const Index = () => {
           </div>
 
           {/* Trust strip */}
-          <p className="mt-6 md:mt-10 italic text-[14px] text-navy/70 font-serif">
+          <p className="mt-6 md:mt-10 italic text-[14px] text-navy/70">
             17 AI tools. No affiliate links. No marketing. No upsells. Just what's worth using and how to use it.
           </p>
         </section>
@@ -78,7 +78,7 @@ const Index = () => {
         <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]/60">
           <div className="grid grid-cols-1 md:grid-cols-[1.1fr_1fr] gap-6 md:gap-10 lg:gap-16 items-start">
             <div>
-              <h2 className="text-3xl md:text-4xl text-navy font-bold tracking-tight">What this is</h2>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight">What this is</h2>
               <div className="mt-5 space-y-4 text-foreground/85 text-[16.5px] leading-[1.7]">
                 <p>
                   17 AI tools, one place, written like a friend would explain them. No
@@ -108,7 +108,7 @@ const Index = () => {
         {/* The Process — 2x2 grid */}
         <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]/60">
           <div className="max-w-[760px]">
-            <h2 className="text-3xl md:text-4xl text-navy font-bold tracking-tight">The way I use AI</h2>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">The way I use AI</h2>
             <p className="mt-5 text-foreground/85 text-[16.5px] leading-[1.7]">
               The tools matter less than the loop. Here's the four-step process I use for almost everything:
             </p>
@@ -133,7 +133,7 @@ const Index = () => {
         {/* Chrome Consulting */}
         <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]/60">
           <div className="max-w-[760px]">
-            <h3 className="text-2xl text-navy font-bold tracking-tight">
+            <h3 className="text-2xl font-bold tracking-tight">
               If you want help getting this set up properly
             </h3>
             <p className="mt-5 text-foreground/85 text-[16.5px] leading-[1.7]">

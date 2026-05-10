@@ -13,7 +13,7 @@ const Settings = () => {
 
   return (
     <div className="max-w-[720px] mx-auto px-5 sm:px-8 py-10 md:py-12">
-      <h1 className="text-[32px] font-bold text-navy">Settings</h1>
+      <h1 className="text-[32px] font-bold">Settings</h1>
 
       <section className="mt-10">
         <h2 className="text-[20px] font-bold text-navy mb-4">Account</h2>

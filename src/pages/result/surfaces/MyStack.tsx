@@ -84,7 +84,7 @@ const MyStack = () => {
   return (
     <div>
       {showWelcome && (
-        <div className="bg-navy-light/40 border border-navy-light rounded-[12px] p-6 mb-8">
+        <div className="bg-background border border-[hsl(var(--border))] rounded-[12px] p-6 mb-8">
           <h2 className="text-[18px] font-bold text-navy">Welcome.</h2>
           <p className="mt-2 text-navy text-[15px] leading-[1.6]">
             This is your Stack. Three tools picked from the 17 I use, based on what you told me. Read the cards. Try the prompts. The bookmark on each card saves it for later. <em>— Zach</em>
@@ -101,7 +101,7 @@ const MyStack = () => {
       {stackLabel && (
         <p className="text-[13px] italic text-navy/70 mb-1">Stack: {stackLabel}</p>
       )}
-      <h3 className="text-[32px] sm:text-[36px] font-bold text-navy tracking-[-0.02em]">{title}</h3>
+      <h3 className="text-[32px] sm:text-[36px] font-bold tracking-[-0.02em]">{title}</h3>
       {isDashboard && (
         <div className="mt-6 bg-navy-light/40 border border-navy-light rounded-[12px] px-5 py-4">
           <p className="text-[14px] text-navy leading-[1.55]">

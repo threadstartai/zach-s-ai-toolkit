@@ -29,14 +29,14 @@ const Tonight = () => {
 
   return (
     <div>
-      <h3 className="text-3xl font-bold text-navy tracking-[-0.02em]">Tonight</h3>
+      <h3 className="text-3xl font-bold tracking-[-0.02em]">Tonight</h3>
       <p className="mt-3 italic text-[15px] text-foreground/70">
         One thing. Do it before bed and you'll thank yourself tomorrow.
       </p>
 
       {best ? (
         <>
-          <div className="relative mt-10 bg-background border border-[hsl(var(--border))] rounded-[16px] p-8 md:p-10 shadow-[0_2px_12px_rgba(26,58,92,0.04)]">
+          <div className="relative mt-10 bg-background border border-[hsl(var(--border))] rounded-[12px] p-8 md:p-10 shadow-[0_2px_12px_rgba(26,58,92,0.04)]">
             {user && (
               <SaveChunkButton
                 saved={savedChunkIds.has(best.chunk.id)}
@@ -60,7 +60,7 @@ const Tonight = () => {
           </p>
         </>
       ) : (
-        <div className="mt-10 bg-background border border-[hsl(var(--border))] rounded-[16px] p-8 md:p-10">
+        <div className="mt-10 bg-background border border-[hsl(var(--border))] rounded-[12px] p-8 md:p-10">
           <p className="text-[15px] text-foreground/80 italic">
             Your stack doesn't have a tonight chunk yet. Head to My Stack for the full guide.
           </p>
