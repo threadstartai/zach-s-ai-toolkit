@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -61,6 +61,7 @@ const Onboarding = () => {
   const [timeBudget, setTimeBudget] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(false);
+  const submittingRef = useRef(false);
 
   const advance = (next: QuizStep) => setTimeout(() => setStep(next), 150);
 
@@ -87,6 +88,8 @@ const Onboarding = () => {
   const selectQ4 = (v: string) => { setQ4(v); advance("time"); };
 
   const submitQuiz = async (timeValue: string) => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setSubmitting(true);
     setSubmitError(false);
     const c2 = codeQ2(q2);
@@ -110,12 +113,14 @@ const Onboarding = () => {
       if (error || !data?.session_id) {
         setSubmitError(true);
         setSubmitting(false);
+        submittingRef.current = false;
         return;
       }
       navigate(`/dashboard/stacks/${data.session_id}/my-stack`, { replace: true });
     } catch {
       setSubmitError(true);
       setSubmitting(false);
+      submittingRef.current = false;
     }
   };
 
