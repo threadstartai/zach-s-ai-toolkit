@@ -36,15 +36,23 @@ const Tonight = () => {
 
       {best ? (
         <>
-          <div className="mt-10 bg-background border border-[hsl(var(--border))] rounded-[16px] p-8 md:p-10 shadow-[0_2px_12px_rgba(26,58,92,0.04)]">
-            <div className="font-mono text-[11px] uppercase tracking-[0.08em] text-navy/60">
-              From {TOOLS[best.toolKey].name}
-            </div>
-            {best.chunk.title && (
-              <h4 className="mt-2 text-xl font-bold text-navy">{best.chunk.title}</h4>
+          <div className="relative mt-10 bg-background border border-[hsl(var(--border))] rounded-[16px] p-8 md:p-10 shadow-[0_2px_12px_rgba(26,58,92,0.04)]">
+            {user && (
+              <SaveChunkButton
+                saved={savedChunkIds.has(best.chunk.id)}
+                onClick={() => toggleSave(best.chunk.id)}
+              />
             )}
-            <div className="mt-4">
-              <ChunkBlock chunk={best.chunk} />
+            <div className={user ? "pr-10" : undefined}>
+              <div className="font-mono text-[11px] uppercase tracking-[0.08em] text-navy/60">
+                From {TOOLS[best.toolKey].name}
+              </div>
+              {best.chunk.title && (
+                <h4 className="mt-2 text-xl font-bold text-navy">{best.chunk.title}</h4>
+              )}
+              <div className="mt-4">
+                <ChunkBlock chunk={best.chunk} />
+              </div>
             </div>
           </div>
           <p className="mt-10 italic text-[14px] text-foreground/65">
