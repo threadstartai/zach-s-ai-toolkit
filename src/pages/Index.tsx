@@ -103,7 +103,7 @@ const Index = () => {
         </section>
 
         {/* The Process — 2x2 grid */}
-        <section className="py-14 md:py-20 border-t border-[hsl(var(--border))]/60">
+        <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]/60">
           <div className="max-w-[760px]">
             <h2 className="text-3xl md:text-4xl text-navy font-bold tracking-tight">The way I use AI</h2>
             <p className="mt-5 text-foreground/85 text-[16.5px] leading-[1.7]">
