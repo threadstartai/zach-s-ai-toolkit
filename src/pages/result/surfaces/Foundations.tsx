@@ -4,6 +4,8 @@ import { SECTION_LABELS, groupChunks } from "../shared/chunks";
 import { ChunkBlock } from "../shared/ChunkBlock";
 import type { Chunk } from "../shared/types";
 import { fullGuideUrl } from "@/lib/pdfs";
+import { SkeletonGuideCard } from "@/components/ui-primitives/Skeletons";
+import { EmptyState } from "@/components/ui-primitives/EmptyState";
 
 const FOUNDATIONAL_ORDER = [
   "start-here",
@@ -80,10 +82,12 @@ const Foundations = () => {
       </p>
 
       {loading && (
-        <p className="mt-10 italic text-foreground/60">Loading the guides…</p>
+        <div className="mt-10 flex flex-col gap-4">
+          {Array.from({ length: 7 }).map((_, i) => <SkeletonGuideCard key={i} />)}
+        </div>
       )}
       {error && !loading && (
-        <p className="mt-10 italic text-foreground/60">Couldn't load the foundations. Refresh the page.</p>
+        <EmptyState>Couldn't load the foundations. Refresh the page.</EmptyState>
       )}
 
       {!loading && !error && (

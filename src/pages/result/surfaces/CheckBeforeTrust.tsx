@@ -5,6 +5,8 @@ import { ChunkBlock } from "../shared/ChunkBlock";
 import { ChunkFeedbackButton } from "../shared/ChunkFeedbackButton";
 import { fullGuideUrl } from "@/lib/pdfs";
 import type { Chunk } from "../shared/types";
+import { SkeletonChunkList } from "@/components/ui-primitives/Skeletons";
+import { EmptyState } from "@/components/ui-primitives/EmptyState";
 
 const SLUG = "rules-with-ai";
 const PAGE_TITLE = "Check before trust";
@@ -58,12 +60,10 @@ const CheckBeforeTrust = () => {
         </a>
       )}
 
-      {loading && (
-        <p className="mt-10 italic text-foreground/60">Loading…</p>
-      )}
+      {loading && <SkeletonChunkList count={5} className="mt-10" />}
 
       {!loading && chunks.length === 0 && (
-        <p className="mt-10 italic text-foreground/60">Coming soon.</p>
+        <EmptyState>Coming soon.</EmptyState>
       )}
 
       {!loading && chunks.length > 0 && (

@@ -7,6 +7,7 @@ import { useSavedChunks } from "../shared/useSavedChunks";
 import { useResultContext } from "../shared/useResultContext";
 import { TOOLS } from "../shared/tools";
 import type { Chunk } from "../shared/types";
+import { SkeletonChunkList } from "@/components/ui-primitives/Skeletons";
 
 type SavedRow = Chunk & { savedAt: string; toolName: string | null };
 
@@ -129,9 +130,7 @@ const Saved = () => {
         Bits of guidance you've kept for later.
       </p>
 
-      {loading && (
-        <p className="mt-10 text-[14px] text-foreground/60 italic">One moment — loading your saves.</p>
-      )}
+      {loading && <SkeletonChunkList count={2} className="mt-10" />}
 
       {!loading && visible.length === 0 && (
         <div className="mt-10">

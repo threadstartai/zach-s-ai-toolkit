@@ -4,6 +4,7 @@ import { TOOLS } from "../shared/tools";
 import { ChunkBlock } from "../shared/ChunkBlock";
 import { SaveChunkButton } from "../shared/SaveChunkButton";
 import { ChunkFeedbackButton } from "../shared/ChunkFeedbackButton";
+import { SkeletonHeroCard } from "@/components/ui-primitives/Skeletons";
 import type { Chunk, ToolKey } from "../shared/types";
 
 const PREFERRED_TYPES = ["first-prompt", "setup", "workflow-example"];
@@ -35,41 +36,51 @@ const Tonight = () => {
         One thing. Do it before bed and you'll thank yourself tomorrow.
       </p>
 
-      {best ? (
-        <>
-          <div className="relative mt-8 bg-card border border-[hsl(var(--border))] rounded-[12px] p-6 md:p-8 shadow-[0_2px_12px_rgba(26,58,92,0.04)]">
-            {user && (
-              <SaveChunkButton
-                saved={savedChunkIds.has(best.chunk.id)}
-                onClick={() => toggleSave(best.chunk.id)}
-              />
-            )}
-            <div className={user ? "pr-10" : undefined}>
-              <div className="font-mono text-[11px] uppercase tracking-[0.08em] text-navy/60">
-                From {TOOLS[best.toolKey].name}
+      {(() => {
+        const chunksLoaded = picks.some((k) => (chunksByTool[TOOLS[k].slug] ?? []).length > 0);
+        const isLoading = picks.length > 0 && !chunksLoaded;
+        if (isLoading) {
+          return <div className="mt-8"><SkeletonHeroCard /></div>;
+        }
+        if (best) {
+          return (
+            <>
+              <div className="relative mt-8 bg-card border border-[hsl(var(--border))] rounded-[12px] p-6 md:p-8 shadow-[0_2px_12px_rgba(26,58,92,0.04)]">
+                {user && (
+                  <SaveChunkButton
+                    saved={savedChunkIds.has(best.chunk.id)}
+                    onClick={() => toggleSave(best.chunk.id)}
+                  />
+                )}
+                <div className={user ? "pr-10" : undefined}>
+                  <div className="font-mono text-[11px] uppercase tracking-[0.08em] text-navy/60">
+                    From {TOOLS[best.toolKey].name}
+                  </div>
+                  {best.chunk.title && (
+                    <h4 className="mt-2 text-xl font-bold text-navy">{best.chunk.title}</h4>
+                  )}
+                  <div className="mt-4">
+                    <ChunkBlock chunk={best.chunk} />
+                  </div>
+                  <div className="mt-6 flex justify-end">
+                    <ChunkFeedbackButton chunkId={best.chunk.id} toolSlug={TOOLS[best.toolKey].slug} sessionId={sessionId} />
+                  </div>
+                </div>
               </div>
-              {best.chunk.title && (
-                <h4 className="mt-2 text-xl font-bold text-navy">{best.chunk.title}</h4>
-              )}
-              <div className="mt-4">
-                <ChunkBlock chunk={best.chunk} />
-              </div>
-              <div className="mt-6 flex justify-end">
-                <ChunkFeedbackButton chunkId={best.chunk.id} toolSlug={TOOLS[best.toolKey].slug} sessionId={sessionId} />
-              </div>
-            </div>
+              <p className="mt-10 italic text-[14px] text-foreground/65">
+                When you've done it, come back. Your full stack is in My Stack.
+              </p>
+            </>
+          );
+        }
+        return (
+          <div className="mt-8 bg-card border border-[hsl(var(--border))] rounded-[12px] p-6 md:p-8">
+            <p className="text-[15px] text-foreground/80 italic">
+              Your stack doesn't have a tonight chunk yet. Head to My Stack for the full guide.
+            </p>
           </div>
-          <p className="mt-10 italic text-[14px] text-foreground/65">
-            When you've done it, come back. Your full stack is in My Stack.
-          </p>
-        </>
-      ) : (
-        <div className="mt-8 bg-card border border-[hsl(var(--border))] rounded-[12px] p-6 md:p-8">
-          <p className="text-[15px] text-foreground/80 italic">
-            Your stack doesn't have a tonight chunk yet. Head to My Stack for the full guide.
-          </p>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 };

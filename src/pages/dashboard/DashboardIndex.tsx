@@ -8,6 +8,7 @@ import { Q2_FROM_CODE, Q3_FROM_CODE, codeQ2, codeQ3 } from "@/pages/result/share
 import { audiencePhrase, useCasePhrase } from "@/pages/result/shared/phrases";
 import { splitFirstPrompt } from "@/pages/result/shared/chunks";
 import { caseStudyForRole } from "@/lib/caseStudies";
+import { SkeletonHeroCard, SkeletonStackCard } from "@/components/ui-primitives/Skeletons";
 
 type StackRow = {
   id: string;
@@ -282,8 +283,22 @@ const DashboardIndex = () => {
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center bg-background">
-        <p className="text-[14px] text-foreground/60 italic">One moment…</p>
+      <div className="max-w-[800px] mx-auto px-5 sm:px-8 py-8 md:py-10">
+        <header>
+          <div className="h-8 w-2/5 rounded-md bg-muted animate-pulse" />
+          <div className="mt-3 h-4 w-3/5 rounded-md bg-muted animate-pulse" />
+        </header>
+        <section className="mt-8 border-t border-[hsl(var(--border))] pt-6">
+          <div className="mb-4 h-3 w-20 rounded-md bg-muted animate-pulse" />
+          <SkeletonHeroCard />
+        </section>
+        <section className="mt-8 border-t border-[hsl(var(--border))] pt-6">
+          <div className="mb-4 h-3 w-24 rounded-md bg-muted animate-pulse" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <SkeletonStackCard />
+            <SkeletonStackCard />
+          </div>
+        </section>
       </div>
     );
   }
@@ -322,7 +337,7 @@ const DashboardIndex = () => {
       <section className={`mt-8 ${divider} pt-2`}>
         <SectionShell label="Tonight" open={sections.tonight} onOpenChange={(v) => setOpen("tonight", v)}>
           {focusLoading ? (
-            <p className="text-[14px] text-foreground/60 italic">One moment…</p>
+            <SkeletonHeroCard />
           ) : !focus ? (
             <div>
               <p className="text-[15px] text-foreground/70 leading-[1.6]">
