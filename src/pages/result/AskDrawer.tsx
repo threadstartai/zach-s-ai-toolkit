@@ -11,6 +11,7 @@ type AskDrawerProps = {
 };
 
 type Msg = { id: string; role: "user" | "assistant"; content: string };
+type ConversationItem = { id: string; title: string | null; updated_at: string };
 
 const SUGGESTIONS = [
   "What should I do tonight?",
