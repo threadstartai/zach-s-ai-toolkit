@@ -18,6 +18,8 @@ import type { ResultContext } from "./shared/useResultContext";
 const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" } = {}) => {
   const { sessionId: routeSessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [askOpen, setAskOpen] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
