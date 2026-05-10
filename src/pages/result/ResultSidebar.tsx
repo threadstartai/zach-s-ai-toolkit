@@ -40,6 +40,8 @@ export const ResultSidebar = ({
         { label: "My Stack", path: `${base}/my-stack` },
         { label: "Saved", path: `${base}/saved` },
         { label: "All tools", path: `${base}/all-tools` },
+        { label: "Briefing method", path: `${base}/briefing-method` },
+        { label: "Check before trust", path: `${base}/check-before-trust` },
         { label: "Foundations", path: `${base}/foundations` },
         { label: "Work with Zach", path: `${base}/work-with-zach` },
       );
