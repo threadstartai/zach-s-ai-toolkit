@@ -9,13 +9,13 @@
 @layer base {
   :root {
     /* Brand palette */
-    --background: 0 0% 98%;            /* OFFWHITE #FAFAFA */
+    --background: 30 20% 96%;          /* OFFWHITE warm */
     --foreground: 0 0% 4%;             /* BLACK #0A0A0A */
 
     --navy: 210 56% 23%;               /* NAVY #1A3A5C */
     --navy-light: 213 41% 93%;         /* NAVY_LIGHT #E8EEF5 */
 
-    --card: 0 0% 98%;
+    --card: 30 20% 97%;
     --card-foreground: 0 0% 4%;
 
     --popover: 0 0% 100%;
