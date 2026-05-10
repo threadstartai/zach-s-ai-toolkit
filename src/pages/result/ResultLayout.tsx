@@ -229,6 +229,7 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
     toggleSave,
     aiPickReasoning,
     isDashboard: chrome === "dashboard",
+    stackLabel: session?.stack_label ?? null,
   };
 
   const isDashboard = chrome === "dashboard";
