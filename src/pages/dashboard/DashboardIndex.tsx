@@ -6,9 +6,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Q2_FROM_CODE, Q3_FROM_CODE, codeQ2, codeQ3 } from "@/pages/result/shared/codes";
 import { audiencePhrase, useCasePhrase } from "@/pages/result/shared/phrases";
-import { splitFirstPrompt } from "@/pages/result/shared/chunks";
 import { caseStudyForRole } from "@/lib/caseStudies";
 import { SkeletonHeroCard, SkeletonStackCard } from "@/components/ui-primitives/Skeletons";
+import { NextUpCard } from "@/components/dashboard/NextUpCard";
 
 type StackRow = {
   id: string;
@@ -23,15 +23,6 @@ type StackRow = {
   created_at: string;
 };
 
-type FocusChunk = {
-  id: string;
-  title: string | null;
-  content: string;
-  toolName: string;
-  toolSlug: string;
-  prompt: string | null;
-};
-
 type RecentSave = {
   id: string;
   title: string | null;
@@ -40,14 +31,13 @@ type RecentSave = {
 };
 
 type SectionsState = {
-  tonight: boolean;
   notes: boolean;
   stacks: boolean;
   saves: boolean;
 };
 
 const SECTIONS_KEY = "myaistack:dashboard-sections";
-const DEFAULT_SECTIONS: SectionsState = { tonight: true, notes: true, stacks: true, saves: false };
+const DEFAULT_SECTIONS: SectionsState = { notes: true, stacks: true, saves: false };
 
 const formatDate = (iso: string) => {
   try {
@@ -97,8 +87,6 @@ const DashboardIndex = () => {
 
   const [sections, setSections] = useState<SectionsState>(DEFAULT_SECTIONS);
 
-  const [focus, setFocus] = useState<FocusChunk | null>(null);
-  const [focusLoading, setFocusLoading] = useState(true);
 
   const [noteContent, setNoteContent] = useState("");
   const [noteSummary, setNoteSummary] = useState<string | null>(null);
@@ -147,50 +135,6 @@ const DashboardIndex = () => {
   }, [user]);
 
   const mostRecent = stacks[0] ?? null;
-
-  // Tonight focus
-  useEffect(() => {
-    if (!mostRecent) { setFocusLoading(false); return; }
-    let cancelled = false;
-    (async () => {
-      setFocusLoading(true);
-      const slugs = (mostRecent.ai_picked_tools ?? []).filter(Boolean);
-      if (slugs.length === 0) {
-        if (!cancelled) { setFocus(null); setFocusLoading(false); }
-        return;
-      }
-      const { data: tools } = await supabase
-        .from("tools")
-        .select("id, name, slug")
-        .in("slug", slugs);
-      if (cancelled) return;
-      if (!tools || tools.length === 0) { setFocus(null); setFocusLoading(false); return; }
-
-      const toolIds = tools.map((t: any) => t.id);
-      const { data: chunks } = await supabase
-        .from("chunks")
-        .select("id, title, content, chunk_type, priority, tool_id")
-        .in("tool_id", toolIds)
-        .eq("chunk_type", "first-prompt")
-        .order("priority", { ascending: false })
-        .limit(3);
-      if (cancelled) return;
-      const top = chunks?.[0];
-      if (!top) { setFocus(null); setFocusLoading(false); return; }
-      const tool = tools.find((t: any) => t.id === top.tool_id);
-      const split = splitFirstPrompt(top.content ?? "");
-      setFocus({
-        id: top.id,
-        title: top.title,
-        content: top.content,
-        toolName: tool?.name ?? "Your stack",
-        toolSlug: tool?.slug ?? "",
-        prompt: split.prompt,
-      });
-      setFocusLoading(false);
-    })();
-    return () => { cancelled = true; };
-  }, [mostRecent?.id]);
 
   // Load notes
   useEffect(() => {
@@ -306,7 +250,7 @@ const DashboardIndex = () => {
   if (stacks.length === 0) return <Navigate to="/onboarding" replace />;
 
   const recentId = mostRecent!.id;
-  const stackHome = `/dashboard/stacks/${recentId}/my-stack`;
+  
   const divider = "border-t border-[hsl(var(--border))]";
   const caseStudy = caseStudyForRole(mostRecent?.onboarding_role ?? null);
 
@@ -333,69 +277,9 @@ const DashboardIndex = () => {
         </section>
       )}
 
-      {/* Tonight */}
-      <section className={`mt-8 ${divider} pt-2`}>
-        <SectionShell label="Tonight" open={sections.tonight} onOpenChange={(v) => setOpen("tonight", v)}>
-          {focusLoading ? (
-            <SkeletonHeroCard />
-          ) : !focus ? (
-            <div>
-              <p className="text-[15px] text-foreground/70 leading-[1.6]">
-                No focus chunk for your most recent stack yet.
-              </p>
-              <Link
-                to={stackHome}
-                className="mt-2 inline-block text-[14px] text-navy hover:underline"
-              >
-                Set up your tonight focus →
-              </Link>
-            </div>
-          ) : (
-            <div>
-              <p className="text-[11px] font-mono uppercase tracking-[0.08em] text-navy">
-                From {focus.toolName}
-              </p>
-              {focus.title && (
-                <h3 className="mt-2 text-[20px] font-bold text-foreground leading-[1.3]">
-                  {focus.title}
-                </h3>
-              )}
-              {(() => {
-                const split = splitFirstPrompt(focus.content ?? "");
-                return (
-                  <>
-                    {split.before && (
-                      <p className="mt-3 text-[15px] text-foreground/85 leading-[1.65] whitespace-pre-wrap">{split.before}</p>
-                    )}
-                    {split.prompt && (
-                      <div className="my-3 bg-background border border-navy/[0.12] border-l-[3px] border-l-navy rounded-[8px] px-5 py-4">
-                        <pre className="whitespace-pre-wrap font-mono text-[13.5px] leading-[1.7] text-foreground/90">{split.prompt}</pre>
-                      </div>
-                    )}
-                    {split.after && (
-                      <p className="mt-3 text-[15px] text-foreground/85 leading-[1.65] whitespace-pre-wrap">{split.after}</p>
-                    )}
-                  </>
-                );
-              })()}
-              {focus.prompt && (
-                <a
-                  href={claudeDeeplink(focus.prompt)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 inline-flex items-center justify-center bg-navy text-primary-foreground rounded-[8px] px-4 h-10 text-[14px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out"
-                >
-                  Try this prompt in Claude →
-                </a>
-              )}
-              <div className="mt-4">
-                <Link to={stackHome} className="text-[14px] text-navy hover:underline">
-                  Skip ahead to your stack →
-                </Link>
-              </div>
-            </div>
-          )}
-        </SectionShell>
+      {/* Next up — hero card */}
+      <section className="mt-8">
+        <NextUpCard sessionId={recentId} />
       </section>
 
       {/* Notes */}
