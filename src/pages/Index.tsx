@@ -67,7 +67,7 @@ const Index = () => {
 
           {/* Trust strip */}
           <p className="mt-6 md:mt-10 italic text-[14px] text-navy/70">
-            17 AI tools. 346 paragraphs of guidance. No affiliate links. No course at the end.
+            17 AI tools. No affiliate links. No marketing. No upsells. Just what's worth using and how to use it.
           </p>
         </section>
 
