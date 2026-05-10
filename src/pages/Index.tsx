@@ -53,7 +53,7 @@ const Index = () => {
               A guide to every AI tool worth using, written for the people I care about.
             </p>
             <p className="mt-5 text-foreground/80">
-              Free. Mine to keep updated. No course at the end.
+              100% free. Made for friends and family — so nobody gets left behind by AI.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <Link to={startHref} className={`${primaryBtn} w-full sm:w-auto`}>
