@@ -38,6 +38,22 @@ const Q4_LABELS: Record<string, string> = {
   weekly: "uses AI regularly",
   confident: "is confident with AI",
 };
+const ROLE_LABELS: Record<string, string> = {
+  "founder": "a founder or CEO",
+  "solo": "solo / freelance",
+  "team-lead": "a team lead or manager",
+  "ic": "an individual contributor",
+  "student": "a student",
+  "personal": "using AI in personal life",
+  "retired": "retired or exploring",
+};
+const TIME_LABELS: Record<string, string> = {
+  "15min": "about 15 minutes a week",
+  "30min": "about 30 minutes a week",
+  "1hr": "about 1 hour a week",
+  "several": "several hours a week",
+  "open": "open-ended time budget",
+};
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
