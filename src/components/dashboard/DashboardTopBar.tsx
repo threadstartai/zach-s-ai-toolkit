@@ -19,13 +19,19 @@ const DashboardTopBar = () => {
 
   return (
     <header
-      className={`sticky top-0 z-40 h-14 bg-background border-b border-[hsl(var(--border))] transition-shadow duration-150 ${
+      className={`sticky top-0 z-40 h-16 bg-background border-b border-[hsl(var(--border))] transition-shadow duration-200 ease-out ${
         scrolled ? "shadow-[0_1px_3px_rgba(0,0,0,0.04)]" : ""
       }`}
     >
       <div className="h-full px-6 flex items-center justify-between">
-        <Link to="/dashboard" className="text-base font-bold text-navy tracking-tight">
-          My AI Stack
+        <Link
+          to="/dashboard"
+          className="flex flex-col leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm"
+        >
+          <span className="text-base font-bold text-navy tracking-tight">My AI Stack</span>
+          <span className="hidden sm:inline text-[11px] text-foreground/55 italic mt-0.5">
+            Simplify and cut your AI learning curve.
+          </span>
         </Link>
         <div className="flex items-center">
           <span className="text-sm text-navy hidden sm:inline truncate max-w-[200px]">
