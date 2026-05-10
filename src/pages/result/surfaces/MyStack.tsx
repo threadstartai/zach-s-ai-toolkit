@@ -218,7 +218,7 @@ const MyStack = () => {
                   {fullGuideUrl(t.slug) && (
                     <a href={fullGuideUrl(t.slug)!} target="_blank" rel="noopener noreferrer"
                        className="block text-[13px] italic text-navy/70 hover:text-navy underline underline-offset-2 mb-3">
-                      Download the full guide (PDF) ↓
+                      Download the full guide (.docx) ↓
                     </a>
                   )}
                   {!feedbackOpen[t.slug] && !feedbackSubmitted[t.slug] && (
