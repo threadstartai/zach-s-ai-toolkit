@@ -6,6 +6,7 @@ import type { Chunk } from "../shared/types";
 import { fullGuideUrl } from "@/lib/pdfs";
 import { SkeletonGuideCard } from "@/components/ui-primitives/Skeletons";
 import { EmptyState } from "@/components/ui-primitives/EmptyState";
+import { ProcessDiagram } from "@/components/diagrams/ProcessDiagram";
 
 const FOUNDATIONAL_ORDER = [
   "start-here",
@@ -128,6 +129,11 @@ const Foundations = () => {
 
                 {isOpen && (
                   <div className="mt-6 pt-6 border-t border-foreground/10">
+                    {t.slug === "the-process" && (
+                      <div className="mb-8">
+                        <ProcessDiagram />
+                      </div>
+                    )}
                     {fullGuideUrl(t.slug) && (
                       <a href={fullGuideUrl(t.slug)!} target="_blank" rel="noopener noreferrer"
                          className="block text-[13px] italic text-navy/70 hover:text-navy underline underline-offset-2 mb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm">
