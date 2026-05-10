@@ -136,17 +136,27 @@ const MyStack = () => {
           return (
             <Fragment key={k}>
               {i === 0 && (
-                <p className="mb-3 mt-2 italic text-[14px] text-navy/75 font-medium">
-                  Start here tonight ↓
-                </p>
+                <div className="mb-3 mt-2">
+                  <div className="font-mono text-[10px] tracking-[0.15em] text-navy/55 uppercase">Begin</div>
+                  <p className="mt-1 italic text-[14px] text-navy/80 font-medium">
+                    Start here tonight ↓
+                  </p>
+                </div>
               )}
               <div
                 id={`tool-${t.slug}`}
-                className="bg-background border border-[hsl(var(--border))] rounded-[16px] p-6 sm:p-8 scroll-mt-[80px] transition-colors duration-150 hover:border-navy/30"
+                onClick={() => setDetailSlug(t.slug)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === "Enter") setDetailSlug(t.slug); }}
+                className="bg-background border border-[hsl(var(--border))] rounded-[16px] p-6 sm:p-8 scroll-mt-[80px] transition-colors duration-150 hover:border-navy/30 cursor-pointer"
               >
-                <div className="flex items-baseline gap-2.5">
-                  <span className="font-mono text-[13px] text-navy/60">{t.num}</span>
-                  <h4 className="text-[22px] font-bold text-navy">{t.name}</h4>
+                <div className="flex items-baseline justify-between gap-3">
+                  <div className="flex items-baseline gap-2.5">
+                    <span className="font-mono text-[13px] text-navy/60">{t.num}</span>
+                    <h4 className="text-[22px] font-bold text-navy">{t.name}</h4>
+                  </div>
+                  <span className="font-mono text-[11px] tracking-[0.05em] text-navy/45 shrink-0">Tool {i + 1} of {picks.length}</span>
                 </div>
                 {statusByTool[t.slug]?.status === "update" && statusByTool[t.slug]?.update_message && (
                   <div className="mt-4 bg-navy text-primary-foreground rounded-[8px] px-4 py-3 text-[14px] leading-[1.55]">
