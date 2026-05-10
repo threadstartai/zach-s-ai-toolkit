@@ -116,7 +116,7 @@ Deno.serve(async (req) => {
       .limit(10);
     history = (msgs ?? []).reverse().map((m: any) => ({ role: m.role, content: m.content }));
   } else {
-    const title = messageText.slice(0, 60);
+    const title = messageText.slice(0, 80);
     const { data: newConvo, error: nErr } = await admin
       .from("conversations")
       .insert({ session_id: sessionId, user_id: userId, title })
