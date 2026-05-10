@@ -1,4 +1,5 @@
 import { Fragment, useState } from "react";
+import { Link } from "react-router-dom";
 import { useResultContext } from "../shared/useResultContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { TOOLS, whyFor, whyForChatGPT } from "../shared/tools";
@@ -49,7 +50,15 @@ const MyStack = () => {
       )}
       {/* Title + intro */}
       <h3 className="text-[32px] sm:text-[36px] font-bold text-navy tracking-[-0.02em]">{title}</h3>
-      <p className="mt-3 text-navy text-[17px] leading-[1.7]">
+      <div className="mt-6 bg-navy-light/40 border border-navy-light rounded-[12px] px-5 py-4">
+        <p className="text-[14px] text-navy leading-[1.55]">
+          <span className="font-semibold">Read this first:</span> The Master Prompt Guide in Foundations. It's the briefing skill — context, job, constraints, output, follow-up — that makes every tool below sharper.{" "}
+          <Link to="../foundations" className="font-medium underline underline-offset-2 hover:opacity-80">
+            Open it →
+          </Link>
+        </p>
+      </div>
+      <p className="mt-6 text-navy text-[17px] leading-[1.7]">
         Here's what I'm reading: {audiencePhrase(c2)}, working on {useCasePhrase(c3, q3OtherText)}, {confidencePhrase(c4)}. Three tools, and what's worth doing tonight. If that's slightly off,{" "}
         <button
           onClick={handleStartOver}
@@ -255,7 +264,15 @@ const MyStack = () => {
               "",
               ...picks.map((k, i) => `${i + 1}. ${TOOLS[k].name} — ${whyThisTool(TOOLS[k].slug, c2, c3, c4, q3OtherText, aiPickReasoning?.[TOOLS[k].slug])}`),
               "",
-              "Help me think through how to actually use these tonight. Ask me clarifying questions before giving generic advice. Push back where I'm being lazy.",
+              "Use the Master Prompt Guide approach with me:",
+              "",
+              "1. Before answering, ask me up to 3 clarifying questions about my actual situation (the Ask-Me-First Flip).",
+              "2. Then give me your first version. I'll push back if it's too generic.",
+              "3. After we land an answer, audit it: what's weak, what did you assume about me, what's the strongest counter-argument? (The Audit Prompt)",
+              "",
+              "Don't preach the method — use it.",
+              "",
+              "Help me think through how to actually use these three tools tonight.",
             ];
             const url = `https://claude.ai/new?q=${encodeURIComponent(lines.join("\n"))}`;
             window.open(url, "_blank", "noopener,noreferrer");

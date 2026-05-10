@@ -118,7 +118,8 @@ Rules:
 - For users with low AI confidence ('never' or 'tried'), favour Claude (slug 'claude') as one of the 3.
 - For free-text use cases, pick tools that genuinely fit what they wrote. Don't force-fit.
 - Each reasoning sentence should reference the user's specific situation, not generic claims.
-- Use UK English. No hype words.`;
+- Use UK English. No hype words.
+- The Master Prompt Guide is the foundational teaching piece. When users have low confidence ('never' or 'tried'), make sure at least one of the 3 picks is a tool that pairs naturally with the briefing skill (Claude is the strongest match — it rewards good prompts most directly). For confident users, prefer tool combinations that show the relay habit (e.g. Claude + ChatGPT, or Claude + Perplexity).`;
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
