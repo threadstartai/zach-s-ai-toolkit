@@ -9,6 +9,7 @@ import { ChunkBlock } from "../shared/ChunkBlock";
 import { SaveChunkButton } from "../shared/SaveChunkButton";
 import type { ToolKey } from "../shared/types";
 import { fullGuideUrl } from "@/lib/pdfs";
+import { AskDrawer } from "../AskDrawer";
 
 const MyStack = () => {
   const {
