@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { codeQ2, codeQ3, codeQ4, isMeaningfulName } from "@/pages/result/shared/codes";
+import {
+  codeQ2, codeQ3, codeQ4, isMeaningfulName,
+  codeRole, codeTimeBudget, codeExistingTool,
+} from "@/pages/result/shared/codes";
 import type { QuizStep } from "@/pages/result/shared/types";
 
 const Q2_OPTIONS = ["Student", "Personal life / family", "Business / work", "Just exploring"];
@@ -15,7 +18,33 @@ const Q3_OPTIONS = [
 ];
 const Q4_OPTIONS = ["Never used it", "Tried it a bit", "Use it weekly", "Pretty confident"];
 
-const STEPS: QuizStep[] = ["intro", "q1", "q2", "q3", "q4"];
+const ROLE_OPTIONS = [
+  "Founder / CEO",
+  "Solo / freelance",
+  "Team lead or manager",
+  "Individual contributor",
+  "Student",
+  "Personal life / family",
+  "Retired or exploring",
+];
+const TIME_OPTIONS = [
+  "About 15 minutes a week",
+  "About 30 minutes a week",
+  "About 1 hour a week",
+  "Several hours a week",
+  "Open-ended — I'll go as deep as it's worth",
+];
+const TOOL_OPTIONS = [
+  "ChatGPT",
+  "Claude",
+  "Gemini",
+  "GitHub Copilot",
+  "Perplexity",
+  "Other AI tool",
+  "Nothing yet",
+];
+
+const STEPS: QuizStep[] = ["intro", "q1", "q2", "role", "q3", "tools", "q4", "time"];
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -23,35 +52,46 @@ const Onboarding = () => {
   const [step, setStep] = useState<QuizStep>("q1");
   const [name, setName] = useState("");
   const [q2, setQ2] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null);
   const [q3, setQ3] = useState<string | null>(null);
   const [q3Other, setQ3Other] = useState("");
   const [q3OtherSelected, setQ3OtherSelected] = useState(false);
+  const [tools, setTools] = useState<string[]>([]);
   const [q4, setQ4] = useState<string | null>(null);
+  const [timeBudget, setTimeBudget] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(false);
 
   const advance = (next: QuizStep) => setTimeout(() => setStep(next), 150);
 
-  const selectQ2 = (v: string) => {
-    if (q2 !== v) { setQ3(null); setQ3Other(""); setQ3OtherSelected(false); setQ4(null); }
-    setQ2(v); advance("q3");
-  };
+  const selectQ2 = (v: string) => { setQ2(v); advance("role"); };
+  const selectRole = (v: string) => { setRole(v); advance("q3"); };
   const selectQ3 = (v: string) => {
-    if (q3 !== v) setQ4(null);
-    setQ3(v); setQ3OtherSelected(false); setQ3Other(""); advance("q4");
+    setQ3(v); setQ3OtherSelected(false); setQ3Other(""); advance("tools");
   };
   const selectQ3Other = () => { setQ3OtherSelected(true); setQ3(null); };
   const submitQ3Other = () => {
     if (!q3Other.trim()) return;
-    setQ3(q3Other.trim()); setQ4(null); advance("q4");
+    setQ3(q3Other.trim()); advance("tools");
   };
 
-  const submitQuiz = async (q4Value: string) => {
+  const toggleTool = (v: string) => {
+    setTools((prev) => {
+      if (v === "Nothing yet") return prev.includes("Nothing yet") ? [] : ["Nothing yet"];
+      const without = prev.filter((t) => t !== "Nothing yet");
+      return without.includes(v) ? without.filter((t) => t !== v) : [...without, v];
+    });
+  };
+  const submitTools = () => { if (tools.length > 0) advance("q4"); };
+
+  const selectQ4 = (v: string) => { setQ4(v); advance("time"); };
+
+  const submitQuiz = async (timeValue: string) => {
     setSubmitting(true);
     setSubmitError(false);
     const c2 = codeQ2(q2);
     const c3 = codeQ3(q3);
-    const c4 = codeQ4(q4Value);
+    const c4 = codeQ4(q4);
     const displayName = isMeaningfulName(name) ? name.trim() : null;
     try {
       const { data, error } = await supabase.functions.invoke("submit-quiz", {
@@ -62,6 +102,9 @@ const Onboarding = () => {
           q3_other_text: c3 === "other" ? (q3 ?? "") : "",
           q4_confidence: c4,
           q5_learning_style: null,
+          onboarding_role: codeRole(role),
+          onboarding_time_budget: codeTimeBudget(timeValue),
+          onboarding_existing_tools: tools.map(codeExistingTool),
         },
       });
       if (error || !data?.session_id) {
@@ -76,15 +119,14 @@ const Onboarding = () => {
     }
   };
 
-  const selectQ4 = (v: string) => { setQ4(v); void submitQuiz(v); };
+  const selectTime = (v: string) => { setTimeBudget(v); void submitQuiz(v); };
 
-  const stepIndex = STEPS.indexOf(step); // q1=1, q2=2, q3=3, q4=4
+  const stepIndex = STEPS.indexOf(step);
   const questionNumber = Math.max(1, stepIndex);
-  const segmentCount = 4;
+  const segmentCount = 7;
 
-  // Option button styling: default / hover / selected
   const optionBase =
-    "w-full text-left p-5 rounded-[12px] bg-background border text-[16px] transition-colors duration-150";
+    "w-full text-left p-5 rounded-[12px] bg-background border text-[16px] transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2";
   const optionCls = (selected: boolean) =>
     `${optionBase} ${
       selected
@@ -92,14 +134,16 @@ const Onboarding = () => {
         : "border-[hsl(var(--border))] text-navy hover:border-navy"
     }`;
 
-  const backLink = "text-[14px] text-foreground/65 hover:text-navy transition-colors duration-150";
+  const backLink = "text-[14px] text-foreground/65 hover:text-navy transition-colors duration-200 ease-out";
 
-  // Per-step heading + subtitle
   const headings: Record<string, { heading: string; subtitle: string }> = {
     q1: { heading: "What should I call you?", subtitle: "Just a first name. Makes the result feel personal." },
     q2: { heading: "What are you using AI for first?", subtitle: "This routes which tools I recommend." },
+    role: { heading: "What's your role or situation?", subtitle: "Helps me think about who's getting AI advice — you, your team, or no one in particular." },
     q3: { heading: "What's one thing you want help with this week?", subtitle: "This makes the recommendation specific." },
+    tools: { heading: "What are you already using?", subtitle: "I'll deprioritise tools you've already got — unless they're the best fit anyway." },
     q4: { heading: "How confident are you with AI right now?", subtitle: "This sets how much I explain." },
+    time: { heading: "How much time can you give this?", subtitle: "I'll match recommendations to what's realistic — not what sounds good." },
   };
   const current = headings[step as keyof typeof headings];
 
@@ -122,23 +166,21 @@ const Onboarding = () => {
           ))}
         </div>
 
-        {/* Question eyebrow + heading */}
         {current && (
           <div className="mt-8">
             {step === "q1" && (
               <p className="mb-6 italic text-[14px] text-navy/75 leading-relaxed">
-                Four quick questions, then your stack. 100% free. Made for friends and family — so nobody gets left behind by AI. The sign-up was just so I can remember you when you come back.
+                Seven quick steps, then your stack. 100% free. Made for friends and family — so nobody gets left behind by AI. The sign-up was just so I can remember you when you come back.
               </p>
             )}
             <p className="text-[12px] uppercase tracking-wider text-navy/60 font-medium">
-              Question {questionNumber} of 4
+              Step {questionNumber} of {segmentCount}
             </p>
             <h1 className="mt-2 text-2xl font-bold text-navy tracking-tight">{current.heading}</h1>
             <p className="mt-2 text-base text-foreground/65">{current.subtitle}</p>
           </div>
         )}
 
-        {/* Step bodies */}
         <div className="mt-8">
           {step === "q1" && (
             <div>
@@ -149,13 +191,13 @@ const Onboarding = () => {
                 onKeyDown={(e) => { if (e.key === "Enter" && name.trim()) setStep("q2"); }}
                 placeholder="e.g. Sarah"
                 autoFocus
-                className="w-full h-12 rounded-[12px] border border-[hsl(var(--border))] bg-background px-4 text-[16px] text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-navy focus:ring-2 focus:ring-navy/20 transition-shadow duration-150"
+                className="w-full h-12 rounded-[12px] border border-[hsl(var(--border))] bg-background px-4 text-[16px] text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-navy focus:ring-2 focus:ring-navy/20 transition-shadow duration-200 ease-out"
               />
               <div className="mt-5">
                 <button
                   onClick={() => name.trim() && setStep("q2")}
                   disabled={!name.trim()}
-                  className="inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[10px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[10px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Continue →
                 </button>
@@ -167,6 +209,14 @@ const Onboarding = () => {
             <div className="flex flex-col gap-3">
               {Q2_OPTIONS.map((o) => (
                 <button key={o} onClick={() => selectQ2(o)} className={optionCls(q2 === o)}>{o}</button>
+              ))}
+            </div>
+          )}
+
+          {step === "role" && (
+            <div className="flex flex-col gap-3">
+              {ROLE_OPTIONS.map((o) => (
+                <button key={o} onClick={() => selectRole(o)} className={optionCls(role === o)}>{o}</button>
               ))}
             </div>
           )}
@@ -186,12 +236,12 @@ const Onboarding = () => {
                     onKeyDown={(e) => { if (e.key === "Enter") submitQ3Other(); }}
                     placeholder="Tell me what you'd like help with"
                     autoFocus
-                    className="flex-1 h-11 rounded-[10px] border border-[hsl(var(--border))] bg-background px-4 text-[15px] text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-navy focus:ring-2 focus:ring-navy/20 transition-shadow duration-150"
+                    className="flex-1 h-11 rounded-[10px] border border-[hsl(var(--border))] bg-background px-4 text-[15px] text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-navy focus:ring-2 focus:ring-navy/20 transition-shadow duration-200 ease-out"
                   />
                   <button
                     onClick={submitQ3Other}
                     disabled={!q3Other.trim()}
-                    className="inline-flex items-center justify-center bg-navy text-primary-foreground px-4 h-11 rounded-[10px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="inline-flex items-center justify-center bg-navy text-primary-foreground px-4 h-11 rounded-[10px] text-[14px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     Continue →
                   </button>
@@ -200,14 +250,39 @@ const Onboarding = () => {
             </div>
           )}
 
+          {step === "tools" && (
+            <div className="flex flex-col gap-3">
+              {TOOL_OPTIONS.map((o) => (
+                <button key={o} onClick={() => toggleTool(o)} className={optionCls(tools.includes(o))}>{o}</button>
+              ))}
+              <div className="mt-3">
+                <button
+                  onClick={submitTools}
+                  disabled={tools.length === 0}
+                  className="inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[10px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Continue →
+                </button>
+              </div>
+            </div>
+          )}
+
           {step === "q4" && (
             <div className="flex flex-col gap-3">
               {Q4_OPTIONS.map((o) => (
+                <button key={o} onClick={() => selectQ4(o)} className={optionCls(q4 === o)}>{o}</button>
+              ))}
+            </div>
+          )}
+
+          {step === "time" && (
+            <div className="flex flex-col gap-3">
+              {TIME_OPTIONS.map((o) => (
                 <button
                   key={o}
-                  onClick={() => selectQ4(o)}
+                  onClick={() => selectTime(o)}
                   disabled={submitting}
-                  className={`${optionCls(q4 === o)} ${submitting ? "opacity-60 cursor-not-allowed" : ""}`}
+                  className={`${optionCls(timeBudget === o)} ${submitting ? "opacity-60 cursor-not-allowed" : ""}`}
                 >
                   {o}
                 </button>
@@ -218,7 +293,6 @@ const Onboarding = () => {
           )}
         </div>
 
-        {/* Back */}
         {questionNumber > 1 && (
           <div className="mt-8">
             <button
