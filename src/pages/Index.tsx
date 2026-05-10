@@ -3,9 +3,9 @@ import SiteLayout from "@/components/SiteLayout";
 import { useAuth } from "@/contexts/AuthContext";
 
 const primaryBtn =
-  "inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-150";
+  "inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2";
 const outlineBtn =
-  "inline-flex items-center justify-center border border-navy text-navy px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy-light transition-colors duration-150";
+  "inline-flex items-center justify-center border border-navy text-navy px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy-light transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2";
 
 const CATEGORIES = [
   { num: "01", name: "Thinking & Writing" },
@@ -15,7 +15,7 @@ const CATEGORIES = [
 ];
 
 const processCardCls =
-  "bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6 hover:border-navy/40 transition-colors duration-150";
+  "bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6 hover:border-navy/40 transition-colors duration-200 ease-out";
 
 const PROCESS = [
   {
@@ -49,24 +49,27 @@ const Index = () => {
             <h1 className="text-[40px] md:text-6xl font-extrabold text-navy tracking-[-0.02em] leading-[1.05]">
               My AI Stack.
             </h1>
-            <p className="mt-5 text-xl md:text-2xl font-normal text-navy leading-snug max-w-[600px]">
+            <p className="mt-5 text-xl md:text-2xl font-normal text-navy leading-snug max-w-[600px] font-serif">
               A guide to every AI tool worth using, written for the people I care about.
             </p>
             <p className="mt-5 text-foreground/80">
               100% free. Made for friends and family — so nobody gets left behind by AI.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-3">
+            <div className="mt-8 flex flex-col items-start gap-3">
               <Link to={startHref} className={`${primaryBtn} w-full sm:w-auto`}>
                 Get my stack →
               </Link>
-              <Link to="/stack" className={`${outlineBtn} w-full sm:w-auto`}>
-                Browse the 17 tools
+              <Link
+                to="/stack"
+                className="text-[14px] text-navy underline underline-offset-4 hover:opacity-80 transition-opacity duration-200 ease-out mt-1 inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
+              >
+                Or browse all 17 tools →
               </Link>
             </div>
           </div>
 
           {/* Trust strip */}
-          <p className="mt-6 md:mt-10 italic text-[14px] text-navy/70">
+          <p className="mt-6 md:mt-10 italic text-[14px] text-navy/70 font-serif">
             17 AI tools. No affiliate links. No marketing. No upsells. Just what's worth using and how to use it.
           </p>
         </section>
@@ -88,7 +91,7 @@ const Index = () => {
                 </p>
               </div>
             </div>
-            <div className="self-start bg-navy-light/40 border border-navy-light rounded-[16px] p-6 md:p-8">
+            <div className="self-start bg-navy-light/40 border border-navy-light rounded-[12px] p-6 md:p-8">
               <p className="text-[15px] font-bold text-navy">Four ways AI shows up.</p>
               <ul className="mt-4 flex flex-col gap-2.5">
                 {CATEGORIES.map((c) => (
