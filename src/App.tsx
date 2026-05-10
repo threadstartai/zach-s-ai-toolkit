@@ -24,6 +24,8 @@ import Saved from "./pages/result/surfaces/Saved.tsx";
 import AllTools from "./pages/result/surfaces/AllTools.tsx";
 import Foundations from "./pages/result/surfaces/Foundations.tsx";
 import WorkWithZach from "./pages/result/surfaces/WorkWithZach.tsx";
+import BriefingMethod from "./pages/result/surfaces/BriefingMethod.tsx";
+import CheckBeforeTrust from "./pages/result/surfaces/CheckBeforeTrust.tsx";
 import Settings from "./pages/dashboard/Settings.tsx";
 
 const queryClient = new QueryClient();
@@ -81,6 +83,8 @@ const App = () => (
                 <Route path="tonight" element={<Tonight />} />
                 <Route path="saved" element={<Saved />} />
                 <Route path="all-tools" element={<AllTools />} />
+                <Route path="briefing-method" element={<BriefingMethod />} />
+                <Route path="check-before-trust" element={<CheckBeforeTrust />} />
                 <Route path="foundations" element={<Foundations />} />
                 <Route path="work-with-zach" element={<WorkWithZach />} />
               </Route>
