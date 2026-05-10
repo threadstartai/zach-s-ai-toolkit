@@ -41,6 +41,54 @@ export type Database = {
         }
         Relationships: []
       }
+      chunk_progress: {
+        Row: {
+          chunk_id: string
+          id: string
+          last_position: Json
+          read_percent: number
+          session_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          chunk_id: string
+          id?: string
+          last_position?: Json
+          read_percent?: number
+          session_id?: string | null
+          status: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          chunk_id?: string
+          id?: string
+          last_position?: Json
+          read_percent?: number
+          session_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chunk_progress_chunk_id_fkey"
+            columns: ["chunk_id"]
+            isOneToOne: false
+            referencedRelation: "chunks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chunk_progress_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chunks: {
         Row: {
           chunk_type: string
@@ -250,6 +298,173 @@ export type Database = {
           used_at?: string | null
         }
         Relationships: []
+      }
+      learning_events: {
+        Row: {
+          created_at: string
+          event_type: Database["public"]["Enums"]["learning_event_type"]
+          id: string
+          payload: Json
+          plan_id: string
+          step_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: Database["public"]["Enums"]["learning_event_type"]
+          id?: string
+          payload?: Json
+          plan_id: string
+          step_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: Database["public"]["Enums"]["learning_event_type"]
+          id?: string
+          payload?: Json
+          plan_id?: string
+          step_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_events_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "learning_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learning_events_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "learning_plan_steps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learning_plan_steps: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          estimated_minutes: number | null
+          foundation_slug: string | null
+          id: string
+          instruction: string
+          metadata: Json
+          plan_id: string
+          position: number
+          primary_chunk_id: string | null
+          purpose: string
+          status: Database["public"]["Enums"]["learning_step_status"]
+          step_kind: string
+          title: string
+          tool_slug: string | null
+          unlock_rule: Json
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          estimated_minutes?: number | null
+          foundation_slug?: string | null
+          id?: string
+          instruction: string
+          metadata?: Json
+          plan_id: string
+          position: number
+          primary_chunk_id?: string | null
+          purpose: string
+          status?: Database["public"]["Enums"]["learning_step_status"]
+          step_kind: string
+          title: string
+          tool_slug?: string | null
+          unlock_rule?: Json
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          estimated_minutes?: number | null
+          foundation_slug?: string | null
+          id?: string
+          instruction?: string
+          metadata?: Json
+          plan_id?: string
+          position?: number
+          primary_chunk_id?: string | null
+          purpose?: string
+          status?: Database["public"]["Enums"]["learning_step_status"]
+          step_kind?: string
+          title?: string
+          tool_slug?: string | null
+          unlock_rule?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_plan_steps_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "learning_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learning_plan_steps_primary_chunk_id_fkey"
+            columns: ["primary_chunk_id"]
+            isOneToOne: false
+            referencedRelation: "chunks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learning_plans: {
+        Row: {
+          active_tool_slugs: string[]
+          created_at: string
+          current_step_id: string | null
+          id: string
+          lane: Database["public"]["Enums"]["learning_lane"]
+          plan_version: number
+          rationale: Json
+          session_id: string
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          active_tool_slugs?: string[]
+          created_at?: string
+          current_step_id?: string | null
+          id?: string
+          lane: Database["public"]["Enums"]["learning_lane"]
+          plan_version?: number
+          rationale?: Json
+          session_id: string
+          title: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          active_tool_slugs?: string[]
+          created_at?: string
+          current_step_id?: string | null
+          id?: string
+          lane?: Database["public"]["Enums"]["learning_lane"]
+          plan_version?: number
+          rationale?: Json
+          session_id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_plans_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       messages: {
         Row: {
@@ -542,7 +757,22 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      learning_event_type:
+        | "plan_created"
+        | "step_opened"
+        | "step_completed"
+        | "step_skipped"
+        | "chunk_saved"
+        | "note_added"
+        | "resume_position_saved"
+        | "plan_repaired"
+      learning_lane: "starting" | "comfortable"
+      learning_step_status:
+        | "locked"
+        | "available"
+        | "in_progress"
+        | "done"
+        | "skipped"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -669,6 +899,25 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      learning_event_type: [
+        "plan_created",
+        "step_opened",
+        "step_completed",
+        "step_skipped",
+        "chunk_saved",
+        "note_added",
+        "resume_position_saved",
+        "plan_repaired",
+      ],
+      learning_lane: ["starting", "comfortable"],
+      learning_step_status: [
+        "locked",
+        "available",
+        "in_progress",
+        "done",
+        "skipped",
+      ],
+    },
   },
 } as const
