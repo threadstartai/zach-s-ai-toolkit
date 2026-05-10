@@ -67,7 +67,26 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
   const displayName = isMeaningfulName(name) ? name.trim() : null;
   const title = displayName ? `${displayName}'s AI Stack` : "My AI Stack";
 
-  const picks = useMemo(() => recommend(c2, c3, c4), [c2, c3, c4]);
+  const aiSlugs = session?.ai_picked_tools ?? null;
+  const aiPickReasoning = session?.ai_pick_reasoning ?? null;
+
+  const slugToKey = useMemo(() => {
+    const map = new Map<string, typeof picks[number]>();
+    for (const [key, tool] of Object.entries(TOOLS)) {
+      map.set(tool.slug, key as any);
+    }
+    return map;
+  }, []);
+
+  const picks = useMemo(() => {
+    if (Array.isArray(aiSlugs) && aiSlugs.length === 3) {
+      const keys = aiSlugs
+        .map((s) => slugToKey.get(s))
+        .filter((k): k is NonNullable<typeof k> => Boolean(k));
+      if (keys.length === 3) return keys;
+    }
+    return recommend(c2, c3, c4);
+  }, [aiSlugs, c2, c3, c4, slugToKey]);
   const pickSlugs = useMemo(() => picks.map((k) => TOOLS[k].slug), [picks]);
 
   // Chunks + status state.
