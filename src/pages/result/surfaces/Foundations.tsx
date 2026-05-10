@@ -82,10 +82,12 @@ const Foundations = () => {
       </p>
 
       {loading && (
-        <p className="mt-10 italic text-foreground/60">Loading the guides…</p>
+        <div className="mt-10 flex flex-col gap-4">
+          {Array.from({ length: 7 }).map((_, i) => <SkeletonGuideCard key={i} />)}
+        </div>
       )}
       {error && !loading && (
-        <p className="mt-10 italic text-foreground/60">Couldn't load the foundations. Refresh the page.</p>
+        <EmptyState>Couldn't load the foundations. Refresh the page.</EmptyState>
       )}
 
       {!loading && !error && (
