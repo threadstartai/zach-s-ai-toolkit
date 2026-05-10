@@ -13,6 +13,7 @@ import { fullGuideUrl } from "@/lib/pdfs";
 import { ToolDetailDrawer } from "../ToolDetailDrawer";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
+import { ChunkFeedbackButton } from "../shared/ChunkFeedbackButton";
 
 const MyStack = () => {
   const {
