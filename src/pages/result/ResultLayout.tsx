@@ -318,7 +318,7 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
   if (isDashboard) {
     return (
       <>
-        <div className="max-w-[820px] mx-auto px-5 sm:px-8 md:px-12 py-10 md:py-12">
+        <div className="max-w-[820px] mx-auto px-5 sm:px-8 md:px-12 py-8 md:py-10">
           {body}
         </div>
         {user && (

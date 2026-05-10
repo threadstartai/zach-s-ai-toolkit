@@ -457,7 +457,7 @@ const MyStack = () => {
         </ol>
       </div>
 
-      <div className="mt-12 bg-navy-light/30 border border-navy-light rounded-[12px] px-6 py-5">
+      <div className="mt-8 bg-navy-light/30 border border-navy-light rounded-[12px] px-6 py-5">
         <p className="text-navy/80 text-[16px] leading-[1.7] italic">
           That's the stack. If you do one thing tonight, take the prompt at the top of the first card. If you want to come back to this — save your link, or just take a screenshot.
         </p>

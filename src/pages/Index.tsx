@@ -79,7 +79,7 @@ const Index = () => {
         </section>
 
         {/* What this is — single column */}
-        <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]/60">
+        <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]">
           <div className={sectionLabelCls}>01 — What this is</div>
           <div className="max-w-[760px]">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">What this is</h2>
@@ -98,7 +98,7 @@ const Index = () => {
         </section>
 
         {/* Inside the stack */}
-        <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]/60">
+        <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]">
           <div className={sectionLabelCls}>02 — Inside</div>
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight">17 tools, four ways AI shows up.</h2>
           <p className="mt-5 max-w-[680px] text-foreground/85 text-[16.5px] leading-[1.7]">
@@ -135,7 +135,7 @@ const Index = () => {
         </section>
 
         {/* The Process — 2x2 grid */}
-        <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]/60">
+        <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]">
           <div className={sectionLabelCls}>03 — How I use AI</div>
           <div className="max-w-[760px]">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">The way I use AI</h2>
@@ -161,7 +161,7 @@ const Index = () => {
         </section>
 
         {/* Chrome Consulting */}
-        <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]/60">
+        <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]">
           <div className={sectionLabelCls}>04 — If you want help</div>
           <div className="max-w-[760px]">
             <h3 className="text-2xl font-bold tracking-tight">
