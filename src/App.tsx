@@ -18,6 +18,11 @@ import ResetPassword from "./pages/auth/ResetPassword.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
 import DashboardShell from "./pages/dashboard/DashboardShell.tsx";
 import DashboardIndex from "./pages/dashboard/DashboardIndex.tsx";
+import Tonight from "./pages/result/surfaces/Tonight.tsx";
+import Saved from "./pages/result/surfaces/Saved.tsx";
+import AllTools from "./pages/result/surfaces/AllTools.tsx";
+import Foundations from "./pages/result/surfaces/Foundations.tsx";
+import WorkWithZach from "./pages/result/surfaces/WorkWithZach.tsx";
 
 const queryClient = new QueryClient();
 
