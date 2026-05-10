@@ -17,6 +17,7 @@ const MyStack = () => {
     sessionId, linkCopied, handleCopyShareLink, handleStartOver,
     saved, setSaved,
     savedChunkIds, toggleSave,
+    aiPickReasoning,
   } = useResultContext();
   const { user } = useAuth();
 
