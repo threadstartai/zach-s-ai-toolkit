@@ -419,7 +419,7 @@ const DashboardIndex = () => {
                 <Link
                   key={s.id}
                   to={`/dashboard/stacks/${s.id}/my-stack`}
-                  className="block bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 hover:border-navy/40 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
+                  className="block bg-card border border-[hsl(var(--border))] rounded-[12px] p-5 hover:border-navy/40 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
                 >
                   <h3 className="text-[16px] font-bold text-foreground">{name}</h3>
                   <p className="mt-1.5 text-[13px] text-foreground/70 leading-[1.55]">
