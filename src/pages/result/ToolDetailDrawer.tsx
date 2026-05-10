@@ -124,7 +124,7 @@ export const ToolDetailDrawer = ({ open, onOpenChange, toolSlug }: Props) => {
                           >
                             <ChunkBlock chunk={ch} />
                             <div className="mt-3 flex justify-end">
-                              <ChunkFeedbackButton chunkId={ch.id} />
+                              <ChunkFeedbackButton chunkId={ch.id} toolSlug={tool.slug} sessionId={null} />
                             </div>
                           </div>
                         ))}
