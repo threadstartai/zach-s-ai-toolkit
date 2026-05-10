@@ -91,7 +91,7 @@ const Index = () => {
                 </p>
               </div>
             </div>
-            <div className="self-start bg-navy-light/40 border border-navy-light rounded-[16px] p-6 md:p-8">
+            <div className="self-start bg-navy-light/40 border border-navy-light rounded-[12px] p-6 md:p-8">
               <p className="text-[15px] font-bold text-navy">Four ways AI shows up.</p>
               <ul className="mt-4 flex flex-col gap-2.5">
                 {CATEGORIES.map((c) => (
