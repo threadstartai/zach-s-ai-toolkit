@@ -29,7 +29,7 @@ const SiteNav = () => {
   }, []);
 
   const navLinkCls = ({ isActive }: { isActive: boolean }) =>
-    `whitespace-nowrap transition-colors duration-150 hover:text-navy ${
+    `whitespace-nowrap transition-colors duration-200 ease-out hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm ${
       isActive ? "text-navy font-medium" : "text-foreground/65"
     }`;
 
