@@ -345,6 +345,9 @@ export type Database = {
           email: string | null
           id: string
           name: string | null
+          onboarding_existing_tools: string[] | null
+          onboarding_role: string | null
+          onboarding_time_budget: string | null
           q2_audience: string | null
           q3_other_text: string | null
           q3_use_case: string | null
@@ -362,6 +365,9 @@ export type Database = {
           email?: string | null
           id?: string
           name?: string | null
+          onboarding_existing_tools?: string[] | null
+          onboarding_role?: string | null
+          onboarding_time_budget?: string | null
           q2_audience?: string | null
           q3_other_text?: string | null
           q3_use_case?: string | null
@@ -379,6 +385,9 @@ export type Database = {
           email?: string | null
           id?: string
           name?: string | null
+          onboarding_existing_tools?: string[] | null
+          onboarding_role?: string | null
+          onboarding_time_budget?: string | null
           q2_audience?: string | null
           q3_other_text?: string | null
           q3_use_case?: string | null
