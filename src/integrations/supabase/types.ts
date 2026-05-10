@@ -271,6 +271,9 @@ export type Database = {
       }
       sessions: {
         Row: {
+          ai_pick_reasoning: Json | null
+          ai_picked_at: string | null
+          ai_picked_tools: string[] | null
           created_at: string
           email: string | null
           id: string
@@ -284,6 +287,9 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          ai_pick_reasoning?: Json | null
+          ai_picked_at?: string | null
+          ai_picked_tools?: string[] | null
           created_at?: string
           email?: string | null
           id?: string
@@ -297,6 +303,9 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          ai_pick_reasoning?: Json | null
+          ai_picked_at?: string | null
+          ai_picked_tools?: string[] | null
           created_at?: string
           email?: string | null
           id?: string
