@@ -130,9 +130,7 @@ const Saved = () => {
         Bits of guidance you've kept for later.
       </p>
 
-      {loading && (
-        <p className="mt-10 text-[14px] text-foreground/60 italic">One moment — loading your saves.</p>
-      )}
+      {loading && <SkeletonChunkList count={2} className="mt-10" />}
 
       {!loading && visible.length === 0 && (
         <div className="mt-10">
