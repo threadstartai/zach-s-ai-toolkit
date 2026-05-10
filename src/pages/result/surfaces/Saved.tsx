@@ -109,13 +109,17 @@ const Saved = () => {
     return () => { cancelled = true; };
   }, [loading, user, picks, chunks, savedChunkIds]);
 
-  const handleSaveSuggestion = (chunk: SavedRow) => {
-    toggleSave(chunk.id);
-    setChunks((prev) => [
-      { ...chunk, savedAt: new Date().toISOString() },
-      ...prev.filter((c) => c.id !== chunk.id),
-    ]);
+  const handleSaveSuggestion = async (chunk: SavedRow) => {
     setSuggestions((prev) => prev.filter((s) => s.id !== chunk.id));
+    try {
+      await toggleSave(chunk.id);
+      setChunks((prev) => [
+        { ...chunk, savedAt: new Date().toISOString() },
+        ...prev.filter((c) => c.id !== chunk.id),
+      ]);
+    } catch {
+      setSuggestions((prev) => [chunk, ...prev]);
+    }
   };
 
   return (
