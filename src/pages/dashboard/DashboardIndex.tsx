@@ -23,15 +23,6 @@ type StackRow = {
   created_at: string;
 };
 
-type FocusChunk = {
-  id: string;
-  title: string | null;
-  content: string;
-  toolName: string;
-  toolSlug: string;
-  prompt: string | null;
-};
-
 type RecentSave = {
   id: string;
   title: string | null;
@@ -40,14 +31,13 @@ type RecentSave = {
 };
 
 type SectionsState = {
-  tonight: boolean;
   notes: boolean;
   stacks: boolean;
   saves: boolean;
 };
 
 const SECTIONS_KEY = "myaistack:dashboard-sections";
-const DEFAULT_SECTIONS: SectionsState = { tonight: true, notes: true, stacks: true, saves: false };
+const DEFAULT_SECTIONS: SectionsState = { notes: true, stacks: true, saves: false };
 
 const formatDate = (iso: string) => {
   try {
