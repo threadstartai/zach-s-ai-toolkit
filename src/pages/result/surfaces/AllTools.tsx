@@ -6,7 +6,7 @@ const ToolCard = ({ tool }: { tool: CategoryTool }) => (
     className="block bg-card border border-[hsl(var(--border))] rounded-[12px] p-5 hover:border-navy/40 transition-colors duration-200 ease-out"
   >
     {tool.num && <div className="font-mono text-xs text-navy/60">{tool.num}</div>}
-    <h4 className="text-lg font-bold text-navy mt-1">{tool.name}</h4>
+    <h4 className="text-[20px] font-bold text-navy mt-1">{tool.name}</h4>
     <p className="mt-2 text-sm text-foreground/80 leading-[1.6]">{tool.tagline}</p>
     {fullGuideUrl(tool.slug) && (
       <a
