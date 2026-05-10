@@ -99,15 +99,15 @@ Deno.serve(async (req) => {
   }
 
   const now = new Date().toISOString();
-  const { error: upsertErr } = await admin
+  // Only update summary fields. Content is managed by the frontend autosave —
+  // writing it here would race against the user's typing and silently overwrite recent edits.
+  const { error: updErr } = await admin
     .from("user_notes")
-    .upsert(
-      { user_id: userId, content, summary, summary_updated_at: now },
-      { onConflict: "user_id" },
-    );
+    .update({ summary, summary_updated_at: now })
+    .eq("user_id", userId);
 
-  if (upsertErr) {
-    console.error("summarise-notes: upsert failed", upsertErr);
+  if (updErr) {
+    console.error("summarise-notes: update failed", updErr);
     return json({ error: "Failed to save summary" }, 500);
   }
 
