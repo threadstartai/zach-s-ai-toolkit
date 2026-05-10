@@ -97,10 +97,10 @@ const Stack = () => {
 
   return (
     <SiteLayout>
-      <div className="mx-auto max-w-[1100px] px-6 pt-12 md:pt-16 pb-24">
+      <div className="mx-auto max-w-[1100px] px-6 pt-10 md:pt-16 pb-24">
         {/* Hero */}
         <header className="max-w-[760px]">
-          <h1 className="text-[44px] sm:text-[52px] font-extrabold text-navy tracking-[-0.02em] leading-[1.05]">
+          <h1 className="text-[36px] sm:text-[52px] font-extrabold text-navy tracking-[-0.02em] leading-[1.05]">
             The Stack
           </h1>
           <p className="mt-4 text-[18px] text-navy/85 leading-snug">
@@ -113,7 +113,7 @@ const Stack = () => {
 
         {/* Build my stack — banner */}
         <section className="mt-10">
-          <div className="bg-navy-light/40 rounded-[12px] p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-navy-light/40 rounded-[12px] p-4 md:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <p className="text-[15px] text-navy">
               <span className="font-bold">Build my stack</span> — answer 4 questions, get 3 personalised tools.
             </p>
@@ -127,7 +127,7 @@ const Stack = () => {
         </section>
 
         {/* Categories */}
-        <section id="tools" className="mt-16 scroll-mt-20">
+        <section id="tools" className="mt-12 md:mt-16 scroll-mt-20">
           {categories.map((c) => <CategorySection key={c.title} data={c} />)}
         </section>
 
