@@ -8,6 +8,7 @@ import { Q2_FROM_CODE, Q3_FROM_CODE, codeQ2, codeQ3 } from "@/pages/result/share
 import { audiencePhrase, useCasePhrase } from "@/pages/result/shared/phrases";
 import { splitFirstPrompt } from "@/pages/result/shared/chunks";
 import { caseStudyForRole } from "@/lib/caseStudies";
+import { SkeletonHeroCard, SkeletonStackCard } from "@/components/ui-primitives/Skeletons";
 
 type StackRow = {
   id: string;
