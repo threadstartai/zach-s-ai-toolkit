@@ -105,6 +105,17 @@ export const ToolDetailDrawer = ({ open, onOpenChange, toolSlug }: Props) => {
                 </div>
               )}
 
+              {tool.when_not_to_use && (
+                <div className="mt-5 bg-navy-light/60 border-l-[3px] border-l-navy rounded-[8px] px-4 py-3">
+                  <p className="font-mono text-[11px] tracking-[0.12em] uppercase text-navy">
+                    When not to use
+                  </p>
+                  <p className="mt-1.5 text-[14px] leading-[1.55] text-foreground/85">
+                    {tool.when_not_to_use}
+                  </p>
+                </div>
+              )}
+
               <div className="mt-7 flex flex-col gap-6">
                 {SECTION_LABELS.map((s) => {
                   const items = grouped[s.key];
