@@ -4,7 +4,7 @@ import { useResultContext } from "../shared/useResultContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { TOOLS, whyFor, whyForChatGPT } from "../shared/tools";
-import { audiencePhrase, useCasePhrase, confidencePhrase, whyThisTool } from "../shared/phrases";
+import { audiencePhrase, useCasePhrase, confidencePhrase, whyThisTool, rolePhrase, timeBudgetPhrase } from "../shared/phrases";
 import { SECTION_LABELS, LADDER, groupChunks } from "../shared/chunks";
 import { ChunkBlock } from "../shared/ChunkBlock";
 import { SaveChunkButton } from "../shared/SaveChunkButton";
