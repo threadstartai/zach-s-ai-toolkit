@@ -277,69 +277,9 @@ const DashboardIndex = () => {
         </section>
       )}
 
-      {/* Tonight */}
-      <section className={`mt-8 ${divider} pt-2`}>
-        <SectionShell label="Tonight" open={sections.tonight} onOpenChange={(v) => setOpen("tonight", v)}>
-          {focusLoading ? (
-            <SkeletonHeroCard />
-          ) : !focus ? (
-            <div>
-              <p className="text-[15px] text-foreground/70 leading-[1.6]">
-                No focus chunk for your most recent stack yet.
-              </p>
-              <Link
-                to={stackHome}
-                className="mt-2 inline-block text-[14px] text-navy hover:underline"
-              >
-                Set up your tonight focus →
-              </Link>
-            </div>
-          ) : (
-            <div>
-              <p className="text-[11px] font-mono uppercase tracking-[0.08em] text-navy">
-                From {focus.toolName}
-              </p>
-              {focus.title && (
-                <h3 className="mt-2 text-[20px] font-bold text-foreground leading-[1.3]">
-                  {focus.title}
-                </h3>
-              )}
-              {(() => {
-                const split = splitFirstPrompt(focus.content ?? "");
-                return (
-                  <>
-                    {split.before && (
-                      <p className="mt-3 text-[15px] text-foreground/85 leading-[1.65] whitespace-pre-wrap">{split.before}</p>
-                    )}
-                    {split.prompt && (
-                      <div className="my-3 bg-background border border-navy/[0.12] border-l-[3px] border-l-navy rounded-[8px] px-5 py-4">
-                        <pre className="whitespace-pre-wrap font-mono text-[13.5px] leading-[1.7] text-foreground/90">{split.prompt}</pre>
-                      </div>
-                    )}
-                    {split.after && (
-                      <p className="mt-3 text-[15px] text-foreground/85 leading-[1.65] whitespace-pre-wrap">{split.after}</p>
-                    )}
-                  </>
-                );
-              })()}
-              {focus.prompt && (
-                <a
-                  href={claudeDeeplink(focus.prompt)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 inline-flex items-center justify-center bg-navy text-primary-foreground rounded-[8px] px-4 h-10 text-[14px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out"
-                >
-                  Try this prompt in Claude →
-                </a>
-              )}
-              <div className="mt-4">
-                <Link to={stackHome} className="text-[14px] text-navy hover:underline">
-                  Skip ahead to your stack →
-                </Link>
-              </div>
-            </div>
-          )}
-        </SectionShell>
+      {/* Next up — hero card */}
+      <section className="mt-8">
+        <NextUpCard sessionId={recentId} />
       </section>
 
       {/* Notes */}
