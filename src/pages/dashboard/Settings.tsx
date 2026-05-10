@@ -34,7 +34,7 @@ const Settings = () => {
         </div>
       </section>
 
-      <section className="mt-10">
+      <section className="mt-8">
         <h2 className="text-[20px] font-bold mb-4">Appearance</h2>
         <div className="flex flex-wrap gap-2">
           {options.map((opt) => {
