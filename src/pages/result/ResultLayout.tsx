@@ -71,9 +71,9 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
   const aiPickReasoning = session?.ai_pick_reasoning ?? null;
 
   const slugToKey = useMemo(() => {
-    const map = new Map<string, typeof picks[number]>();
+    const map = new Map<string, ToolKey>();
     for (const [key, tool] of Object.entries(TOOLS)) {
-      map.set(tool.slug, key as any);
+      map.set(tool.slug, key as ToolKey);
     }
     return map;
   }, []);
