@@ -32,9 +32,13 @@ const DashboardTopBar = () => {
             {display}
           </span>
           <span className="text-sm text-navy/40 mx-2 hidden sm:inline">·</span>
+          <Link to="/dashboard/settings" className="text-sm text-navy hover:underline">
+            Settings
+          </Link>
+          <span className="text-sm text-foreground/40 mx-2">·</span>
           <button
             onClick={() => { void signOut(); window.location.assign("/"); }}
-            className="text-sm text-navy/60 hover:text-navy hover:underline transition-colors duration-150 ml-3 sm:ml-0"
+            className="text-sm text-navy/60 hover:text-navy hover:underline transition-colors duration-150"
           >
             Sign out
           </button>
