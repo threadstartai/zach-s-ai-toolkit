@@ -91,8 +91,8 @@ export const ResultSidebar = ({
                 end={item.end}
                 className={
                   isActive
-                    ? "block px-3 py-1.5 md:py-2.5 md:pl-2.5 md:pr-3 rounded-[8px] text-[13px] md:text-[14px] font-medium md:border-l-2 md:border-navy bg-navy-light/60 text-navy whitespace-nowrap transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
-                    : "block px-3 py-1.5 md:py-2.5 md:px-3 rounded-[8px] text-[13px] md:text-[14px] md:border-l-2 md:border-transparent text-navy/70 hover:text-navy hover:bg-navy-light/30 whitespace-nowrap transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
+                    ? "block px-3 py-2.5 md:pl-2.5 md:pr-3 rounded-[8px] text-[13px] md:text-[14px] font-medium md:border-l-2 md:border-navy bg-navy-light/60 text-navy whitespace-nowrap transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
+                    : "block px-3 py-2.5 md:px-3 rounded-[8px] text-[13px] md:text-[14px] md:border-l-2 md:border-transparent text-navy/70 hover:text-navy hover:bg-navy-light/30 whitespace-nowrap transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
                 }
               >
                 {item.label}
