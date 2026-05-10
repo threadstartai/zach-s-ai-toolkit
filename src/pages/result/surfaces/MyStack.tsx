@@ -101,7 +101,7 @@ const MyStack = () => {
       {stackLabel && (
         <p className="text-[13px] italic text-navy/70 mb-1">Stack: {stackLabel}</p>
       )}
-      <h3 className="text-[32px] sm:text-[36px] font-bold text-navy tracking-[-0.02em]">{title}</h3>
+      <h3 className="text-[32px] sm:text-[36px] font-bold tracking-[-0.02em]">{title}</h3>
       {isDashboard && (
         <div className="mt-6 bg-navy-light/40 border border-navy-light rounded-[12px] px-5 py-4">
           <p className="text-[14px] text-navy leading-[1.55]">
