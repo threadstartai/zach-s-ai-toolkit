@@ -4,6 +4,7 @@ import { TOOLS } from "../shared/tools";
 import { ChunkBlock } from "../shared/ChunkBlock";
 import { SaveChunkButton } from "../shared/SaveChunkButton";
 import { ChunkFeedbackButton } from "../shared/ChunkFeedbackButton";
+import { SkeletonHeroCard } from "@/components/ui-primitives/Skeletons";
 import type { Chunk, ToolKey } from "../shared/types";
 
 const PREFERRED_TYPES = ["first-prompt", "setup", "workflow-example"];
