@@ -128,7 +128,7 @@ const MyStack = () => {
                 )}
                 <p className="mt-3 text-navy text-[16px] leading-[1.65]">{why(k)}</p>
                 <p className="mt-3 mb-1 text-[13px] italic text-navy/65 leading-[1.55]">
-                  {whyThisTool(t.slug, c2, c3, c4, q3OtherText)}
+                  {whyThisTool(t.slug, c2, c3, c4, q3OtherText, aiPickReasoning?.[t.slug])}
                 </p>
 
                 {hasAnyChunks && (
