@@ -270,7 +270,8 @@ const DashboardIndex = () => {
   const greetingName = useMemo(() => {
     const fromStack = mostRecent?.name?.trim();
     const meta = (user?.user_metadata as { display_name?: string } | undefined)?.display_name?.trim();
-    const raw = fromStack || meta || "";
+    const fromStackClean = fromStack && fromStack.toLowerCase() !== "anonymous" ? fromStack : "";
+    const raw = fromStackClean || meta || "";
     if (!raw) return "there";
     return raw.split(/\s+/)[0];
   }, [mostRecent, user]);
