@@ -82,7 +82,7 @@ const Index = () => {
         <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]">
           <div className={sectionLabelCls}>01 — What this is</div>
           <div className="max-w-[760px]">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">What this is</h2>
+            <h2 className="text-[26px] md:text-[28px] font-bold tracking-tight">What this is</h2>
             <div className="mt-5 space-y-4 text-foreground/85 text-[16.5px] leading-[1.7]">
               <p>
                 17 AI tools, one place, written like a friend would explain them. No
@@ -100,7 +100,7 @@ const Index = () => {
         {/* Inside the stack */}
         <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]">
           <div className={sectionLabelCls}>02 — Inside</div>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">17 tools, four ways AI shows up.</h2>
+          <h2 className="text-[26px] md:text-[28px] font-bold tracking-tight">17 tools, four ways AI shows up.</h2>
           <p className="mt-5 max-w-[680px] text-foreground/85 text-[16.5px] leading-[1.7]">
             Every tool I'd actually recommend, organised by where it fits in real life. Read the ones that match what you're doing. Skip the rest.
           </p>
@@ -138,7 +138,7 @@ const Index = () => {
         <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]">
           <div className={sectionLabelCls}>03 — How I use AI</div>
           <div className="max-w-[760px]">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">The way I use AI</h2>
+            <h2 className="text-[26px] md:text-[28px] font-bold tracking-tight">The way I use AI</h2>
             <p className="mt-5 text-foreground/85 text-[16.5px] leading-[1.7]">
               The tools matter less than the loop. Here's the four-step process I use for almost everything:
             </p>

@@ -74,7 +74,7 @@ const Foundations = () => {
 
   return (
     <div>
-      <h3 className="text-3xl font-bold tracking-[-0.02em]">Foundations</h3>
+      <h3 className="text-[32px] font-bold tracking-[-0.02em]">Foundations</h3>
       <p className="mt-3 italic text-[15px] text-foreground/70 max-w-[640px]">
         Field guide. Background reading on how this stack came together and how to pass it on. The backbone of how to actually use AI well lives in Briefing method and Check before trust above.
       </p>
@@ -95,7 +95,7 @@ const Foundations = () => {
             return (
               <div
                 key={t.slug}
-                className="bg-card border border-[hsl(var(--border))] rounded-[12px] p-6 sm:p-8 transition-colors duration-200 ease-out hover:border-navy/30"
+                className="bg-card border border-[hsl(var(--border))] rounded-[12px] p-5 sm:p-6 transition-colors duration-200 ease-out hover:border-navy/30"
               >
                 <button
                   type="button"
@@ -104,7 +104,7 @@ const Foundations = () => {
                   aria-expanded={isOpen}
                 >
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-[22px] font-bold text-navy">{t.name}</h4>
+                    <h4 className="text-[20px] font-bold text-navy">{t.name}</h4>
                     {t.tagline && (
                       <p className="mt-2 text-[15px] text-foreground/80 leading-[1.6]">{t.tagline}</p>
                     )}

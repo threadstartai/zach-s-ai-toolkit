@@ -217,7 +217,7 @@ const MyStack = () => {
                 <div className="flex items-baseline justify-between gap-3">
                   <div className="flex items-baseline gap-2.5 flex-wrap">
                     <span className="font-mono text-[13px] text-navy/60">{t.num}</span>
-                    <h4 className="text-[22px] font-bold text-navy">{t.name}</h4>
+                    <h4 className="text-[20px] font-bold text-navy">{t.name}</h4>
                     {toolStatusMap[t.slug]?.status === "update" && (
                       <span className="font-mono text-[10px] uppercase tracking-[0.1em] bg-navy-light/70 text-navy px-2 py-0.5 rounded-[4px] whitespace-nowrap">
                         Update available
@@ -356,7 +356,7 @@ const MyStack = () => {
             <p className="italic text-foreground/60">Loading your stack…</p>
           ) : guidedIndex >= guidedSteps.length ? (
             <div className="bg-card border border-[hsl(var(--border))] rounded-[12px] p-8 text-center">
-              <h4 className="text-[22px] font-bold text-navy">You've worked through your stack.</h4>
+              <h4 className="text-[20px] font-bold text-navy">You've worked through your stack.</h4>
               <p className="mt-3 text-foreground/85 text-[15px] leading-[1.65]">
                 That's everything in priority order. Now go try one of the prompts in real life.
               </p>
