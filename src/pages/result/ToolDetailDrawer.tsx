@@ -120,7 +120,7 @@ export const ToolDetailDrawer = ({ open, onOpenChange, toolSlug }: Props) => {
                         {items.map((ch) => (
                           <div
                             key={ch.id}
-                            className="bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6 transition-colors duration-150 hover:border-navy/40"
+                            className="bg-card border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6 transition-colors duration-150 hover:border-navy/40"
                           >
                             <ChunkBlock chunk={ch} />
                             <div className="mt-3 flex justify-end">

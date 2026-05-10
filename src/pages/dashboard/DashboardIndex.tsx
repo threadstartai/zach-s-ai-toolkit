@@ -290,10 +290,10 @@ const DashboardIndex = () => {
 
   const recentId = mostRecent!.id;
   const stackHome = `/dashboard/stacks/${recentId}/my-stack`;
-  const divider = "border-t border-[hsl(var(--border))]/50";
+  const divider = "border-t border-[hsl(var(--border))]";
 
   return (
-    <div className="max-w-[800px] mx-auto px-5 sm:px-8 py-10 md:py-12">
+    <div className="max-w-[800px] mx-auto px-5 sm:px-8 py-8 md:py-10">
       {/* Greeting */}
       <header>
         <h1 className="text-[32px] font-bold text-foreground tracking-[-0.02em] leading-[1.15]">
@@ -305,7 +305,7 @@ const DashboardIndex = () => {
       </header>
 
       {/* Tonight */}
-      <section className={`mt-10 ${divider} pt-2`}>
+      <section className={`mt-8 ${divider} pt-2`}>
         <SectionShell label="Tonight" open={sections.tonight} onOpenChange={(v) => setOpen("tonight", v)}>
           {focusLoading ? (
             <p className="text-[14px] text-foreground/60 italic">One moment…</p>
@@ -419,7 +419,7 @@ const DashboardIndex = () => {
                 <Link
                   key={s.id}
                   to={`/dashboard/stacks/${s.id}/my-stack`}
-                  className="block bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 hover:border-navy/40 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
+                  className="block bg-card border border-[hsl(var(--border))] rounded-[12px] p-5 hover:border-navy/40 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
                 >
                   <h3 className="text-[16px] font-bold text-foreground">{name}</h3>
                   <p className="mt-1.5 text-[13px] text-foreground/70 leading-[1.55]">

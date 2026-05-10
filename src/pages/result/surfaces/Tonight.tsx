@@ -37,7 +37,7 @@ const Tonight = () => {
 
       {best ? (
         <>
-          <div className="relative mt-10 bg-background border border-[hsl(var(--border))] rounded-[12px] p-8 md:p-10 shadow-[0_2px_12px_rgba(26,58,92,0.04)]">
+          <div className="relative mt-8 bg-card border border-[hsl(var(--border))] rounded-[12px] p-6 md:p-8 shadow-[0_2px_12px_rgba(26,58,92,0.04)]">
             {user && (
               <SaveChunkButton
                 saved={savedChunkIds.has(best.chunk.id)}
@@ -64,7 +64,7 @@ const Tonight = () => {
           </p>
         </>
       ) : (
-        <div className="mt-10 bg-background border border-[hsl(var(--border))] rounded-[12px] p-8 md:p-10">
+        <div className="mt-8 bg-card border border-[hsl(var(--border))] rounded-[12px] p-6 md:p-8">
           <p className="text-[15px] text-foreground/80 italic">
             Your stack doesn't have a tonight chunk yet. Head to My Stack for the full guide.
           </p>

@@ -9,16 +9,16 @@
 @layer base {
   :root {
     /* Brand palette */
-    --background: 30 20% 96%;          /* OFFWHITE warm */
+    --background: 30 22% 94%;          /* OFFWHITE warm cream */
     --foreground: 0 0% 4%;             /* BLACK #0A0A0A */
 
     --navy: 210 56% 23%;               /* NAVY #1A3A5C */
     --navy-light: 213 41% 93%;         /* NAVY_LIGHT #E8EEF5 */
 
-    --card: 30 20% 97%;
+    --card: 30 30% 98%;
     --card-foreground: 0 0% 4%;
 
-    --popover: 0 0% 100%;
+    --popover: 30 30% 99%;
     --popover-foreground: 0 0% 4%;
 
     --primary: 210 56% 23%;            /* navy */
@@ -36,13 +36,13 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 80%;                /* GREY #CCCCCC */
-    --input: 0 0% 80%;
+    --border: 30 12% 78%;              /* warm-grey tint */
+    --input: 30 12% 78%;
     --ring: 210 56% 23%;
 
     --radius: 0.25rem;
 
-    --sidebar-background: 30 20% 96%;
+    --sidebar-background: 30 22% 94%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
     --sidebar-primary-foreground: 0 0% 98%;
@@ -57,9 +57,9 @@
     --foreground: 0 0% 92%;
     --navy: 210 56% 65%;
     --navy-light: 0 0% 14%;
-    --card: 0 0% 10%;
+    --card: 0 0% 13%;
     --card-foreground: 0 0% 92%;
-    --popover: 0 0% 10%;
+    --popover: 0 0% 13%;
     --popover-foreground: 0 0% 92%;
     --primary: 210 56% 65%;
     --primary-foreground: 0 0% 7%;
@@ -71,8 +71,8 @@
     --accent-foreground: 0 0% 92%;
     --destructive: 0 62% 45%;
     --destructive-foreground: 0 0% 92%;
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
+    --border: 0 0% 22%;
+    --input: 0 0% 22%;
     --ring: 210 56% 65%;
     --sidebar-background: 0 0% 9%;
     --sidebar-foreground: 0 0% 92%;

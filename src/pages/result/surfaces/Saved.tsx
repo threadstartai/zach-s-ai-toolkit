@@ -150,7 +150,7 @@ const Saved = () => {
               {suggestions.map((ch) => (
                 <div
                   key={ch.id}
-                  className="relative bg-background border border-[hsl(var(--border))] rounded-[12px] p-6 transition-colors duration-200 ease-out hover:border-navy/40"
+                  className="relative bg-card border border-[hsl(var(--border))] rounded-[12px] p-6 transition-colors duration-200 ease-out hover:border-navy/40"
                 >
                   <SaveChunkButton
                     saved={savedChunkIds.has(ch.id)}
@@ -176,7 +176,7 @@ const Saved = () => {
           {visible.map((ch) => (
             <div
               key={ch.id}
-              className="relative bg-background border border-[hsl(var(--border))] rounded-[12px] p-6 transition-colors duration-200 ease-out hover:border-navy/40"
+              className="relative bg-card border border-[hsl(var(--border))] rounded-[12px] p-6 transition-colors duration-200 ease-out hover:border-navy/40"
             >
               <SaveChunkButton
                 saved={savedChunkIds.has(ch.id)}

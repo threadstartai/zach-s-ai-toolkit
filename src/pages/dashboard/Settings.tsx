@@ -12,12 +12,12 @@ const Settings = () => {
   ];
 
   return (
-    <div className="max-w-[720px] mx-auto px-5 sm:px-8 py-10 md:py-12">
+    <div className="max-w-[720px] mx-auto px-5 sm:px-8 py-8 md:py-10">
       <h1 className="text-[32px] font-bold">Settings</h1>
 
-      <section className="mt-10">
+      <section className="mt-8">
         <h2 className="text-[20px] font-bold mb-4">Account</h2>
-        <div className="border border-[hsl(var(--border))] rounded-[12px] divide-y divide-[hsl(var(--border))]">
+        <div className="bg-card border border-[hsl(var(--border))] rounded-[12px] divide-y divide-[hsl(var(--border))]">
           <div className="flex items-center justify-between px-5 py-4">
             <span className="text-foreground/70">Email</span>
             <span className="text-navy truncate ml-4">{user?.email ?? "—"}</span>
@@ -34,7 +34,7 @@ const Settings = () => {
         </div>
       </section>
 
-      <section className="mt-10">
+      <section className="mt-8">
         <h2 className="text-[20px] font-bold mb-4">Appearance</h2>
         <div className="flex flex-wrap gap-2">
           {options.map((opt) => {
