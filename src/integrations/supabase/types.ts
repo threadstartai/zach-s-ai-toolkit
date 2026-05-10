@@ -439,6 +439,7 @@ export type Database = {
           tool_number: string | null
           update_message: string | null
           updated_at: string
+          when_not_to_use: string | null
         }
         Insert: {
           category: string
@@ -452,6 +453,7 @@ export type Database = {
           tool_number?: string | null
           update_message?: string | null
           updated_at?: string
+          when_not_to_use?: string | null
         }
         Update: {
           category?: string
@@ -465,6 +467,7 @@ export type Database = {
           tool_number?: string | null
           update_message?: string | null
           updated_at?: string
+          when_not_to_use?: string | null
         }
         Relationships: []
       }
