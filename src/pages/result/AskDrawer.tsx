@@ -49,6 +49,8 @@ export const AskDrawer = ({ open, onOpenChange, sessionId }: AskDrawerProps) => 
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [, setError] = useState<string | null>(null);
+  const [view, setView] = useState<"chat" | "history">("chat");
+  const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const loadedRef = useRef<string | null>(null);
