@@ -7,6 +7,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Q2_FROM_CODE, Q3_FROM_CODE, codeQ2, codeQ3 } from "@/pages/result/shared/codes";
 import { audiencePhrase, useCasePhrase } from "@/pages/result/shared/phrases";
 import { splitFirstPrompt } from "@/pages/result/shared/chunks";
+import { caseStudyForRole } from "@/lib/caseStudies";
 
 type StackRow = {
   id: string;
@@ -17,6 +18,7 @@ type StackRow = {
   q3_other_text: string | null;
   q4_confidence: string | null;
   ai_picked_tools: string[] | null;
+  onboarding_role: string | null;
   created_at: string;
 };
 
@@ -133,7 +135,7 @@ const DashboardIndex = () => {
     (async () => {
       const { data, error: err } = await supabase
         .from("sessions")
-        .select("id, name, stack_label, q2_audience, q3_use_case, q3_other_text, q4_confidence, ai_picked_tools, created_at")
+        .select("id, name, stack_label, q2_audience, q3_use_case, q3_other_text, q4_confidence, ai_picked_tools, onboarding_role, created_at")
         .order("created_at", { ascending: false });
       if (cancelled) return;
       if (err) { setError(true); setLoading(false); return; }
@@ -291,6 +293,7 @@ const DashboardIndex = () => {
   const recentId = mostRecent!.id;
   const stackHome = `/dashboard/stacks/${recentId}/my-stack`;
   const divider = "border-t border-[hsl(var(--border))]";
+  const caseStudy = caseStudyForRole(mostRecent?.onboarding_role ?? null);
 
   return (
     <div className="max-w-[800px] mx-auto px-5 sm:px-8 py-8 md:py-10">
@@ -303,6 +306,17 @@ const DashboardIndex = () => {
           Simplify and cut your AI learning curve.
         </p>
       </header>
+
+      {caseStudy && (
+        <section className="mt-8">
+          <p className="font-mono text-[11px] tracking-[0.12em] uppercase text-navy mb-2">
+            For someone like you
+          </p>
+          <p className="text-[15px] leading-[1.6] text-foreground/85 max-w-[680px]">
+            {caseStudy}
+          </p>
+        </section>
+      )}
 
       {/* Tonight */}
       <section className={`mt-8 ${divider} pt-2`}>
