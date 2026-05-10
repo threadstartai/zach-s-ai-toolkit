@@ -11,6 +11,7 @@ type AskDrawerProps = {
 };
 
 type Msg = { id: string; role: "user" | "assistant"; content: string };
+type ConversationItem = { id: string; title: string | null; updated_at: string };
 
 const SUGGESTIONS = [
   "What should I do tonight?",
@@ -48,6 +49,8 @@ export const AskDrawer = ({ open, onOpenChange, sessionId }: AskDrawerProps) => 
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [, setError] = useState<string | null>(null);
+  const [view, setView] = useState<"chat" | "history">("chat");
+  const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const loadedRef = useRef<string | null>(null);
@@ -61,24 +64,26 @@ export const AskDrawer = ({ open, onOpenChange, sessionId }: AskDrawerProps) => 
     (async () => {
       const { data: convs } = await supabase
         .from("conversations")
-        .select("id, updated_at")
+        .select("id, title, updated_at")
         .eq("session_id", sessionId)
-        .order("updated_at", { ascending: false })
-        .limit(1);
+        .order("updated_at", { ascending: false });
 
-      if (convs && convs[0]) {
-        setConversationId(convs[0].id);
-        const { data: msgs } = await supabase
-          .from("messages")
-          .select("id, role, content, created_at")
-          .eq("conversation_id", convs[0].id)
-          .order("created_at", { ascending: true });
-        if (msgs) {
-          setMessages(
-            msgs
-              .filter((m: any) => m.role !== "system")
-              .map((m: any) => ({ id: m.id, role: m.role, content: m.content }))
-          );
+      if (convs) {
+        setConversations(convs as ConversationItem[]);
+        if (convs[0]) {
+          setConversationId(convs[0].id);
+          const { data: msgs } = await supabase
+            .from("messages")
+            .select("id, role, content, created_at")
+            .eq("conversation_id", convs[0].id)
+            .order("created_at", { ascending: true });
+          if (msgs) {
+            setMessages(
+              msgs
+                .filter((m: any) => m.role !== "system")
+                .map((m: any) => ({ id: m.id, role: m.role, content: m.content }))
+            );
+          }
         }
       }
     })();
@@ -130,6 +135,20 @@ export const AskDrawer = ({ open, onOpenChange, sessionId }: AskDrawerProps) => 
           content: data.content,
         },
       ]);
+      setConversations((prev) => {
+        const id = data.conversation_id;
+        if (!id) return prev;
+        const existing = prev.find((c) => c.id === id);
+        const now = new Date().toISOString();
+        const titleFromFirstMessage = prev.length === 0 || !existing ? text.slice(0, 80) : existing.title;
+        const updated: ConversationItem = {
+          id,
+          title: existing?.title ?? titleFromFirstMessage,
+          updated_at: now,
+        };
+        const others = prev.filter((c) => c.id !== id);
+        return [updated, ...others];
+      });
     } catch (e) {
       setMessages((m) => [
         ...m,
@@ -171,9 +190,74 @@ export const AskDrawer = ({ open, onOpenChange, sessionId }: AskDrawerProps) => 
           </p>
         </div>
 
-        {/* Messages / empty */}
+        {/* Toolbar */}
+        <div className="px-6 py-2.5 border-b border-[hsl(var(--border))] flex items-center justify-between text-[13px]">
+          <button
+            onClick={() => {
+              setMessages([]);
+              setConversationId(null);
+              setView("chat");
+            }}
+            className="text-navy hover:underline underline-offset-2 font-medium"
+          >
+            + New chat
+          </button>
+          {conversations.length > 1 && (
+            <button
+              onClick={() => setView(view === "history" ? "chat" : "history")}
+              className="text-navy hover:underline underline-offset-2"
+            >
+              {view === "history" ? "Back to chat ↩" : `Past chats (${conversations.length})`}
+            </button>
+          )}
+        </div>
+
+        {/* Body */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-5">
-          {messages.length === 0 ? (
+          {view === "history" ? (
+            <div className="flex flex-col gap-2">
+              {conversations.map((conv) => (
+                <button
+                  key={conv.id}
+                  onClick={() => {
+                    if (conv.id === conversationId) {
+                      setView("chat");
+                      return;
+                    }
+                    setConversationId(conv.id);
+                    setMessages([]);
+                    setView("chat");
+                    void (async () => {
+                      const { data: msgs } = await supabase
+                        .from("messages")
+                        .select("id, role, content, created_at")
+                        .eq("conversation_id", conv.id)
+                        .order("created_at", { ascending: true });
+                      if (msgs) {
+                        setMessages(
+                          msgs
+                            .filter((m: any) => m.role !== "system")
+                            .map((m: any) => ({ id: m.id, role: m.role, content: m.content }))
+                        );
+                      }
+                    })();
+                  }}
+                  className={`w-full text-left px-4 py-3 rounded-[10px] bg-background border transition-colors duration-150 ${
+                    conv.id === conversationId
+                      ? "border-navy/60"
+                      : "border-[hsl(var(--border))] hover:border-navy/40"
+                  }`}
+                >
+                  <p className="text-[14px] text-navy font-medium truncate">
+                    {conv.title ?? "Untitled chat"}
+                  </p>
+                  <p className="mt-1 text-[12px] italic text-foreground/60">
+                    {new Date(conv.updated_at).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}
+                  </p>
+                </button>
+              ))}
+            </div>
+          ) : messages.length === 0 ? (
             <div>
               <p className="text-[14.5px] text-foreground/85 leading-[1.65]">
                 Ask anything about your stack. I'll use the Master Prompt Guide approach — clarifying questions first, then push back if I see it.
