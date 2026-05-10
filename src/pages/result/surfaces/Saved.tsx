@@ -7,6 +7,7 @@ import { useSavedChunks } from "../shared/useSavedChunks";
 import { useResultContext } from "../shared/useResultContext";
 import { TOOLS } from "../shared/tools";
 import type { Chunk } from "../shared/types";
+import { SkeletonChunkList } from "@/components/ui-primitives/Skeletons";
 
 type SavedRow = Chunk & { savedAt: string; toolName: string | null };
 
