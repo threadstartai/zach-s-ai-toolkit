@@ -116,7 +116,7 @@ Deno.serve(async (req) => {
       .limit(10);
     history = (msgs ?? []).reverse().map((m: any) => ({ role: m.role, content: m.content }));
   } else {
-    const title = messageText.slice(0, 60);
+    const title = messageText.slice(0, 80);
     const { data: newConvo, error: nErr } = await admin
       .from("conversations")
       .insert({ session_id: sessionId, user_id: userId, title })
@@ -233,15 +233,15 @@ How to help them:
       console.log("ask-stack: gateway non-ok", res.status, errText);
       if (res.status === 429) return json({ error: "AI is busy. Try again shortly." }, 429);
       if (res.status === 402) return json({ error: "AI credits exhausted." }, 402);
-      return json({ error: "AI gateway error" }, 502);
+      return json({ error: "Couldn't reach the assistant. Try again." }, 502);
     }
     const payload = await res.json();
     assistantContent = payload?.choices?.[0]?.message?.content ?? "";
-    if (!assistantContent) return json({ error: "Empty AI response" }, 502);
+    if (!assistantContent) return json({ error: "Couldn't reach the assistant. Try again." }, 502);
   } catch (e) {
     clearTimeout(timeout);
     console.log("ask-stack: gateway error", e);
-    return json({ error: "AI request failed" }, 502);
+    return json({ error: "Couldn't reach the assistant. Try again." }, 502);
   }
 
   // Persist user + assistant messages
