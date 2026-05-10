@@ -3,7 +3,7 @@ import { fullGuideUrl } from "@/lib/pdfs";
 
 const ToolCard = ({ tool }: { tool: CategoryTool }) => (
   <div
-    className="block bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 hover:border-navy/40 transition-colors duration-200 ease-out"
+    className="block bg-card border border-[hsl(var(--border))] rounded-[12px] p-5 hover:border-navy/40 transition-colors duration-200 ease-out"
   >
     {tool.num && <div className="font-mono text-xs text-navy/60">{tool.num}</div>}
     <h4 className="text-lg font-bold text-navy mt-1">{tool.name}</h4>
