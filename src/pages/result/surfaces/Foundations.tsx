@@ -95,7 +95,7 @@ const Foundations = () => {
             return (
               <div
                 key={t.slug}
-                className="bg-card border border-[hsl(var(--border))] rounded-[12px] p-6 sm:p-8 transition-colors duration-200 ease-out hover:border-navy/30"
+                className="bg-card border border-[hsl(var(--border))] rounded-[12px] p-5 sm:p-6 transition-colors duration-200 ease-out hover:border-navy/30"
               >
                 <button
                   type="button"
