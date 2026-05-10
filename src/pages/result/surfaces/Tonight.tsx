@@ -29,7 +29,7 @@ const Tonight = () => {
 
   return (
     <div>
-      <h3 className="text-3xl font-bold text-navy tracking-[-0.02em]">Tonight</h3>
+      <h3 className="text-3xl font-bold tracking-[-0.02em]">Tonight</h3>
       <p className="mt-3 italic text-[15px] text-foreground/70">
         One thing. Do it before bed and you'll thank yourself tomorrow.
       </p>
