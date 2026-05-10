@@ -27,6 +27,16 @@ const MyStack = () => {
   const [renaming, setRenaming] = useState(false);
   const [labelDraft, setLabelDraft] = useState("");
   const [saving, setSaving] = useState(false);
+  const [detailSlug, setDetailSlug] = useState<string | null>(null);
+
+  const stageFromConfidence = (() => {
+    switch (c4) {
+      case "tried": return 2;
+      case "weekly": return 3;
+      case "confident": return 4;
+      default: return 1;
+    }
+  })();
 
   const why = (k: ToolKey) => k === "04" ? whyForChatGPT(c4) : whyFor(k, c2);
 
