@@ -55,7 +55,7 @@ const Tonight = () => {
                 <ChunkBlock chunk={best.chunk} />
               </div>
               <div className="mt-6 flex justify-end">
-                <ChunkFeedbackButton chunkId={best.chunk.id} />
+                <ChunkFeedbackButton chunkId={best.chunk.id} toolSlug={TOOLS[best.toolKey].slug} sessionId={sessionId} />
               </div>
             </div>
           </div>
