@@ -223,6 +223,7 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
     submitFeedback,
     savedChunkIds,
     toggleSave,
+    aiPickReasoning,
   };
 
   const isDashboard = chrome === "dashboard";
