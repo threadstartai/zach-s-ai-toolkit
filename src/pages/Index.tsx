@@ -82,7 +82,7 @@ const Index = () => {
         <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]">
           <div className={sectionLabelCls}>01 — What this is</div>
           <div className="max-w-[760px]">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">What this is</h2>
+            <h2 className="text-[26px] md:text-[28px] font-bold tracking-tight">What this is</h2>
             <div className="mt-5 space-y-4 text-foreground/85 text-[16.5px] leading-[1.7]">
               <p>
                 17 AI tools, one place, written like a friend would explain them. No
