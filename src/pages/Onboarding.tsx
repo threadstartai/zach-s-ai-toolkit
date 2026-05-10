@@ -61,6 +61,7 @@ const Onboarding = () => {
   const [timeBudget, setTimeBudget] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(false);
+  const submittingRef = useRef(false);
 
   const advance = (next: QuizStep) => setTimeout(() => setStep(next), 150);
 
