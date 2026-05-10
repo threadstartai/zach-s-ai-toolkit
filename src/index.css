@@ -57,9 +57,9 @@
     --foreground: 0 0% 92%;
     --navy: 210 56% 65%;
     --navy-light: 0 0% 14%;
-    --card: 0 0% 10%;
+    --card: 0 0% 13%;
     --card-foreground: 0 0% 92%;
-    --popover: 0 0% 10%;
+    --popover: 0 0% 13%;
     --popover-foreground: 0 0% 92%;
     --primary: 210 56% 65%;
     --primary-foreground: 0 0% 7%;
@@ -71,8 +71,8 @@
     --accent-foreground: 0 0% 92%;
     --destructive: 0 62% 45%;
     --destructive-foreground: 0 0% 92%;
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
+    --border: 0 0% 22%;
+    --input: 0 0% 22%;
     --ring: 210 56% 65%;
     --sidebar-background: 0 0% 9%;
     --sidebar-foreground: 0 0% 92%;
