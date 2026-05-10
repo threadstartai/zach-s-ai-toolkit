@@ -53,6 +53,40 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
     return () => { cancelled = true; };
   }, [routeSessionId]);
 
+  // Poll for AI picks if session is recent and AI hasn't completed yet
+  useEffect(() => {
+    if (!session || !routeSessionId) return;
+    const aiTools = (session as any).ai_picked_tools;
+    if (Array.isArray(aiTools) && aiTools.length === 3) return;
+
+    const createdAt = (session as any).created_at as string | undefined;
+    if (!createdAt) return;
+    const ageMs = Date.now() - new Date(createdAt).getTime();
+    if (ageMs > 30000) return;
+
+    let attempts = 0;
+    const maxAttempts = 8;
+    const interval = setInterval(async () => {
+      attempts += 1;
+      try {
+        const { data } = await supabase.functions.invoke("get-session", {
+          body: { session_id: routeSessionId },
+        });
+        const updated = (data as any)?.session;
+        if (updated?.ai_picked_tools && Array.isArray(updated.ai_picked_tools) && updated.ai_picked_tools.length === 3) {
+          setSession(updated);
+          clearInterval(interval);
+          return;
+        }
+      } catch {
+        // ignore, keep polling
+      }
+      if (attempts >= maxAttempts) clearInterval(interval);
+    }, 1500);
+
+    return () => clearInterval(interval);
+  }, [session, routeSessionId]);
+
   // Derive raw question strings (Result-component shape).
   const name = session?.name ?? "";
   const q2 = session ? (Q2_FROM_CODE[session.q2_audience ?? ""] ?? null) : null;
