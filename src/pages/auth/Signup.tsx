@@ -47,7 +47,7 @@ const Signup = () => {
   return (
     <AuthCard
       title="Create your account"
-      subtitle="Free. Yours to keep updated."
+      subtitle="Made for friends and family. Sign-up is just to save your Stack — no marketing, no spam, no upsells."
       footer={<>Already have an account? <Link to="/login" className="text-navy hover:underline">Log in</Link></>}
     >
       <SocialButtons />
