@@ -3,6 +3,7 @@ import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
 import SiteLayout from "@/components/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { ResultSidebar } from "./ResultSidebar";
+import { useSavedChunks } from "./shared/useSavedChunks";
 import { TOOLS, recommend } from "./shared/tools";
 import {
   Q2_FROM_CODE, Q3_FROM_CODE, Q4_FROM_CODE,
@@ -77,6 +78,7 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
   const [feedbackSubmitted, setFeedbackSubmitted] = useState<Record<string, boolean>>({});
   const [saved, setSaved] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const { savedChunkIds, toggleSave } = useSavedChunks();
 
   useEffect(() => {
     if (!session || pickSlugs.length === 0) return;
@@ -200,6 +202,8 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
     handleCopyShareLink,
     setFeedbackOpen,
     submitFeedback,
+    savedChunkIds,
+    toggleSave,
   };
 
   const isDashboard = chrome === "dashboard";

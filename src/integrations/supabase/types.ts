@@ -240,6 +240,35 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_chunks: {
+        Row: {
+          chunk_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          chunk_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          chunk_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_chunks_chunk_id_fkey"
+            columns: ["chunk_id"]
+            isOneToOne: false
+            referencedRelation: "chunks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sessions: {
         Row: {
           created_at: string
