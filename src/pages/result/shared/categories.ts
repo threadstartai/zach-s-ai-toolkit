@@ -4,13 +4,14 @@ export type CategoryData = { title: string; blurb: string; tools: CategoryTool[]
 export const CATEGORIES: CategoryData[] = [
   {
     title: "Foundationals",
-    blurb: "The eight guides that make the rest of the Stack make sense.",
+    blurb: "The nine guides that make the rest of the Stack make sense.",
     tools: [
       { num: "00", name: "Start Here", tagline: "Where to begin and what order to read.", slug: "start-here" },
       { num: "01", name: "Why I Made This", tagline: "The honest reason this exists.", slug: "why-i-made-this" },
       { num: "02", name: "The Process", tagline: "The four-step loop I use for almost everything.", slug: "the-process" },
       { num: "03", name: "How This Was Built", tagline: "Behind the scenes.", slug: "how-this-was-built" },
       { name: "The Master Prompt Guide", tagline: "The prompt patterns worth memorising.", slug: "master-prompt-guide" },
+      { name: "Rules With AI", tagline: "Honest guidance about staying yourself while using these tools.", slug: "rules-with-ai" },
       { name: "Building Things — Overview", tagline: "The whole landscape, in one place.", slug: "building-things-overview" },
       { name: "Power-Ups", tagline: "Small upgrades that make a big difference.", slug: "power-ups" },
       { name: "Pass This On", tagline: "Who this is for, and how to share it.", slug: "pass-this-on" },
