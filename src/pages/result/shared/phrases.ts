@@ -52,12 +52,6 @@ export const timeBudgetPhrase = (tb: string | null | undefined): string => {
   return "";
 };
 
-const _confidencePlaceholder = (q4: Q4Code): string => {
-  if (q4 === "never") return "starting from scratch";
-  if (q4 === "tried") return "with a bit of experience";
-  if (q4 === "weekly") return "using AI regularly";
-  return "comfortable enough to push it further";
-};
 
 export const whyThisTool = (
   slug: string,
