@@ -7,10 +7,10 @@ import { fullGuideUrl } from "@/lib/pdfs";
 
 const FOUNDATIONAL_ORDER = [
   "start-here",
-  "why-i-made-this",
-  "the-process",
-  "how-this-was-built",
   "master-prompt-guide",
+  "the-process",
+  "why-i-made-this",
+  "how-this-was-built",
   "building-things-overview",
   "power-ups",
   "pass-this-on",
