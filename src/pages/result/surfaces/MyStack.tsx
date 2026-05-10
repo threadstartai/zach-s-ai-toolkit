@@ -258,6 +258,17 @@ const MyStack = () => {
 
       {/* Footer actions */}
       <div className="mt-14 text-[14px] text-navy">
+        {user && isDashboard && (
+          <>
+            <button
+              onClick={() => setAskOpen(true)}
+              className="hover:underline transition-colors duration-150 font-medium"
+            >
+              Ask about your stack
+            </button>
+            <span className="text-foreground/40 mx-2">·</span>
+          </>
+        )}
         <button
           onClick={() => {
             const lines = [
