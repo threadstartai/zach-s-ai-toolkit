@@ -11,6 +11,8 @@ import { SaveChunkButton } from "../shared/SaveChunkButton";
 import type { Chunk, ToolKey } from "../shared/types";
 import { fullGuideUrl } from "@/lib/pdfs";
 import { ToolDetailDrawer } from "../ToolDetailDrawer";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 
 const MyStack = () => {
   const {
