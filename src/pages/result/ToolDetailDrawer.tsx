@@ -123,6 +123,9 @@ export const ToolDetailDrawer = ({ open, onOpenChange, toolSlug }: Props) => {
                             className="bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6 transition-colors duration-150 hover:border-navy/40"
                           >
                             <ChunkBlock chunk={ch} />
+                            <div className="mt-3 flex justify-end">
+                              <ChunkFeedbackButton chunkId={ch.id} />
+                            </div>
                           </div>
                         ))}
                       </div>
