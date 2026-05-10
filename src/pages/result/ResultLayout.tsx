@@ -296,9 +296,11 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
     <>
       {loading && (
         chrome === "dashboard" ? dashboardSkeleton : (
-          <p className="text-[14px] text-foreground/60 italic">
-            One moment — loading this Stack.
-          </p>
+          <div className="flex flex-col gap-6">
+            <SkeletonHeroCard />
+            <SkeletonChunkList count={2} />
+            <SkeletonChunkList count={2} />
+          </div>
         )
       )}
       {!loading && error && (
