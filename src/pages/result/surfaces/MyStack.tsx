@@ -168,6 +168,12 @@ const MyStack = () => {
                 )}
 
                 <div className="mt-6 pt-4 border-t border-foreground/10">
+                  {fullGuideUrl(t.slug) && (
+                    <a href={fullGuideUrl(t.slug)!} target="_blank" rel="noopener noreferrer"
+                       className="block text-[13px] italic text-navy/70 hover:text-navy underline underline-offset-2 mb-3">
+                      Download the full guide (PDF) ↓
+                    </a>
+                  )}
                   {!feedbackOpen[t.slug] && !feedbackSubmitted[t.slug] && (
                     <button
                       onClick={() => setFeedbackOpen((prev) => ({ ...prev, [t.slug]: true }))}
