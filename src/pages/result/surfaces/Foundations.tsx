@@ -4,6 +4,8 @@ import { SECTION_LABELS, groupChunks } from "../shared/chunks";
 import { ChunkBlock } from "../shared/ChunkBlock";
 import type { Chunk } from "../shared/types";
 import { fullGuideUrl } from "@/lib/pdfs";
+import { SkeletonGuideCard } from "@/components/ui-primitives/Skeletons";
+import { EmptyState } from "@/components/ui-primitives/EmptyState";
 
 const FOUNDATIONAL_ORDER = [
   "start-here",
