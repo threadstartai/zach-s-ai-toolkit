@@ -36,7 +36,9 @@ export const whyThisTool = (
   q3: Q3Code,
   q4: Q4Code,
   q3OtherText: string,
+  aiReason?: string,
 ): string => {
+  if (aiReason && aiReason.trim().length > 0) return aiReason.trim();
   const aud = audiencePhrase(q2);
   const use = useCasePhrase(q3, q3OtherText);
   const conf = confidencePhrase(q4);

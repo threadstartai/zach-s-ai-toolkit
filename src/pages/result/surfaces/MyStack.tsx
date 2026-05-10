@@ -17,6 +17,7 @@ const MyStack = () => {
     sessionId, linkCopied, handleCopyShareLink, handleStartOver,
     saved, setSaved,
     savedChunkIds, toggleSave,
+    aiPickReasoning,
   } = useResultContext();
   const { user } = useAuth();
 
@@ -127,7 +128,7 @@ const MyStack = () => {
                 )}
                 <p className="mt-3 text-navy text-[16px] leading-[1.65]">{why(k)}</p>
                 <p className="mt-3 mb-1 text-[13px] italic text-navy/65 leading-[1.55]">
-                  {whyThisTool(t.slug, c2, c3, c4, q3OtherText)}
+                  {whyThisTool(t.slug, c2, c3, c4, q3OtherText, aiPickReasoning?.[t.slug])}
                 </p>
 
                 {hasAnyChunks && (
@@ -252,7 +253,7 @@ const MyStack = () => {
               "",
               "My three tools (in the order they were recommended):",
               "",
-              ...picks.map((k, i) => `${i + 1}. ${TOOLS[k].name} — ${whyThisTool(TOOLS[k].slug, c2, c3, c4, q3OtherText)}`),
+              ...picks.map((k, i) => `${i + 1}. ${TOOLS[k].name} — ${whyThisTool(TOOLS[k].slug, c2, c3, c4, q3OtherText, aiPickReasoning?.[TOOLS[k].slug])}`),
               "",
               "Help me think through how to actually use these tonight. Ask me clarifying questions before giving generic advice. Push back where I'm being lazy.",
             ];

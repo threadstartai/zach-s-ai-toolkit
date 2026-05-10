@@ -29,6 +29,7 @@ export type ResultContext = {
   submitFeedback: (toolSlug: string, reason: string) => Promise<void>;
   savedChunkIds: Set<string>;
   toggleSave: (chunkId: string) => Promise<void>;
+  aiPickReasoning: Record<string, string> | null;
 };
 
 export const useResultContext = () => useOutletContext<ResultContext>();
