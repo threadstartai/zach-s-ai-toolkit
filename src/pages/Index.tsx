@@ -1,18 +1,22 @@
 import { Link } from "react-router-dom";
 import SiteLayout from "@/components/SiteLayout";
 import { useAuth } from "@/contexts/AuthContext";
+import { CATEGORIES as SHARED_CATEGORIES } from "@/pages/result/shared/categories";
 
 const primaryBtn =
   "inline-flex items-center justify-center bg-navy text-primary-foreground px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2";
 const outlineBtn =
   "inline-flex items-center justify-center border border-navy text-navy px-5 py-3 rounded-[8px] text-[15px] font-medium hover:bg-navy-light transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2";
 
-const CATEGORIES = [
-  { num: "01", name: "Thinking & Writing" },
-  { num: "02", name: "Research & Study" },
-  { num: "03", name: "Building Things" },
-  { num: "04", name: "Daily Life" },
-];
+const sectionLabelCls = "font-mono text-[11px] tracking-[0.12em] uppercase text-navy mb-3";
+
+const STACK_CATEGORIES = SHARED_CATEGORIES
+  .filter((c) => c.title !== "Foundationals")
+  .map((c, i) => ({
+    num: `0${i + 1}`,
+    name: c.title,
+    tools: c.tools.filter((t) => Boolean(t.num)),
+  }));
 
 const processCardCls =
   "bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6 hover:border-navy/40 transition-colors duration-200 ease-out";
