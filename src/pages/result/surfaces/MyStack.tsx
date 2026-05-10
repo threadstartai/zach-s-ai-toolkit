@@ -26,6 +26,7 @@ const MyStack = () => {
 
   const why = (k: ToolKey) => k === "04" ? whyForChatGPT(c4) : whyFor(k, c2);
 
+  const [askOpen, setAskOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(
     () => typeof window !== "undefined" && !localStorage.getItem("myaistack_dashboard_welcomed")
   );
