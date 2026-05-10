@@ -35,6 +35,7 @@ export type ResultContext = {
   onboardingRole: string | null;
   onboardingTimeBudget: string | null;
   onboardingExistingTools: string[] | null;
+  toolStatusMap: Record<string, { status: string; updateMessage: string | null }>;
 };
 
 export const useResultContext = () => useOutletContext<ResultContext>();

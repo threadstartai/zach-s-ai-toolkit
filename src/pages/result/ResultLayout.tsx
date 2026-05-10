@@ -267,6 +267,12 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
     onboardingRole: (session as any)?.onboarding_role ?? null,
     onboardingTimeBudget: (session as any)?.onboarding_time_budget ?? null,
     onboardingExistingTools: (session as any)?.onboarding_existing_tools ?? null,
+    toolStatusMap: Object.fromEntries(
+      Object.entries(statusByTool).map(([slug, s]) => [
+        slug,
+        { status: s?.status ?? "current", updateMessage: s?.update_message ?? null },
+      ])
+    ),
   };
 
   const isDashboard = chrome === "dashboard";
