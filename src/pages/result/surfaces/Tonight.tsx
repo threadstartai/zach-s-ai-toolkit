@@ -1,12 +1,15 @@
 import { useResultContext } from "../shared/useResultContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { TOOLS } from "../shared/tools";
 import { ChunkBlock } from "../shared/ChunkBlock";
+import { SaveChunkButton } from "../shared/SaveChunkButton";
 import type { Chunk, ToolKey } from "../shared/types";
 
 const PREFERRED_TYPES = ["first-prompt", "setup", "workflow-example"];
 
 const Tonight = () => {
-  const { picks, chunksByTool } = useResultContext();
+  const { picks, chunksByTool, savedChunkIds, toggleSave } = useResultContext();
+  const { user } = useAuth();
 
   let best: { chunk: Chunk; toolKey: ToolKey } | null = null;
   for (const type of PREFERRED_TYPES) {
