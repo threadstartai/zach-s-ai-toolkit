@@ -237,11 +237,11 @@ How to help them:
     }
     const payload = await res.json();
     assistantContent = payload?.choices?.[0]?.message?.content ?? "";
-    if (!assistantContent) return json({ error: "Empty AI response" }, 502);
+    if (!assistantContent) return json({ error: "Couldn't reach the assistant. Try again." }, 502);
   } catch (e) {
     clearTimeout(timeout);
     console.log("ask-stack: gateway error", e);
-    return json({ error: "AI request failed" }, 502);
+    return json({ error: "Couldn't reach the assistant. Try again." }, 502);
   }
 
   // Persist user + assistant messages
