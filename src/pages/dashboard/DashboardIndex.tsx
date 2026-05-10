@@ -409,6 +409,9 @@ const DashboardIndex = () => {
       {/* Your stacks */}
       <section className={`mt-6 ${divider} pt-2`}>
         <SectionShell label="Your stacks" open={sections.stacks} onOpenChange={(v) => setOpen("stacks", v)}>
+          <p className="mb-4 text-[14px] text-foreground/70 leading-[1.55]">
+            One stack per situation — research, side project, daily life.
+          </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {stacks.map((s) => {
               const name = s.stack_label || `Stack from ${formatDate(s.created_at)}`;
@@ -428,7 +431,7 @@ const DashboardIndex = () => {
           </div>
           <div className="mt-4">
             <Link to="/onboarding" className="text-[14px] text-navy hover:underline">
-              + Start new onboarding
+              + Start a new stack
             </Link>
           </div>
         </SectionShell>
