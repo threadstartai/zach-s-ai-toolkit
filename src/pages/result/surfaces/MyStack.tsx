@@ -18,7 +18,7 @@ import { ChunkFeedbackButton } from "../shared/ChunkFeedbackButton";
 const MyStack = () => {
   const {
     title, picks, c2, c3, c4, q3OtherText, q3,
-    chunksByTool, statusByTool, showSlowMessage,
+    chunksByTool, statusByTool, toolStatusMap, showSlowMessage,
     feedbackOpen, feedbackSubmitted, setFeedbackOpen, submitFeedback,
     sessionId, linkCopied, handleCopyShareLink, handleStartOver,
     savedChunkIds, toggleSave,
@@ -215,9 +215,19 @@ const MyStack = () => {
                 className="bg-background border border-[hsl(var(--border))] rounded-[12px] p-6 sm:p-8 scroll-mt-[80px] transition-colors duration-200 ease-out hover:border-navy/30 cursor-pointer"
               >
                 <div className="flex items-baseline justify-between gap-3">
-                  <div className="flex items-baseline gap-2.5">
+                  <div className="flex items-baseline gap-2.5 flex-wrap">
                     <span className="font-mono text-[13px] text-navy/60">{t.num}</span>
                     <h4 className="text-[22px] font-bold text-navy">{t.name}</h4>
+                    {toolStatusMap[t.slug]?.status === "update" && (
+                      <span className="font-mono text-[10px] uppercase tracking-[0.1em] bg-navy-light/70 text-navy px-2 py-0.5 rounded-[4px] whitespace-nowrap">
+                        Update available
+                      </span>
+                    )}
+                    {toolStatusMap[t.slug]?.status === "deprecated" && (
+                      <span className="font-mono text-[10px] uppercase tracking-[0.1em] bg-destructive/15 text-destructive px-2 py-0.5 rounded-[4px] whitespace-nowrap">
+                        Deprecated
+                      </span>
+                    )}
                   </div>
                   <span className="font-mono text-[11px] tracking-[0.05em] text-navy/45 shrink-0">Tool {i + 1} of {picks.length}</span>
                 </div>
