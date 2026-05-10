@@ -9,9 +9,9 @@ const SiteFooter = () => {
         <div className="max-w-[640px]">
           <p className="italic">
             Created by Zach Z. Made for friends &amp; family. If you know someone whose business or team would benefit from a proper AI setup, send them my way:{" "}
-            <a href="mailto:zach@chromeconsulting.xyz" className="text-navy hover:underline">zach@chromeconsulting.xyz</a>{" "}
+            <a href="mailto:zach@chromeconsulting.xyz" className="text-navy hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm">zach@chromeconsulting.xyz</a>{" "}
             <span className="text-foreground/40">|</span>{" "}
-            <a href="https://instagram.com/chrome.zach" className="text-navy hover:underline">@chrome.zach</a>{" "}
+            <a href="https://instagram.com/chrome.zach" className="text-navy hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm">@chrome.zach</a>{" "}
             <span className="not-italic text-foreground/55">(Instagram)</span>.
           </p>
           <p className="mt-5 text-[12px] text-foreground/55">
