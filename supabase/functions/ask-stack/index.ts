@@ -233,7 +233,7 @@ How to help them:
       console.log("ask-stack: gateway non-ok", res.status, errText);
       if (res.status === 429) return json({ error: "AI is busy. Try again shortly." }, 429);
       if (res.status === 402) return json({ error: "AI credits exhausted." }, 402);
-      return json({ error: "AI gateway error" }, 502);
+      return json({ error: "Couldn't reach the assistant. Try again." }, 502);
     }
     const payload = await res.json();
     assistantContent = payload?.choices?.[0]?.message?.content ?? "";
