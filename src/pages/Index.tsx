@@ -110,7 +110,7 @@ const Index = () => {
               The tools matter less than the loop. Here's the four-step process I use for almost everything:
             </p>
           </div>
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {PROCESS.map((item, i) => (
               <div key={i} className={processCardCls}>
                 <span className="font-mono text-[12px] text-navy/60 tabular-nums">{`0${i + 1}.`}</span>
