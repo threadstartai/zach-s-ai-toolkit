@@ -82,10 +82,10 @@ const ToolCard = ({ tool }: { tool: Tool }) => (
 );
 
 const CategorySection = ({ data }: { data: CategoryData }) => (
-  <section className="mt-16 first:mt-0 scroll-mt-20">
+  <section className="mt-12 md:mt-16 first:mt-0 scroll-mt-20">
     <h3 className="text-2xl font-bold text-navy">{data.title}</h3>
     <p className="mt-2 italic text-[14px] text-foreground/70">{data.blurb}</p>
-    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
       {data.tools.map((t) => <ToolCard key={t.slug} tool={t} />)}
     </div>
   </section>
