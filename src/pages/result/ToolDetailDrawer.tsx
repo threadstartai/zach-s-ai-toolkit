@@ -72,9 +72,7 @@ export const ToolDetailDrawer = ({ open, onOpenChange, toolSlug }: Props) => {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-[640px] overflow-y-auto p-0">
         <div className="px-6 sm:px-8 py-8">
-          {loading && (
-            <p className="italic text-navy/65 text-[14px]">Loading the full guide…</p>
-          )}
+          {loading && <SkeletonChunkList count={3} />}
           {tool && (
             <>
               <h2 className="text-[24px] font-bold text-navy tracking-[-0.01em]">{tool.name}</h2>
