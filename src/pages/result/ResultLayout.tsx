@@ -10,7 +10,7 @@ import {
   codeQ2, codeQ3, codeQ4, isMeaningfulName, UUID_RE,
 } from "./shared/codes";
 import { SECTION_LABELS } from "./shared/chunks";
-import type { Chunk, LoadedSession, ToolStatus } from "./shared/types";
+import type { Chunk, LoadedSession, ToolKey, ToolStatus } from "./shared/types";
 import type { ResultContext } from "./shared/useResultContext";
 
 const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" } = {}) => {
@@ -71,9 +71,9 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
   const aiPickReasoning = session?.ai_pick_reasoning ?? null;
 
   const slugToKey = useMemo(() => {
-    const map = new Map<string, typeof picks[number]>();
+    const map = new Map<string, ToolKey>();
     for (const [key, tool] of Object.entries(TOOLS)) {
-      map.set(tool.slug, key as any);
+      map.set(tool.slug, key as ToolKey);
     }
     return map;
   }, []);
@@ -224,6 +224,7 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
     savedChunkIds,
     toggleSave,
     aiPickReasoning,
+    isDashboard: chrome === "dashboard",
   };
 
   const isDashboard = chrome === "dashboard";

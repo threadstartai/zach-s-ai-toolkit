@@ -30,6 +30,7 @@ export type ResultContext = {
   savedChunkIds: Set<string>;
   toggleSave: (chunkId: string) => Promise<void>;
   aiPickReasoning: Record<string, string> | null;
+  isDashboard: boolean;
 };
 
 export const useResultContext = () => useOutletContext<ResultContext>();

@@ -19,6 +19,7 @@ const MyStack = () => {
     saved, setSaved,
     savedChunkIds, toggleSave,
     aiPickReasoning,
+    isDashboard,
   } = useResultContext();
   const { user } = useAuth();
 
@@ -50,14 +51,16 @@ const MyStack = () => {
       )}
       {/* Title + intro */}
       <h3 className="text-[32px] sm:text-[36px] font-bold text-navy tracking-[-0.02em]">{title}</h3>
-      <div className="mt-6 bg-navy-light/40 border border-navy-light rounded-[12px] px-5 py-4">
-        <p className="text-[14px] text-navy leading-[1.55]">
-          <span className="font-semibold">Read this first:</span> The Master Prompt Guide in Foundations. It's the briefing skill — context, job, constraints, output, follow-up — that makes every tool below sharper.{" "}
-          <Link to="../foundations" className="font-medium underline underline-offset-2 hover:opacity-80">
-            Open it →
-          </Link>
-        </p>
-      </div>
+      {isDashboard && (
+        <div className="mt-6 bg-navy-light/40 border border-navy-light rounded-[12px] px-5 py-4">
+          <p className="text-[14px] text-navy leading-[1.55]">
+            <span className="font-semibold">Read this first:</span> The Master Prompt Guide in Foundations. It's the briefing skill — context, job, constraints, output, follow-up — that makes every tool below sharper.{" "}
+            <Link to="../foundations" className="font-medium underline underline-offset-2 hover:opacity-80">
+              Open it →
+            </Link>
+          </p>
+        </div>
+      )}
       <p className="mt-6 text-navy text-[17px] leading-[1.7]">
         Here's what I'm reading: {audiencePhrase(c2)}, working on {useCasePhrase(c3, q3OtherText)}, {confidencePhrase(c4)}. Three tools, and what's worth doing tonight. If that's slightly off,{" "}
         <button

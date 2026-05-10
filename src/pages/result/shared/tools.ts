@@ -5,6 +5,7 @@ export const TOOLS: Record<ToolKey, { num: string; name: string; tagline: string
   "02": { num: "02", name: "Claude Code", tagline: "Claude in your terminal. For bigger work.", slug: "claude-code" },
   "03": { num: "03", name: "Co-Pilot", tagline: "Claude inside Excel, Word, PowerPoint.", slug: "co-pilot" },
   "04": { num: "04", name: "ChatGPT", tagline: "The all-rounder. Best mobile experience.", slug: "chatgpt" },
+  "05": { num: "05", name: "Grok", tagline: "When timing matters. Live news, real-time data.", slug: "grok" },
   "06": { num: "06", name: "Gemini", tagline: "Google's research assistant. Connected to Drive and Workspace.", slug: "gemini" },
   "07": { num: "07", name: "Perplexity", tagline: "The research engine. Cited answers.", slug: "perplexity" },
   "08": { num: "08", name: "Manus", tagline: "The connected work agent. For longer tasks.", slug: "manus" },
