@@ -88,6 +88,8 @@ const Onboarding = () => {
   const selectQ4 = (v: string) => { setQ4(v); advance("time"); };
 
   const submitQuiz = async (timeValue: string) => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setSubmitting(true);
     setSubmitError(false);
     const c2 = codeQ2(q2);
@@ -111,12 +113,14 @@ const Onboarding = () => {
       if (error || !data?.session_id) {
         setSubmitError(true);
         setSubmitting(false);
+        submittingRef.current = false;
         return;
       }
       navigate(`/dashboard/stacks/${data.session_id}/my-stack`, { replace: true });
     } catch {
       setSubmitError(true);
       setSubmitting(false);
+      submittingRef.current = false;
     }
   };
 
