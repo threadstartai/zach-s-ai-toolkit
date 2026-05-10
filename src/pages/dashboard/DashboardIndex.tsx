@@ -337,7 +337,7 @@ const DashboardIndex = () => {
       <section className={`mt-8 ${divider} pt-2`}>
         <SectionShell label="Tonight" open={sections.tonight} onOpenChange={(v) => setOpen("tonight", v)}>
           {focusLoading ? (
-            <p className="text-[14px] text-foreground/60 italic">One moment…</p>
+            <SkeletonHeroCard />
           ) : !focus ? (
             <div>
               <p className="text-[15px] text-foreground/70 leading-[1.6]">
