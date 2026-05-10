@@ -7,6 +7,7 @@ import { SECTION_LABELS, LADDER, groupChunks } from "../shared/chunks";
 import { ChunkBlock } from "../shared/ChunkBlock";
 import { SaveChunkButton } from "../shared/SaveChunkButton";
 import type { ToolKey } from "../shared/types";
+import { fullGuideUrl } from "@/lib/pdfs";
 
 const MyStack = () => {
   const {
