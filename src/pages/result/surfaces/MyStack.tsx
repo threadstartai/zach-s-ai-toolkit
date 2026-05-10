@@ -267,33 +267,50 @@ const MyStack = () => {
         })}
       </div>
 
+      {/* Section break */}
+      <div className="mt-20 mb-2 flex items-center justify-center gap-3 text-navy/30">
+        <div className="h-px w-12 bg-navy/30" />
+        <span className="font-mono text-[10px] tracking-[0.2em]">●</span>
+        <div className="h-px w-12 bg-navy/30" />
+      </div>
+
       {/* Where this leads — ladder */}
-      <div className="mt-20">
+      <div className="mt-6">
         <h4 className="text-[24px] font-bold text-navy">Where this leads</h4>
         <p className="mt-3 text-foreground/85 text-[16px] leading-[1.7]">
           Using AI well isn't a list of tools. It's a skill that builds in stages. Here's the ladder:
         </p>
         <ol className="mt-7 space-y-5">
-          {LADDER.map((s, i) => (
-            <li key={i} className="flex gap-4">
-              <span className="shrink-0 w-8 h-8 rounded-full bg-navy text-primary-foreground flex items-center justify-center text-[14px] font-semibold">
-                {i + 1}
-              </span>
-              <div>
-                <p className="font-bold text-navy text-[16px]">{s.name}</p>
-                <p className="mt-1 text-foreground/85 text-[15px] leading-[1.65]">{s.desc}</p>
-              </div>
-            </li>
-          ))}
+          {LADDER.map((s, i) => {
+            const isCurrent = i + 1 === stageFromConfidence;
+            return (
+              <li
+                key={i}
+                className={`flex gap-4 py-2 ${isCurrent ? "bg-navy-light/40 -mx-3 px-3 rounded-[8px]" : ""}`}
+              >
+                <span className="shrink-0 w-8 h-8 rounded-full bg-navy text-primary-foreground flex items-center justify-center text-[14px] font-semibold">
+                  {i + 1}
+                </span>
+                <div className="flex-1">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <p className="font-bold text-navy text-[16px]">{s.name}</p>
+                    {isCurrent && (
+                      <span className="font-mono text-[11px] tracking-[0.08em] text-navy shrink-0">You're here</span>
+                    )}
+                  </div>
+                  <p className="mt-1 text-foreground/85 text-[15px] leading-[1.65]">{s.desc}</p>
+                </div>
+              </li>
+            );
+          })}
         </ol>
-        <p className="mt-7 italic text-navy text-[15px]">
-          {ladderLine(c4)}
-        </p>
       </div>
 
-      <p className="mt-12 text-navy/80 text-[16px] leading-[1.7] italic">
-        That's the stack. If you do one thing tonight, take the prompt at the top of the first card. If you want to come back to this — save your link, or just take a screenshot.
-      </p>
+      <div className="mt-12 bg-navy-light/30 border border-navy-light rounded-[16px] px-6 py-5">
+        <p className="text-navy/80 text-[16px] leading-[1.7] italic">
+          That's the stack. If you do one thing tonight, take the prompt at the top of the first card. If you want to come back to this — save your link, or just take a screenshot.
+        </p>
+      </div>
 
       {/* Footer actions */}
       <div className="mt-14 text-[14px] text-navy">
