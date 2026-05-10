@@ -74,6 +74,7 @@ const App = () => (
               }
             >
               <Route index element={<DashboardIndex />} />
+              <Route path="settings" element={<Settings />} />
               <Route path="stacks/:sessionId" element={<ResultLayout chrome="dashboard" />}>
                 <Route index element={<Navigate to="my-stack" replace />} />
                 <Route path="my-stack" element={<MyStack />} />
