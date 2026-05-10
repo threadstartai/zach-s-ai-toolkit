@@ -49,7 +49,7 @@ const Saved = () => {
 
   return (
     <div>
-      <h3 className="text-3xl font-bold text-navy tracking-[-0.02em]">Saved</h3>
+      <h3 className="text-3xl font-bold tracking-[-0.02em]">Saved</h3>
       <p className="mt-3 italic text-[15px] text-foreground/70">
         Bits of guidance you've kept for later.
       </p>
