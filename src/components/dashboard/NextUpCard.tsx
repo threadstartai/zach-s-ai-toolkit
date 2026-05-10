@@ -230,13 +230,47 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
 
   if (loading) return <SkeletonHeroCard />;
 
-  // Happy path: plan exists
-  if (plan && steps.length > 0) {
-    const current =
-      steps.find((s) => s.id === plan.current_step_id) ||
-      steps.find((s) => s.status === "available") ||
-      steps.find((s) => s.status === "in_progress") ||
-      steps[0];
+  // End-of-plan celebration
+  const allDone =
+    plan &&
+    steps.length > 0 &&
+    !steps.some((s) => s.status === "available" || s.status === "in_progress" || s.status === "locked");
+
+  if (allDone) {
+    const doneCount = steps.filter((s) => s.status === "done").length;
+    return (
+      <div className={cardCls}>
+        <p className="font-mono text-[11px] tracking-[0.12em] uppercase text-navy">
+          Plan complete
+        </p>
+        <h2 className="mt-3 text-[28px] sm:text-[32px] font-bold text-foreground tracking-[-0.02em] leading-[1.15]">
+          {doneCount === steps.length
+            ? "You've worked through every step."
+            : `You've worked through ${doneCount} of ${steps.length} steps.`}
+        </h2>
+        <p className="mt-3 text-[15px] text-foreground/85 leading-[1.65]">
+          That's the starting plan done. The tools are yours to keep using — come back to your stack any time you want to dig deeper or start a new one.
+        </p>
+        <div className="mt-5 flex flex-wrap items-center gap-4">
+          <Link
+            to={`/dashboard/stacks/${sessionId}/my-stack`}
+            className="inline-flex items-center justify-center bg-navy text-primary-foreground rounded-[8px] px-4 h-10 text-[14px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
+          >
+            Open your stack →
+          </Link>
+          <Link
+            to="/onboarding"
+            className="text-[14px] text-navy hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm"
+          >
+            Start a new stack
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Happy path: plan exists with an active step
+  if (plan && current) {
     const next = steps.find((s) => s.position === current.position + 1) ?? null;
     const split = chunk?.content ? splitFirstPrompt(chunk.content) : null;
     const promptText = split?.prompt ?? null;
@@ -285,8 +319,9 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
         <div className="mt-5 flex flex-wrap items-center gap-4">
           <button
             type="button"
-            onClick={() => console.log("Stage 19: mark done", current.id)}
-            className="inline-flex items-center justify-center bg-navy text-primary-foreground rounded-[8px] px-4 h-10 text-[14px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
+            onClick={() => complete("done")}
+            disabled={busy}
+            className="inline-flex items-center justify-center bg-navy text-primary-foreground rounded-[8px] px-4 h-10 text-[14px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             Mark done
           </button>
@@ -302,8 +337,9 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
           )}
           <button
             type="button"
-            onClick={() => console.log("Stage 19: skip", current.id)}
-            className="text-[14px] text-foreground/60 hover:text-foreground/85 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm"
+            onClick={() => complete("skipped")}
+            disabled={busy}
+            className="text-[14px] text-foreground/60 hover:text-foreground/85 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm disabled:opacity-60 disabled:cursor-not-allowed"
           >
             Skip
           </button>
@@ -319,6 +355,7 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
       </div>
     );
   }
+
 
   // Fallback: legacy first-prompt focus
   if (fallback) {
