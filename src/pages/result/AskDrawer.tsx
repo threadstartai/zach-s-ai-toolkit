@@ -64,24 +64,26 @@ export const AskDrawer = ({ open, onOpenChange, sessionId }: AskDrawerProps) => 
     (async () => {
       const { data: convs } = await supabase
         .from("conversations")
-        .select("id, updated_at")
+        .select("id, title, updated_at")
         .eq("session_id", sessionId)
-        .order("updated_at", { ascending: false })
-        .limit(1);
+        .order("updated_at", { ascending: false });
 
-      if (convs && convs[0]) {
-        setConversationId(convs[0].id);
-        const { data: msgs } = await supabase
-          .from("messages")
-          .select("id, role, content, created_at")
-          .eq("conversation_id", convs[0].id)
-          .order("created_at", { ascending: true });
-        if (msgs) {
-          setMessages(
-            msgs
-              .filter((m: any) => m.role !== "system")
-              .map((m: any) => ({ id: m.id, role: m.role, content: m.content }))
-          );
+      if (convs) {
+        setConversations(convs as ConversationItem[]);
+        if (convs[0]) {
+          setConversationId(convs[0].id);
+          const { data: msgs } = await supabase
+            .from("messages")
+            .select("id, role, content, created_at")
+            .eq("conversation_id", convs[0].id)
+            .order("created_at", { ascending: true });
+          if (msgs) {
+            setMessages(
+              msgs
+                .filter((m: any) => m.role !== "system")
+                .map((m: any) => ({ id: m.id, role: m.role, content: m.content }))
+            );
+          }
         }
       }
     })();
