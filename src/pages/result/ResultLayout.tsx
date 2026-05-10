@@ -78,6 +78,7 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
   const [feedbackSubmitted, setFeedbackSubmitted] = useState<Record<string, boolean>>({});
   const [saved, setSaved] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const { savedChunkIds, toggleSave } = useSavedChunks();
 
   useEffect(() => {
     if (!session || pickSlugs.length === 0) return;
