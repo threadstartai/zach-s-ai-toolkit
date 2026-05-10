@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { useResultContext } from "../shared/useResultContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { TOOLS, whyFor, whyForChatGPT } from "../shared/tools";
