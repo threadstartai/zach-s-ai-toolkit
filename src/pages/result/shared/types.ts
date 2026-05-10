@@ -6,6 +6,9 @@ export type Q2Code = "student" | "personal" | "business" | "exploring";
 export type Q3Code = "writing" | "research" | "building" | "notes" | "images" | "admin" | "other";
 export type Q4Code = "never" | "tried" | "weekly" | "confident";
 export type Q5Code = "prompt" | "video" | "guide" | "stepbystep";
+export type RoleCode = "founder" | "solo" | "team-lead" | "ic" | "student" | "personal" | "retired";
+export type TimeBudgetCode = "15min" | "30min" | "1hr" | "several" | "open";
+export type ExistingToolCode = "chatgpt" | "claude" | "gemini" | "copilot" | "perplexity" | "other-ai" | "nothing-yet";
 
 export type Chunk = {
   id: string;
