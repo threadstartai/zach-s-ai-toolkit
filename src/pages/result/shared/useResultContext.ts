@@ -27,6 +27,8 @@ export type ResultContext = {
   handleCopyShareLink: () => void;
   setFeedbackOpen: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   submitFeedback: (toolSlug: string, reason: string) => Promise<void>;
+  savedChunkIds: Set<string>;
+  toggleSave: (chunkId: string) => Promise<void>;
 };
 
 export const useResultContext = () => useOutletContext<ResultContext>();
