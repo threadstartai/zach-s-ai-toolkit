@@ -9,7 +9,7 @@ import type { Chunk, ToolKey } from "../shared/types";
 const PREFERRED_TYPES = ["first-prompt", "setup", "workflow-example"];
 
 const Tonight = () => {
-  const { picks, chunksByTool, savedChunkIds, toggleSave } = useResultContext();
+  const { picks, chunksByTool, savedChunkIds, toggleSave, sessionId } = useResultContext();
   const { user } = useAuth();
 
   let best: { chunk: Chunk; toolKey: ToolKey } | null = null;
