@@ -1,9 +1,11 @@
 import { Fragment } from "react";
 import { useResultContext } from "../shared/useResultContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { TOOLS, whyFor, whyForChatGPT } from "../shared/tools";
 import { audiencePhrase, useCasePhrase, confidencePhrase, whyThisTool, ladderLine } from "../shared/phrases";
 import { SECTION_LABELS, LADDER, groupChunks } from "../shared/chunks";
 import { ChunkBlock } from "../shared/ChunkBlock";
+import { SaveChunkButton } from "../shared/SaveChunkButton";
 import type { ToolKey } from "../shared/types";
 
 const MyStack = () => {
@@ -13,7 +15,9 @@ const MyStack = () => {
     feedbackOpen, feedbackSubmitted, setFeedbackOpen, submitFeedback,
     sessionId, linkCopied, handleCopyShareLink, handleStartOver,
     saved, setSaved,
+    savedChunkIds, toggleSave,
   } = useResultContext();
+  const { user } = useAuth();
 
   const why = (k: ToolKey) => k === "04" ? whyForChatGPT(c4) : whyFor(k, c2);
 
