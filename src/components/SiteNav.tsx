@@ -65,7 +65,7 @@ const SiteNav = () => {
                   <li>
                     <button
                       onClick={async () => { await signOut(); navigate("/"); }}
-                      className="whitespace-nowrap text-foreground/65 hover:text-navy transition-colors duration-150"
+                      className="whitespace-nowrap text-foreground/65 hover:text-navy transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm"
                     >
                       Sign out
                     </button>
