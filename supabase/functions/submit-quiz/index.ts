@@ -11,8 +11,30 @@ import {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
 const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
+
+const Q2_LABELS: Record<string, string> = {
+  student: "a student",
+  personal: "using AI in personal life",
+  business: "using AI for business or work",
+  exploring: "exploring AI",
+};
+const Q3_LABELS: Record<string, string> = {
+  writing: "writing",
+  research: "research",
+  building: "building things",
+  notes: "note-taking and meetings",
+  images: "images and video",
+  admin: "admin and emails",
+};
+const Q4_LABELS: Record<string, string> = {
+  never: "has never used AI",
+  tried: "has tried AI a bit",
+  weekly: "uses AI regularly",
+  confident: "is confident with AI",
+};
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -31,6 +53,125 @@ async function userIdFromAuthHeader(req: Request): Promise<string | null> {
     if (error || !data?.user) return null;
     return data.user.id;
   } catch {
+    return null;
+  }
+}
+
+type AiPick = { tools: string[]; reasoning: Record<string, string> };
+
+async function pickToolsWithAi(profile: {
+  name: string;
+  q2: string;
+  q3: string;
+  q3Other: string;
+  q4: string;
+}): Promise<AiPick | null> {
+  if (!LOVABLE_API_KEY) {
+    console.log("ai-pick: LOVABLE_API_KEY missing, skipping");
+    return null;
+  }
+
+  const { data: tools, error: toolsErr } = await admin
+    .from("tools")
+    .select("slug, name, tagline, category, status")
+    .neq("category", "foundational")
+    .neq("status", "deprecated");
+
+  if (toolsErr || !tools || tools.length === 0) {
+    console.log("ai-pick: tool catalogue fetch failed", toolsErr);
+    return null;
+  }
+
+  const validSlugs = new Set(tools.map((t: any) => t.slug));
+  const catalogue = tools
+    .map((t: any) => `${t.slug} | ${t.name} | ${t.tagline ?? ""} | ${t.category}`)
+    .join("\n");
+
+  const useCase = profile.q3 === "other"
+    ? `free text — "${profile.q3Other}"`
+    : `${profile.q3} (${Q3_LABELS[profile.q3] ?? profile.q3})`;
+
+  const system = `You're recommending the 3 best AI tools for a user of MY AI STACK. The user just answered an onboarding quiz. Pick from the catalogue ONLY — exact slugs.
+
+User profile:
+- Audience: ${profile.q2} (${Q2_LABELS[profile.q2] ?? profile.q2})
+- Use case: ${useCase}
+- AI confidence: ${profile.q4} (${Q4_LABELS[profile.q4] ?? profile.q4})
+- Name: ${profile.name || "anonymous"}
+
+Tool catalogue:
+${catalogue}
+
+Output strict JSON only, no prose:
+{
+  "tools": ["slug1", "slug2", "slug3"],
+  "reasoning": {
+    "slug1": "One-sentence reason this fits this specific user's situation. Reference their actual use case where possible.",
+    "slug2": "...",
+    "slug3": "..."
+  }
+}
+
+Rules:
+- Exactly 3 slugs, all from the catalogue.
+- Order them by which the user should try first (priority order).
+- For users with low AI confidence ('never' or 'tried'), favour Claude (slug 'claude') as one of the 3.
+- For free-text use cases, pick tools that genuinely fit what they wrote. Don't force-fit.
+- Each reasoning sentence should reference the user's specific situation, not generic claims.
+- Use UK English. No hype words.`;
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-flash-preview",
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: "Pick 3 tools for this user. Output JSON only." },
+        ],
+        response_format: { type: "json_object" },
+      }),
+    });
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      console.log("ai-pick: gateway non-ok", res.status, await res.text());
+      return null;
+    }
+    const payload = await res.json();
+    const content: string = payload?.choices?.[0]?.message?.content ?? "";
+    if (!content) return null;
+
+    let parsed: any;
+    try {
+      parsed = JSON.parse(content);
+    } catch {
+      const m = content.match(/\{[\s\S]*\}/);
+      if (!m) return null;
+      parsed = JSON.parse(m[0]);
+    }
+
+    const tools = parsed?.tools;
+    const reasoning = parsed?.reasoning;
+    if (!Array.isArray(tools) || tools.length !== 3) return null;
+    if (!tools.every((s) => typeof s === "string" && validSlugs.has(s))) return null;
+    if (new Set(tools).size !== 3) return null;
+    if (!reasoning || typeof reasoning !== "object") return null;
+    for (const s of tools) {
+      if (typeof reasoning[s] !== "string" || reasoning[s].trim().length === 0) return null;
+    }
+    return { tools, reasoning };
+  } catch (e) {
+    clearTimeout(timeout);
+    console.log("ai-pick: error", e);
     return null;
   }
 }
@@ -73,7 +214,6 @@ Deno.serve(async (req) => {
     return json({ error: "Invalid learning style" }, 400);
   }
 
-  // Derive user_id from JWT only — never trust client-supplied user_id.
   const userId = await userIdFromAuthHeader(req);
 
   const { data, error } = await admin
@@ -91,5 +231,30 @@ Deno.serve(async (req) => {
     .single();
 
   if (error) return json({ error: "Failed to save session" }, 500);
+
+  // AI tool selection — best effort, before returning.
+  try {
+    const pick = await pickToolsWithAi({
+      name,
+      q2: q2 as string,
+      q3: q3 as string,
+      q3Other,
+      q4: q4 as string,
+    });
+    if (pick) {
+      const { error: updErr } = await admin
+        .from("sessions")
+        .update({
+          ai_picked_tools: pick.tools,
+          ai_picked_at: new Date().toISOString(),
+          ai_pick_reasoning: pick.reasoning,
+        })
+        .eq("id", data.id);
+      if (updErr) console.log("ai-pick: update failed", updErr);
+    }
+  } catch (e) {
+    console.log("ai-pick: unexpected error", e);
+  }
+
   return json({ session_id: data.id });
 });
