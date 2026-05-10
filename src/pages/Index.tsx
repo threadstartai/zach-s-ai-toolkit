@@ -49,24 +49,27 @@ const Index = () => {
             <h1 className="text-[40px] md:text-6xl font-extrabold text-navy tracking-[-0.02em] leading-[1.05]">
               My AI Stack.
             </h1>
-            <p className="mt-5 text-xl md:text-2xl font-normal text-navy leading-snug max-w-[600px]">
+            <p className="mt-5 text-xl md:text-2xl font-normal text-navy leading-snug max-w-[600px] font-serif">
               A guide to every AI tool worth using, written for the people I care about.
             </p>
             <p className="mt-5 text-foreground/80">
               100% free. Made for friends and family — so nobody gets left behind by AI.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-3">
+            <div className="mt-8 flex flex-col items-start gap-3">
               <Link to={startHref} className={`${primaryBtn} w-full sm:w-auto`}>
                 Get my stack →
               </Link>
-              <Link to="/stack" className={`${outlineBtn} w-full sm:w-auto`}>
-                Browse the 17 tools
+              <Link
+                to="/stack"
+                className="text-[14px] text-navy underline underline-offset-4 hover:opacity-80 transition-opacity duration-200 ease-out mt-1 inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
+              >
+                Or browse all 17 tools →
               </Link>
             </div>
           </div>
 
           {/* Trust strip */}
-          <p className="mt-6 md:mt-10 italic text-[14px] text-navy/70">
+          <p className="mt-6 md:mt-10 italic text-[14px] text-navy/70 font-serif">
             17 AI tools. No affiliate links. No marketing. No upsells. Just what's worth using and how to use it.
           </p>
         </section>
