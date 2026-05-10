@@ -228,7 +228,7 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
 
   if (isDashboard) {
     return (
-      <div className="flex">
+      <div className="flex flex-col md:flex-row">
         <ResultSidebar />
         <main className="flex-1 min-w-0 bg-offwhite min-h-[calc(100vh-3.5rem)]">
           <div className="max-w-[820px] mx-auto px-5 sm:px-8 md:px-12 py-10 md:py-12">

@@ -18,6 +18,11 @@ import ResetPassword from "./pages/auth/ResetPassword.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
 import DashboardShell from "./pages/dashboard/DashboardShell.tsx";
 import DashboardIndex from "./pages/dashboard/DashboardIndex.tsx";
+import Tonight from "./pages/result/surfaces/Tonight.tsx";
+import Saved from "./pages/result/surfaces/Saved.tsx";
+import AllTools from "./pages/result/surfaces/AllTools.tsx";
+import Foundations from "./pages/result/surfaces/Foundations.tsx";
+import WorkWithZach from "./pages/result/surfaces/WorkWithZach.tsx";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +74,11 @@ const App = () => (
               <Route path="stacks/:sessionId" element={<ResultLayout chrome="dashboard" />}>
                 <Route index element={<Navigate to="my-stack" replace />} />
                 <Route path="my-stack" element={<MyStack />} />
+                <Route path="tonight" element={<Tonight />} />
+                <Route path="saved" element={<Saved />} />
+                <Route path="all-tools" element={<AllTools />} />
+                <Route path="foundations" element={<Foundations />} />
+                <Route path="work-with-zach" element={<WorkWithZach />} />
               </Route>
             </Route>
 
