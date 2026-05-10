@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SECTION_LABELS, groupChunks } from "../shared/chunks";
 import { ChunkBlock } from "../shared/ChunkBlock";
 import type { Chunk } from "../shared/types";
+import { fullGuideUrl } from "@/lib/pdfs";
 
 const FOUNDATIONAL_ORDER = [
   "start-here",
@@ -124,6 +125,12 @@ const Foundations = () => {
 
                 {isOpen && (
                   <div className="mt-6 pt-6 border-t border-foreground/10">
+                    {fullGuideUrl(t.slug) && (
+                      <a href={fullGuideUrl(t.slug)!} target="_blank" rel="noopener noreferrer"
+                         className="block text-[13px] italic text-navy/70 hover:text-navy underline underline-offset-2 mb-4">
+                        Download the full guide (PDF) ↓
+                      </a>
+                    )}
                     {tChunks.length === 0 ? (
                       <p className="italic text-foreground/60">Coming soon.</p>
                     ) : (
