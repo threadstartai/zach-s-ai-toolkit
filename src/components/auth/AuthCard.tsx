@@ -13,7 +13,7 @@ const AuthCard = ({
   footer?: ReactNode;
 }) => {
   return (
-    <div className="min-h-screen bg-offwhite flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       <header className="px-6 py-5 border-b border-[hsl(var(--border))]/60">
         <Link to="/" className="font-bold text-navy tracking-tight text-[15px]">
           My AI Stack

@@ -30,7 +30,7 @@ const DashboardIndex = () => {
   if (error) return <Navigate to="/onboarding" replace />;
   if (!target) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-offwhite">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <p className="text-[14px] text-foreground/60 italic">One moment…</p>
       </div>
     );

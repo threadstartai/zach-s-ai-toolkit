@@ -14,7 +14,7 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-offwhite flex items-center justify-center px-6">
+    <div className="min-h-screen bg-background flex items-center justify-center px-6">
       <div className="max-w-[480px] w-full">
         <p className="font-mono text-[13px] text-navy/60">404</p>
         <h1 className="mt-3 text-3xl font-bold text-navy tracking-tight">Page not found</h1>

@@ -236,7 +236,7 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
   const dashboardSkeleton = (
     <>
       {[0, 1, 2].map((i) => (
-        <div key={i} className="bg-white border border-[hsl(var(--border))] rounded-[16px] p-8 mt-6 first:mt-0">
+        <div key={i} className="bg-card border border-[hsl(var(--border))] rounded-[16px] p-8 mt-6 first:mt-0">
           <div className="h-6 bg-navy-light/40 rounded-full w-1/3 animate-pulse" />
           <div className="mt-3 h-4 bg-navy-light/30 rounded-full w-2/3 animate-pulse" />
           <div className="mt-6 h-3 bg-navy-light/30 rounded-full w-full animate-pulse" />
@@ -275,7 +275,7 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
     return (
       <div className="flex flex-col md:flex-row">
         <ResultSidebar />
-        <main className="flex-1 min-w-0 bg-offwhite min-h-[calc(100vh-3.5rem)]">
+        <main className="flex-1 min-w-0 bg-background min-h-[calc(100vh-3.5rem)]">
           <div className="max-w-[820px] mx-auto px-5 sm:px-8 md:px-12 py-10 md:py-12">
             {body}
           </div>
