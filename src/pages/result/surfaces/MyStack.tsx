@@ -9,6 +9,7 @@ import { ChunkBlock } from "../shared/ChunkBlock";
 import { SaveChunkButton } from "../shared/SaveChunkButton";
 import type { ToolKey } from "../shared/types";
 import { fullGuideUrl } from "@/lib/pdfs";
+import { AskDrawer } from "../AskDrawer";
 
 const MyStack = () => {
   const {
@@ -25,6 +26,7 @@ const MyStack = () => {
 
   const why = (k: ToolKey) => k === "04" ? whyForChatGPT(c4) : whyFor(k, c2);
 
+  const [askOpen, setAskOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(
     () => typeof window !== "undefined" && !localStorage.getItem("myaistack_dashboard_welcomed")
   );
@@ -256,6 +258,17 @@ const MyStack = () => {
 
       {/* Footer actions */}
       <div className="mt-14 text-[14px] text-navy">
+        {user && isDashboard && (
+          <>
+            <button
+              onClick={() => setAskOpen(true)}
+              className="hover:underline transition-colors duration-150 font-medium"
+            >
+              Ask about your stack
+            </button>
+            <span className="text-foreground/40 mx-2">·</span>
+          </>
+        )}
         <button
           onClick={() => {
             const lines = [
@@ -316,6 +329,7 @@ const MyStack = () => {
           </p>
         )}
       </div>
+      <AskDrawer open={askOpen} onOpenChange={setAskOpen} sessionId={sessionId} />
     </div>
   );
 };
