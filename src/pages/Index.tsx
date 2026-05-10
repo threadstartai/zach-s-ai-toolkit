@@ -44,9 +44,9 @@ const Index = () => {
     <SiteLayout>
       <div className="mx-auto max-w-[1100px] px-6">
         {/* Hero */}
-        <section className="pt-16 md:pt-24 pb-14 md:pb-20">
+        <section className="pt-10 md:pt-24 pb-10 md:pb-20">
           <div className="max-w-[760px]">
-            <h1 className="text-5xl md:text-6xl font-extrabold text-navy tracking-[-0.02em] leading-[1.05]">
+            <h1 className="text-[40px] md:text-6xl font-extrabold text-navy tracking-[-0.02em] leading-[1.05]">
               My AI Stack.
             </h1>
             <p className="mt-5 text-xl md:text-2xl font-normal text-navy leading-snug max-w-[600px]">
@@ -56,17 +56,17 @@ const Index = () => {
               Free. Mine to keep updated. No course at the end.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <Link to={startHref} className={primaryBtn}>
+              <Link to={startHref} className={`${primaryBtn} w-full sm:w-auto`}>
                 Get my stack →
               </Link>
-              <Link to="/stack" className={outlineBtn}>
+              <Link to="/stack" className={`${outlineBtn} w-full sm:w-auto`}>
                 Browse the 17 tools
               </Link>
             </div>
           </div>
 
           {/* Trust strip */}
-          <p className="mt-10 italic text-[14px] text-navy/70">
+          <p className="mt-6 md:mt-10 italic text-[14px] text-navy/70">
             17 AI tools. 346 paragraphs of guidance. No affiliate links. No course at the end.
           </p>
         </section>
