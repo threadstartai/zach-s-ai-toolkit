@@ -24,6 +24,7 @@ import Saved from "./pages/result/surfaces/Saved.tsx";
 import AllTools from "./pages/result/surfaces/AllTools.tsx";
 import Foundations from "./pages/result/surfaces/Foundations.tsx";
 import WorkWithZach from "./pages/result/surfaces/WorkWithZach.tsx";
+import Settings from "./pages/dashboard/Settings.tsx";
 
 const queryClient = new QueryClient();
 
