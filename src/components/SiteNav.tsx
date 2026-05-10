@@ -91,7 +91,7 @@ const SiteNav = () => {
             <SheetTrigger asChild>
               <button
                 aria-label="Open menu"
-                className="w-9 h-9 inline-flex items-center justify-center text-navy hover:bg-navy-light/40 rounded-[8px] transition-colors"
+                className="w-11 h-11 inline-flex items-center justify-center text-navy hover:bg-navy-light/40 rounded-[8px] transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
               >
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                   <line x1="3" y1="6" x2="21" y2="6" />
