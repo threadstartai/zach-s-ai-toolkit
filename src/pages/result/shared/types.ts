@@ -25,6 +25,9 @@ export type LoadedSession = {
   q3_other_text: string | null;
   q4_confidence: string | null;
   q5_learning_style: string | null;
+  ai_picked_tools?: string[] | null;
+  ai_picked_at?: string | null;
+  ai_pick_reasoning?: Record<string, string> | null;
 };
 
 export type QuizStep = "intro" | "q1" | "q2" | "q3" | "q4" | "done";
