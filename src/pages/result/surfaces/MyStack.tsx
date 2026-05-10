@@ -190,7 +190,8 @@ const MyStack = () => {
                             {items.map((ch) => (
                               <div
                                 key={ch.id}
-                                className="relative bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6 transition-colors duration-150 hover:border-navy/40"
+                                onClick={(e) => e.stopPropagation()}
+                                className="relative bg-background border border-[hsl(var(--border))] rounded-[12px] p-5 md:p-6 transition-colors duration-150 hover:border-navy/40 cursor-default"
                               >
                                 {user && (
                                   <SaveChunkButton
@@ -210,7 +211,10 @@ const MyStack = () => {
                   </div>
                 )}
 
-                <div className="mt-6 pt-4 border-t border-foreground/10">
+                <div
+                  className="mt-6 pt-4 border-t border-foreground/10"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   {fullGuideUrl(t.slug) && (
                     <a href={fullGuideUrl(t.slug)!} target="_blank" rel="noopener noreferrer"
                        className="block text-[13px] italic text-navy/70 hover:text-navy underline underline-offset-2 mb-3">
@@ -250,6 +254,13 @@ const MyStack = () => {
                     <p className="text-[13px] italic text-navy/60">Thanks — noted.</p>
                   )}
                 </div>
+
+                <button
+                  onClick={(e) => { e.stopPropagation(); setDetailSlug(t.slug); }}
+                  className="mt-5 italic text-[13px] text-navy/70 hover:text-navy underline underline-offset-2"
+                >
+                  Read the full guide for {t.name} →
+                </button>
               </div>
             </Fragment>
           );
