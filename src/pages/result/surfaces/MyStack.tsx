@@ -14,6 +14,7 @@ import { ToolDetailDrawer } from "../ToolDetailDrawer";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
 import { ChunkFeedbackButton } from "../shared/ChunkFeedbackButton";
+import { SkeletonChunkList } from "@/components/ui-primitives/Skeletons";
 
 const MyStack = () => {
   const {
