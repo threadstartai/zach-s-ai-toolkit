@@ -264,7 +264,15 @@ const MyStack = () => {
               "",
               ...picks.map((k, i) => `${i + 1}. ${TOOLS[k].name} — ${whyThisTool(TOOLS[k].slug, c2, c3, c4, q3OtherText, aiPickReasoning?.[TOOLS[k].slug])}`),
               "",
-              "Help me think through how to actually use these tonight. Ask me clarifying questions before giving generic advice. Push back where I'm being lazy.",
+              "Use the Master Prompt Guide approach with me:",
+              "",
+              "1. Before answering, ask me up to 3 clarifying questions about my actual situation (the Ask-Me-First Flip).",
+              "2. Then give me your first version. I'll push back if it's too generic.",
+              "3. After we land an answer, audit it: what's weak, what did you assume about me, what's the strongest counter-argument? (The Audit Prompt)",
+              "",
+              "Don't preach the method — use it.",
+              "",
+              "Help me think through how to actually use these three tools tonight.",
             ];
             const url = `https://claude.ai/new?q=${encodeURIComponent(lines.join("\n"))}`;
             window.open(url, "_blank", "noopener,noreferrer");
