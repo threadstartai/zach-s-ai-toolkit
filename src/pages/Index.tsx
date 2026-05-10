@@ -78,10 +78,6 @@ const Index = () => {
           </p>
         </section>
 
-        {/* What this is — 2 column */}
-        <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]/60">
-          <div className="grid grid-cols-1 md:grid-cols-[1.1fr_1fr] gap-6 md:gap-10 lg:gap-16 items-start">
-            <div>
         {/* What this is — single column */}
         <section className="py-10 md:py-20 border-t border-[hsl(var(--border))]/60">
           <div className={sectionLabelCls}>01 — What this is</div>
