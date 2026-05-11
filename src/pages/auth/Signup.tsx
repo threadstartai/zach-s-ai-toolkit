@@ -47,11 +47,14 @@ const Signup = () => {
   return (
     <AuthCard
       title="Create your account"
-      subtitle="Made for friends and family. Sign-up is just to save your Stack — no marketing, no spam, no upsells."
+      subtitle="Three tools. One starting plan. I'll save it so you can come back to it."
       footer={<>Already have an account? <Link to="/login" className="text-navy hover:underline">Log in</Link></>}
     >
       <SocialButtons />
       <Divider />
+      <p className="text-[13px] text-foreground/60 italic leading-[1.55] -mt-2 mb-1">
+        No marketing emails. No upsells. Just your Stack saved for next time.
+      </p>
       <form onSubmit={onSubmit} className="flex flex-col space-y-4">
         <div>
           <label htmlFor="email" className={labelCls}>Email</label>

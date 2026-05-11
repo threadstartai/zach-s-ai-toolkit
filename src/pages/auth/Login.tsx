@@ -38,8 +38,8 @@ const Login = () => {
 
   return (
     <AuthCard
-      title="Welcome back"
-      subtitle="Log in to your AI Stack."
+      title="Pick up where you left off."
+      subtitle="Your stack, your saves, your next step."
       footer={<>Don't have an account? <Link to="/signup" className="text-navy hover:underline">Sign up</Link></>}
     >
       <SocialButtons />
