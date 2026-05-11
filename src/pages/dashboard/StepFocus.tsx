@@ -205,23 +205,28 @@ const StepFocus = () => {
   };
 
   const complete = async (action: "done" | "skipped") => {
-    if (busy || !current) return;
+    if (busyRef.current || !current) return;
+    busyRef.current = true;
     setBusy(true);
-    setShowWelcome(false);
     try {
       const { data, error } = await supabase.functions.invoke("complete-step", {
         body: { step_id: current.id, action },
       });
       if (error || !data) {
         toast.error("Couldn't update — try again");
+        busyRef.current = false;
         setBusy(false);
         return;
       }
-      const completedId = current.id;
-      const completedPosition = current.position;
+      const completedSnapshot = {
+        position: current.position,
+        title: current.title,
+        purpose: current.purpose,
+        isComplete: !!data.is_complete,
+      };
       setSteps((prev) =>
         prev.map((s) => {
-          if (s.id === completedId) {
+          if (s.id === current.id) {
             return { ...s, status: action === "done" ? "done" : "skipped" };
           }
           if (data.next_step_id && s.id === data.next_step_id && s.status === "locked") {
@@ -231,16 +236,24 @@ const StepFocus = () => {
         }),
       );
       setPlan((prev) => (prev ? { ...prev, current_step_id: data.next_step_id } : prev));
-      toast.success(
-        action === "done"
-          ? `Step ${completedPosition} done`
-          : `Step ${completedPosition} skipped`,
-      );
+
+      if (action === "done") {
+        setJustCompleted(completedSnapshot);
+        setShowWelcome(false);
+      } else {
+        toast(`Step ${current.position} skipped`);
+      }
+      busyRef.current = false;
       setBusy(false);
     } catch {
       toast.error("Couldn't update — try again");
+      busyRef.current = false;
       setBusy(false);
     }
+  };
+
+  const continueToNext = () => {
+    setJustCompleted(null);
   };
 
   const allDone =
