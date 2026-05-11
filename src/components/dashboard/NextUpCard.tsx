@@ -283,9 +283,17 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
 
     return (
       <div className={cardCls}>
-        <p className="font-mono text-[11px] tracking-[0.12em] uppercase text-navy">
-          {eyebrowParts.join(" · ")}
-        </p>
+        <div className="flex items-start justify-between gap-4 mb-1">
+          <p className="font-mono text-[11px] tracking-[0.12em] uppercase text-navy">
+            {eyebrowParts.join(" · ")}
+          </p>
+          <Link
+            to={`/dashboard/stacks/${sessionId}/step`}
+            className="shrink-0 text-[12px] text-navy hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm"
+          >
+            Open in focus →
+          </Link>
+        </div>
         <h2 className="mt-3 text-[28px] sm:text-[32px] font-bold text-foreground tracking-[-0.02em] leading-[1.15]">
           {current.title}
         </h2>

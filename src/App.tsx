@@ -27,6 +27,7 @@ import WorkWithZach from "./pages/result/surfaces/WorkWithZach.tsx";
 import BriefingMethod from "./pages/result/surfaces/BriefingMethod.tsx";
 import CheckBeforeTrust from "./pages/result/surfaces/CheckBeforeTrust.tsx";
 import Settings from "./pages/dashboard/Settings.tsx";
+import StepFocus from "./pages/dashboard/StepFocus.tsx";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,16 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Onboarding />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Protected step focus (full-bleed, no dashboard chrome) */}
+            <Route
+              path="/dashboard/stacks/:sessionId/step"
+              element={
+                <ProtectedRoute>
+                  <StepFocus />
                 </ProtectedRoute>
               }
             />
