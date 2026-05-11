@@ -36,11 +36,17 @@ export const ResultSidebar = ({
       return [{ items: [{ label: "My Stack", path: `${base}/my-stack` }] }];
     }
     if (!currentStackId) {
-      return [{ items: [{ label: "Home", path: "/dashboard", end: true }] }];
+      return [{ items: [
+        { label: "Home", path: "/dashboard", end: true },
+        { label: "Notes", path: "/dashboard/notes" },
+      ] }];
     }
     const base = `/dashboard/stacks/${currentStackId}`;
     return [
-      { items: [{ label: "Home", path: "/dashboard", end: true }] },
+      { items: [
+        { label: "Home", path: "/dashboard", end: true },
+        { label: "Notes", path: "/dashboard/notes" },
+      ] },
       {
         label: "Progress",
         items: [
