@@ -329,14 +329,10 @@ const ResultLayout = ({ chrome = "public" }: { chrome?: "public" | "dashboard" }
             <button
               onClick={() => setAskOpen(true)}
               aria-label="Ask AI"
-              className="..."
-            >
-              {/* keep existing icon/markup below */}
-              Ask AI
               style={{ bottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))" }}
               className="fixed right-6 z-30 bg-navy text-primary-foreground rounded-full px-5 py-3 text-[14px] font-medium shadow-[0_4px_24px_rgba(26,58,92,0.16)] hover:bg-navy/90 transition-colors duration-150"
             >
-              Ask about your stack
+              Ask AI
             </button>
             <AskDrawer
               open={askOpen}
