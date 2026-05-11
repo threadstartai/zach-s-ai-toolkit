@@ -102,8 +102,10 @@ const StepFocus = () => {
   useEffect(() => {
     if (!sessionId) return;
     let cancelled = false;
-    (async () => {
-      setLoading(true);
+    let attempts = 0;
+    const MAX_ATTEMPTS = 30; // 30 * 1500ms = 45s
+
+    const tryFetch = async (): Promise<void> => {
       const { data: planRow } = await supabase
         .from("learning_plans")
         .select("id, title, current_step_id, lane, plan_version")
@@ -112,6 +114,16 @@ const StepFocus = () => {
       if (cancelled) return;
 
       if (!planRow) {
+        if (cameFromOnboarding && attempts < MAX_ATTEMPTS) {
+          attempts++;
+          setWaitingForPlan(true);
+          setLoading(false);
+          setTimeout(() => { if (!cancelled) tryFetch(); }, 1500);
+          return;
+        }
+        if (cameFromOnboarding) {
+          toast.error("Couldn't build your plan — back to dashboard");
+        }
         navigate("/dashboard", { replace: true });
         return;
       }
@@ -132,10 +144,15 @@ const StepFocus = () => {
 
       setPlan(planRow as Plan);
       setSteps((stepRows ?? []) as Step[]);
+      setWaitingForPlan(false);
       setLoading(false);
-    })();
+    };
+
+    setLoading(true);
+    tryFetch();
+
     return () => { cancelled = true; };
-  }, [sessionId, navigate]);
+  }, [sessionId, cameFromOnboarding, navigate]);
 
   useEffect(() => {
     if (!current) return;
