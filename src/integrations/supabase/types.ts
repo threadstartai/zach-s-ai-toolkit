@@ -299,6 +299,24 @@ export type Database = {
         }
         Relationships: []
       }
+      foundation_progress: {
+        Row: {
+          foundation_slug: string
+          marked_at: string
+          user_id: string
+        }
+        Insert: {
+          foundation_slug: string
+          marked_at?: string
+          user_id: string
+        }
+        Update: {
+          foundation_slug?: string
+          marked_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       learning_events: {
         Row: {
           created_at: string
