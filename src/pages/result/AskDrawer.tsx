@@ -309,7 +309,7 @@ export const AskDrawer = ({ open, onOpenChange, sessionId }: AskDrawerProps) => 
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKey}
-              placeholder="Ask about your stack…"
+              placeholder="Ask AI…"
               rows={1}
               className="flex-1 resize-none border border-[hsl(var(--border))] focus:border-navy/50 focus:outline-none rounded-[8px] px-3 py-2 text-[14.5px] leading-[1.5] bg-background text-foreground"
               style={{ maxHeight: 200 }}
