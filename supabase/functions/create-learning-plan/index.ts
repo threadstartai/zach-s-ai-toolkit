@@ -297,7 +297,11 @@ Deno.serve(async (req) => {
       lane,
       title,
       active_tool_slugs: picks,
-      rationale: { source: "create-learning-plan", lane_reason: { hasExisting, confidence: conf } },
+      rationale: {
+        source: usedDefaults ? "create-learning-plan-defaults" : "create-learning-plan",
+        lane_reason: { hasExisting, confidence: conf },
+        used_defaults: usedDefaults,
+      },
     })
     .select("id")
     .single();
