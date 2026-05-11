@@ -211,6 +211,21 @@ Deno.serve(async (req) => {
   const sessionId = body.session_id;
   if (!sessionId || !isValidUuid(sessionId)) return json({ error: "Invalid session id" }, 400);
 
+  // Short-circuit if a plan already exists for this session.
+  const { data: existingPlan } = await admin
+    .from("learning_plans")
+    .select("id, current_step_id")
+    .eq("session_id", sessionId)
+    .maybeSingle();
+
+  if (existingPlan) {
+    return json({
+      plan_id: existingPlan.id,
+      current_step_id: existingPlan.current_step_id,
+      idempotent: true,
+    });
+  }
+
   const { data: session, error: sessErr } = await admin
     .from("sessions")
     .select("name, q2_audience, q3_use_case, q3_other_text, q4_confidence, onboarding_role, onboarding_time_budget, onboarding_existing_tools, ai_picked_tools, user_id")
