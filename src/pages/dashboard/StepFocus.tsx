@@ -287,6 +287,21 @@ const StepFocus = () => {
 
         {!loading && !allDone && current && (
           <>
+            {showWelcome && current.position === 1 && (
+              <div className="mb-8 pb-6 border-b border-[hsl(var(--border))]/60">
+                <p className="font-mono text-[11px] tracking-[0.14em] uppercase text-navy">
+                  Welcome
+                </p>
+                <p className="mt-3 text-[18px] text-foreground/90 leading-[1.55] font-medium">
+                  This is your first step. The button below sends a prompt straight to Claude — that's the whole game.
+                </p>
+                {profile && (
+                  <p className="mt-3 text-[13px] text-foreground/55 italic leading-[1.6]">
+                    Picked from your answers: {personalContextLine(profile)}.
+                  </p>
+                )}
+              </div>
+            )}
             <p className="font-mono text-[12px] tracking-[0.14em] uppercase text-navy">
               {eyebrowParts.join(" · ")}
             </p>
