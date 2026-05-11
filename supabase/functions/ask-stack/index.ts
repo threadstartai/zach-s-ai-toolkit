@@ -233,7 +233,43 @@ Deno.serve(async (req) => {
     : (Q3_LABELS[session.q3_use_case as string] ?? session.q3_use_case ?? "unknown");
   const confidenceLabel = Q4_LABELS[session.q4_confidence as string] ?? session.q4_confidence ?? "unknown";
 
-  const systemPrompt = `You're an assistant helping ${session.name || "this user"} understand their personalised AI stack from MY AI STACK.
+  let stateBlock = "";
+
+  if (plan && currentStep) {
+    stateBlock += `\nWhere they are right now:\n- Plan: ${plan.title} (${plan.lane} lane).\n- Current step: ${currentStep.position}. ${currentStep.title}\n- Why this step: ${currentStep.purpose}\n`;
+  }
+
+  if (recentSteps.length > 0) {
+    const done = recentSteps.filter((s: any) => s.status === "done").map((s: any) => `Step ${s.position}: ${s.title}`);
+    const skipped = recentSteps.filter((s: any) => s.status === "skipped").map((s: any) => `Step ${s.position}: ${s.title}`);
+    if (done.length) stateBlock += `- Recently done: ${done.join("; ")}\n`;
+    if (skipped.length) stateBlock += `- Recently skipped: ${skipped.join("; ")}\n`;
+  }
+
+  if (savedChunks && savedChunks.length > 0) {
+    const lines = savedChunks
+      .filter((s: any) => s.chunks)
+      .map((s: any) => {
+        const toolName = s.chunks?.tools?.name ?? "Unknown";
+        const title = s.chunks?.title ?? s.chunks?.chunk_type ?? "Untitled";
+        return `${toolName} — ${title}`;
+      });
+    if (lines.length) stateBlock += `\nThings they saved recently:\n- ${lines.join("\n- ")}\n`;
+  }
+
+  if (notes && notes.length > 0) {
+    const lines = notes
+      .filter((n: any) => n.title || n.summary)
+      .map((n: any) => {
+        const pin = n.pinned ? "[pinned] " : "";
+        const title = n.title || "Untitled note";
+        const summary = n.summary ? ` — ${n.summary}` : "";
+        return `${pin}${title}${summary}`;
+      });
+    if (lines.length) stateBlock += `\nWhat's in their notes:\n- ${lines.join("\n- ")}\n`;
+  }
+
+  const systemPrompt = `You're Ask AI — an assistant helping ${session.name || "this user"} understand their personalised AI stack from MY AI STACK.
 
 Their profile:
 - Audience: ${audienceLabel}
@@ -241,12 +277,13 @@ Their profile:
 - AI confidence: ${confidenceLabel}
 
 ${toolBlocks || "(No specific tools selected yet — answer generally about the MY AI STACK approach.)"}
-
+${stateBlock}
 How to help them:
 - Use the Master Prompt Guide approach. Ask up to 3 clarifying questions before giving generic advice. Push back where they're being lazy or unclear. After landing an answer, audit it: what's weak, what did you assume.
-- Stay grounded in the chunks above. If they ask about a tool not in their stack, say "that's not in your stack — try [tool from their stack] for that, or take a quiz again."
+- Stay grounded in the chunks above AND in the user's current state. If they ask "what should I do next?", point to their current step. If they ask about something they saved, reference the actual saved chunk. If they reference a note they wrote, use the title/summary as context.
+- If they ask about a tool not in their stack, say "that's not in your stack — try [tool from their stack] for that, or take a quiz again."
 - UK English. No hype words. No fake encouragement. Be direct and warm.
-- Sign off as Claude (the assistant), not Zach.`;
+- Sign off as Ask AI, not Zach.`;
 
   if (!LOVABLE_API_KEY) return json({ error: "AI gateway not configured" }, 502);
 
