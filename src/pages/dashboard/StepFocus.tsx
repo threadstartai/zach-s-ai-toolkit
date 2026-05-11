@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -31,10 +31,43 @@ type ChunkRow = { id: string; content: string; title: string | null };
 const claudeDeeplink = (prompt: string) =>
   `https://claude.ai/new?q=${encodeURIComponent(prompt)}`;
 
+const USE_CASE_LABELS: Record<string, string> = {
+  writing: "writing properly",
+  research: "researching a topic",
+  building: "building something",
+  notes: "note-taking and meetings",
+  images: "images and video",
+  admin: "admin and emails",
+};
+
+const ROLE_LABELS: Record<string, string> = {
+  founder: "founder / CEO",
+  solo: "solo / freelance",
+  "team-lead": "team lead",
+  ic: "individual contributor",
+  student: "student",
+  personal: "personal life",
+  retired: "exploring / retired",
+};
+
+const personalContextLine = (p: {
+  q3_use_case: string | null;
+  q3_other_text: string | null;
+  onboarding_role: string | null;
+}): string => {
+  const useText = p.q3_use_case === "other"
+    ? (p.q3_other_text || "something specific")
+    : (p.q3_use_case ? USE_CASE_LABELS[p.q3_use_case] ?? p.q3_use_case : "what you want help with");
+  const roleText = p.onboarding_role ? ROLE_LABELS[p.onboarding_role] ?? p.onboarding_role : null;
+  return roleText ? `${useText}, as a ${roleText}` : useText;
+};
+
 const StepFocus = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const cameFromOnboarding = searchParams.get("first") === "1";
 
   const [loading, setLoading] = useState(true);
   const [plan, setPlan] = useState<Plan | null>(null);
@@ -43,6 +76,12 @@ const StepFocus = () => {
   const [toolName, setToolName] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [profile, setProfile] = useState<{
+    q3_use_case: string | null;
+    q3_other_text: string | null;
+    onboarding_role: string | null;
+  } | null>(null);
+  const [showWelcome, setShowWelcome] = useState(cameFromOnboarding);
 
   const current = plan && steps.length > 0
     ? (steps.find((s) => s.id === plan.current_step_id) ||
@@ -75,6 +114,13 @@ const StepFocus = () => {
         .eq("plan_id", planRow.id)
         .order("position", { ascending: true });
       if (cancelled) return;
+
+      const { data: sessionRow } = await supabase
+        .from("sessions")
+        .select("q3_use_case, q3_other_text, onboarding_role")
+        .eq("id", sessionId)
+        .maybeSingle();
+      if (!cancelled && sessionRow) setProfile(sessionRow);
 
       setPlan(planRow as Plan);
       setSteps((stepRows ?? []) as Step[]);
@@ -136,6 +182,7 @@ const StepFocus = () => {
   const complete = async (action: "done" | "skipped") => {
     if (busy || !current) return;
     setBusy(true);
+    setShowWelcome(false);
     try {
       const { data, error } = await supabase.functions.invoke("complete-step", {
         body: { step_id: current.id, action },
@@ -240,6 +287,21 @@ const StepFocus = () => {
 
         {!loading && !allDone && current && (
           <>
+            {showWelcome && current.position === 1 && (
+              <div className="mb-8 pb-6 border-b border-[hsl(var(--border))]/60">
+                <p className="font-mono text-[11px] tracking-[0.14em] uppercase text-navy">
+                  Welcome
+                </p>
+                <p className="mt-3 text-[18px] text-foreground/90 leading-[1.55] font-medium">
+                  This is your first step. The button below sends a prompt straight to Claude — that's the whole game.
+                </p>
+                {profile && (
+                  <p className="mt-3 text-[13px] text-foreground/55 italic leading-[1.6]">
+                    Picked from your answers: {personalContextLine(profile)}.
+                  </p>
+                )}
+              </div>
+            )}
             <p className="font-mono text-[12px] tracking-[0.14em] uppercase text-navy">
               {eyebrowParts.join(" · ")}
             </p>

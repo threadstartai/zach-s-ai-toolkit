@@ -123,7 +123,7 @@ const Onboarding = () => {
         submittingRef.current = false;
         return;
       }
-      navigate(`/dashboard/stacks/${data.session_id}/my-stack`, { replace: true });
+      navigate(`/dashboard/stacks/${data.session_id}/step?first=1`, { replace: true });
     } catch {
       setSubmitError(true);
       setSubmitting(false);
