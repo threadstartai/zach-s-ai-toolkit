@@ -86,18 +86,7 @@ const DashboardIndex = () => {
   const [error, setError] = useState(false);
 
   const [sections, setSections] = useState<SectionsState>(DEFAULT_SECTIONS);
-
-
-  const [noteContent, setNoteContent] = useState("");
-  const [noteSummary, setNoteSummary] = useState<string | null>(null);
-  const [noteDirty, setNoteDirty] = useState(false);
-  const [noteSaving, setNoteSaving] = useState(false);
-  const [summarising, setSummarising] = useState(false);
-  const [summariseError, setSummariseError] = useState<string | null>(null);
-  const noteHydrated = useRef(false);
-
   const [recentSaves, setRecentSaves] = useState<RecentSave[]>([]);
-
   // Hydrate sections
   useEffect(() => {
     try {
