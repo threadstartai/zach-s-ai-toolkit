@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,6 +76,14 @@ const StepFocus = () => {
   const [toolName, setToolName] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
+  const [waitingForPlan, setWaitingForPlan] = useState(false);
+  const [justCompleted, setJustCompleted] = useState<{
+    position: number;
+    title: string;
+    purpose: string;
+    isComplete: boolean;
+  } | null>(null);
   const [profile, setProfile] = useState<{
     q3_use_case: string | null;
     q3_other_text: string | null;
@@ -94,8 +102,10 @@ const StepFocus = () => {
   useEffect(() => {
     if (!sessionId) return;
     let cancelled = false;
-    (async () => {
-      setLoading(true);
+    let attempts = 0;
+    const MAX_ATTEMPTS = 30; // 30 * 1500ms = 45s
+
+    const tryFetch = async (): Promise<void> => {
       const { data: planRow } = await supabase
         .from("learning_plans")
         .select("id, title, current_step_id, lane, plan_version")
@@ -104,6 +114,16 @@ const StepFocus = () => {
       if (cancelled) return;
 
       if (!planRow) {
+        if (cameFromOnboarding && attempts < MAX_ATTEMPTS) {
+          attempts++;
+          setWaitingForPlan(true);
+          setLoading(false);
+          setTimeout(() => { if (!cancelled) tryFetch(); }, 1500);
+          return;
+        }
+        if (cameFromOnboarding) {
+          toast.error("Couldn't build your plan — back to dashboard");
+        }
         navigate("/dashboard", { replace: true });
         return;
       }
@@ -124,10 +144,15 @@ const StepFocus = () => {
 
       setPlan(planRow as Plan);
       setSteps((stepRows ?? []) as Step[]);
+      setWaitingForPlan(false);
       setLoading(false);
-    })();
+    };
+
+    setLoading(true);
+    tryFetch();
+
     return () => { cancelled = true; };
-  }, [sessionId, navigate]);
+  }, [sessionId, cameFromOnboarding, navigate]);
 
   useEffect(() => {
     if (!current) return;
@@ -180,23 +205,28 @@ const StepFocus = () => {
   };
 
   const complete = async (action: "done" | "skipped") => {
-    if (busy || !current) return;
+    if (busyRef.current || !current) return;
+    busyRef.current = true;
     setBusy(true);
-    setShowWelcome(false);
     try {
       const { data, error } = await supabase.functions.invoke("complete-step", {
         body: { step_id: current.id, action },
       });
       if (error || !data) {
         toast.error("Couldn't update — try again");
+        busyRef.current = false;
         setBusy(false);
         return;
       }
-      const completedId = current.id;
-      const completedPosition = current.position;
+      const completedSnapshot = {
+        position: current.position,
+        title: current.title,
+        purpose: current.purpose,
+        isComplete: !!data.is_complete,
+      };
       setSteps((prev) =>
         prev.map((s) => {
-          if (s.id === completedId) {
+          if (s.id === current.id) {
             return { ...s, status: action === "done" ? "done" : "skipped" };
           }
           if (data.next_step_id && s.id === data.next_step_id && s.status === "locked") {
@@ -206,16 +236,24 @@ const StepFocus = () => {
         }),
       );
       setPlan((prev) => (prev ? { ...prev, current_step_id: data.next_step_id } : prev));
-      toast.success(
-        action === "done"
-          ? `Step ${completedPosition} done`
-          : `Step ${completedPosition} skipped`,
-      );
+
+      if (action === "done") {
+        setJustCompleted(completedSnapshot);
+        setShowWelcome(false);
+      } else {
+        toast(`Step ${current.position} skipped`);
+      }
+      busyRef.current = false;
       setBusy(false);
     } catch {
       toast.error("Couldn't update — try again");
+      busyRef.current = false;
       setBusy(false);
     }
+  };
+
+  const continueToNext = () => {
+    setJustCompleted(null);
   };
 
   const allDone =
@@ -253,9 +291,76 @@ const StepFocus = () => {
       </header>
 
       <main className="flex-1 max-w-[720px] mx-auto w-full px-5 sm:px-8 py-12 md:py-16">
-        {loading && <SkeletonHeroCard />}
+        {loading && !waitingForPlan && <SkeletonHeroCard />}
 
-        {!loading && allDone && (
+        {waitingForPlan && (
+          <div className="text-center">
+            <p className="font-mono text-[12px] tracking-[0.14em] uppercase text-navy">
+              Building your plan
+            </p>
+            <h1 className="mt-4 text-[28px] sm:text-[32px] font-bold text-foreground tracking-[-0.02em] leading-[1.15]">
+              One moment — picking your three tools.
+            </h1>
+            <p className="mt-4 text-[15px] text-foreground/70 leading-[1.6] max-w-[480px] mx-auto">
+              I'm reading your answers and choosing the tools that fit. This usually takes about 10 seconds.
+            </p>
+            <div className="mt-8 flex items-center justify-center">
+              <div className="h-2 w-48 rounded-full bg-navy-light overflow-hidden">
+                <div className="h-full w-1/3 bg-navy rounded-full animate-pulse" />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!loading && !waitingForPlan && justCompleted && (
+          <div className="text-center">
+            <p className="font-mono text-[12px] tracking-[0.14em] uppercase text-navy">
+              Step {justCompleted.position} done
+            </p>
+            <h1 className="mt-4 text-[36px] sm:text-[44px] font-bold text-foreground tracking-[-0.025em] leading-[1.1]">
+              {justCompleted.isComplete ? "Plan complete." : "Nicely done."}
+            </h1>
+            <p className="mt-5 text-[17px] text-foreground/80 leading-[1.65] max-w-[560px] mx-auto">
+              {justCompleted.purpose}
+            </p>
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-5">
+              {justCompleted.isComplete ? (
+                <>
+                  <Link
+                    to={`/dashboard/stacks/${sessionId}/my-stack`}
+                    className="inline-flex items-center justify-center bg-navy text-primary-foreground rounded-[8px] px-5 h-11 text-[15px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
+                  >
+                    Open your stack →
+                  </Link>
+                  <Link
+                    to="/dashboard"
+                    className="text-[14px] text-navy hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm"
+                  >
+                    Back to dashboard
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={continueToNext}
+                    className="inline-flex items-center justify-center bg-navy text-primary-foreground rounded-[8px] px-5 h-11 text-[15px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
+                  >
+                    Continue to step {justCompleted.position + 1} →
+                  </button>
+                  <Link
+                    to="/dashboard"
+                    className="text-[14px] text-navy hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm"
+                  >
+                    Take a break — back to dashboard
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {!loading && !waitingForPlan && !justCompleted && allDone && (
           <div className="text-center">
             <p className="font-mono text-[12px] tracking-[0.14em] uppercase text-navy">
               Plan complete
@@ -285,7 +390,7 @@ const StepFocus = () => {
           </div>
         )}
 
-        {!loading && !allDone && current && (
+        {!loading && !waitingForPlan && !justCompleted && !allDone && current && (
           <>
             {showWelcome && current.position === 1 && (
               <div className="mb-8 pb-6 border-b border-[hsl(var(--border))]/60">

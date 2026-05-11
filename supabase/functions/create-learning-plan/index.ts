@@ -234,8 +234,13 @@ Deno.serve(async (req) => {
 
   if (sessErr || !session) return json({ error: "Session not found" }, 404);
 
-  const picks: string[] = (session.ai_picked_tools as string[] | null) ?? [];
-  if (!picks.length) return json({ error: "No ai_picked_tools yet", skipped: true }, 200);
+  const aiPicks: string[] = (session.ai_picked_tools as string[] | null) ?? [];
+
+  // Deterministic defaults if AI pick failed or hasn't landed.
+  // Claude is the foundation tool — pairs naturally with the briefing method skill.
+  // Second tool depends on lane: ChatGPT for comparison practice (starting), Perplexity for relay habit (comfortable).
+  const DEFAULT_STARTING = ["claude", "chatgpt"];
+  const DEFAULT_COMFORTABLE = ["claude", "perplexity"];
 
   // Lane inference
   const existing = (session.onboarding_existing_tools as string[] | null) ?? [];
@@ -245,6 +250,14 @@ Deno.serve(async (req) => {
     hasExisting && (conf === "weekly" || conf === "confident") ? "comfortable"
     : (conf === "never" || conf === "tried") ? "starting"
     : "starting";
+
+  let picks = aiPicks;
+  let usedDefaults = false;
+  if (picks.length === 0) {
+    picks = lane === "comfortable" ? DEFAULT_COMFORTABLE : DEFAULT_STARTING;
+    usedDefaults = true;
+    console.log("create-learning-plan: using deterministic defaults for session", sessionId);
+  }
 
   const primary = picks[0];
   const second = picks[1] ?? picks[0];
@@ -284,7 +297,11 @@ Deno.serve(async (req) => {
       lane,
       title,
       active_tool_slugs: picks,
-      rationale: { source: "create-learning-plan", lane_reason: { hasExisting, confidence: conf } },
+      rationale: {
+        source: usedDefaults ? "create-learning-plan-defaults" : "create-learning-plan",
+        lane_reason: { hasExisting, confidence: conf },
+        used_defaults: usedDefaults,
+      },
     })
     .select("id")
     .single();

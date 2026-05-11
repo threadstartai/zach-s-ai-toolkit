@@ -302,23 +302,24 @@ Deno.serve(async (req) => {
           })
           .eq("id", sessionIdForAi);
         if (updErr) console.log("ai-pick: update failed", updErr);
+      }
 
-        // Chain into learning plan creation
-        try {
-          const planRes = await fetch(`${SUPABASE_URL}/functions/v1/create-learning-plan`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${SERVICE_ROLE}`,
-            },
-            body: JSON.stringify({ session_id: sessionIdForAi }),
-          });
-          if (!planRes.ok) {
-            console.log("create-learning-plan: chained call failed", planRes.status, await planRes.text());
-          }
-        } catch (e) {
-          console.log("create-learning-plan: chained call error", e);
+      // Chain into plan creation unconditionally. The plan function handles the no-picks case
+      // with deterministic defaults so a brand-new user never gets stuck without a plan.
+      try {
+        const planRes = await fetch(`${SUPABASE_URL}/functions/v1/create-learning-plan`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${SERVICE_ROLE}`,
+          },
+          body: JSON.stringify({ session_id: sessionIdForAi }),
+        });
+        if (!planRes.ok) {
+          console.log("create-learning-plan: chained call failed", planRes.status, await planRes.text());
         }
+      } catch (e) {
+        console.log("create-learning-plan: chained call error", e);
       }
     } catch (e) {
       console.log("ai-pick: unexpected error", e);
