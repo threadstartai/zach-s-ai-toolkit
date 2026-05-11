@@ -99,16 +99,38 @@ Deno.serve(async (req) => {
   }
 
   const now = new Date().toISOString();
-  // Only update summary fields. Content is managed by the frontend autosave —
-  // writing it here would race against the user's typing and silently overwrite recent edits.
-  const { error: updErr } = await admin
+  // Upsert pattern: if the row doesn't exist yet (user clicked Summarise before
+  // the 1s autosave debounce fired), insert with empty content. Otherwise update
+  // only the summary fields — content is managed by the frontend autosave and
+  // writing it here would race against the user's typing.
+  const { data: existing, error: lookupErr } = await admin
     .from("user_notes")
-    .update({ summary, summary_updated_at: now })
-    .eq("user_id", userId);
+    .select("id")
+    .eq("user_id", userId)
+    .maybeSingle();
 
-  if (updErr) {
-    console.error("summarise-notes: update failed", updErr);
+  if (lookupErr) {
+    console.error("summarise-notes: lookup failed", lookupErr);
     return json({ error: "Failed to save summary" }, 500);
+  }
+
+  if (existing) {
+    const { error: updErr } = await admin
+      .from("user_notes")
+      .update({ summary, summary_updated_at: now })
+      .eq("user_id", userId);
+    if (updErr) {
+      console.error("summarise-notes: update failed", updErr);
+      return json({ error: "Failed to save summary" }, 500);
+    }
+  } else {
+    const { error: insErr } = await admin
+      .from("user_notes")
+      .insert({ user_id: userId, content: "", summary, summary_updated_at: now });
+    if (insErr) {
+      console.error("summarise-notes: insert failed", insErr);
+      return json({ error: "Failed to save summary" }, 500);
+    }
   }
 
   return json({ summary });

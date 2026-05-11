@@ -211,6 +211,21 @@ Deno.serve(async (req) => {
   const sessionId = body.session_id;
   if (!sessionId || !isValidUuid(sessionId)) return json({ error: "Invalid session id" }, 400);
 
+  // Short-circuit if a plan already exists for this session.
+  const { data: existingPlan } = await admin
+    .from("learning_plans")
+    .select("id, current_step_id")
+    .eq("session_id", sessionId)
+    .maybeSingle();
+
+  if (existingPlan) {
+    return json({
+      plan_id: existingPlan.id,
+      current_step_id: existingPlan.current_step_id,
+      idempotent: true,
+    });
+  }
+
   const { data: session, error: sessErr } = await admin
     .from("sessions")
     .select("name, q2_audience, q3_use_case, q3_other_text, q4_confidence, onboarding_role, onboarding_time_budget, onboarding_existing_tools, ai_picked_tools, user_id")
@@ -299,8 +314,9 @@ Deno.serve(async (req) => {
     .select("id, position");
 
   if (stepsErr || !insertedSteps) {
-    console.log("steps insert failed", stepsErr);
-    return json({ error: "Failed to create steps" }, 500);
+    console.error("create-learning-plan: steps insert failed, rolling back plan", stepsErr);
+    await admin.from("learning_plans").delete().eq("id", plan.id);
+    return json({ error: "Failed to create plan steps" }, 500);
   }
 
   const firstStep = insertedSteps.find((r) => r.position === 1);
