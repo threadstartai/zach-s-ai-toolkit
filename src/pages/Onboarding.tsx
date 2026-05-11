@@ -165,31 +165,53 @@ const Onboarding = () => {
         My AI Stack
       </Link>
 
-      <div className="w-full max-w-[600px] bg-background rounded-[16px] border border-[hsl(var(--border))] shadow-[0_2px_12px_rgba(26,58,92,0.06)] p-10 md:p-12 mb-12">
+      <div className="w-full max-w-[600px] bg-card rounded-[12px] border border-[hsl(var(--border))] p-10 md:p-12 mb-12">
         {/* Progress segments */}
-        <div className="flex gap-2">
-          {Array.from({ length: segmentCount }).map((_, i) => (
-            <div
-              key={i}
-              className={`h-1 flex-1 rounded-full transition-colors duration-200 ${
-                i < questionNumber ? "bg-navy" : "bg-navy-light"
-              }`}
-            />
-          ))}
+        <div>
+          <div className="flex gap-2">
+            {Array.from({ length: segmentCount }).map((_, i) => (
+              <div
+                key={i}
+                className={`h-1 flex-1 rounded-full transition-colors duration-200 ${
+                  i < questionNumber ? "bg-navy" : "bg-navy-light"
+                }`}
+              />
+            ))}
+          </div>
+          <div className="mt-2 hidden sm:flex gap-2">
+            {STEP_LABELS.map((label, i) => (
+              <span
+                key={label}
+                className={`flex-1 text-center font-mono text-[10px] tracking-[0.08em] uppercase transition-colors duration-200 ${
+                  i < questionNumber ? "text-navy" : "text-navy/40"
+                }`}
+              >
+                {label}
+              </span>
+            ))}
+          </div>
         </div>
 
         {current && (
           <div className="mt-8">
             {step === "q1" && (
-              <p className="mb-6 italic text-[14px] text-navy/75 leading-relaxed">
-                Seven quick steps, then your stack. 100% free. Made for friends and family — so nobody gets left behind by AI. The sign-up was just so I can remember you when you come back.
+              <p className="mb-6 italic text-[14px] text-foreground/65 leading-[1.6]">
+                Seven quick steps, then your stack. Made for friends and family — so nobody gets left behind.
               </p>
             )}
             <p className="text-[12px] uppercase tracking-wider text-navy/60 font-medium">
               Step {questionNumber} of {segmentCount}
             </p>
-            <h1 className="mt-2 text-2xl font-bold text-navy tracking-tight">{current.heading}</h1>
-            <p className="mt-2 text-base text-foreground/65">{current.subtitle}</p>
+            <h1 className="mt-2 text-[28px] sm:text-[32px] font-bold text-foreground tracking-[-0.02em] leading-[1.15]">{current.heading}</h1>
+            {step === "time" ? (
+              <p className="mt-2 text-base text-foreground/65 leading-[1.55]">
+                {laneFromConfidence(q4) === "comfortable"
+                  ? "I'll match recommendations to what's realistic. We'll start with the system behind better AI work."
+                  : "I'll match recommendations to what's realistic. We'll start with one safe thing you can try tonight."}
+              </p>
+            ) : (
+              <p className="mt-2 text-base text-foreground/65 leading-[1.55]">{current.subtitle}</p>
+            )}
           </div>
         )}
 
