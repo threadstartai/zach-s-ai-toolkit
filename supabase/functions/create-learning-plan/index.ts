@@ -314,8 +314,9 @@ Deno.serve(async (req) => {
     .select("id, position");
 
   if (stepsErr || !insertedSteps) {
-    console.log("steps insert failed", stepsErr);
-    return json({ error: "Failed to create steps" }, 500);
+    console.error("create-learning-plan: steps insert failed, rolling back plan", stepsErr);
+    await admin.from("learning_plans").delete().eq("id", plan.id);
+    return json({ error: "Failed to create plan steps" }, 500);
   }
 
   const firstStep = insertedSteps.find((r) => r.position === 1);
