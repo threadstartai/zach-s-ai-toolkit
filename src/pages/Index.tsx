@@ -54,7 +54,7 @@ const Index = () => {
               My AI Stack.
             </h1>
             <p className="mt-5 text-xl md:text-2xl font-normal text-navy leading-snug max-w-[600px]">
-              A guide to every AI tool worth using, written for the people I care about.
+              A guide to every AI tool worth using, written for my friends and family.
             </p>
             <p className="mt-5 text-foreground/80">
               100% free. Made for friends and family — so nobody gets left behind by AI.
