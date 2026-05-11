@@ -94,7 +94,50 @@ Deno.serve(async (req) => {
   if (!session) return json({ error: "Session not found" }, 404);
   if (session.user_id !== userId) return json({ error: "Forbidden" }, 403);
 
-  // Load or create conversation
+  // Fetch user's current state in parallel
+  const [planRes, savedRes, notesRes] = await Promise.all([
+    admin
+      .from("learning_plans")
+      .select("id, title, lane, current_step_id, plan_version")
+      .eq("session_id", sessionId)
+      .maybeSingle(),
+    admin
+      .from("saved_chunks")
+      .select("created_at, chunks(title, chunk_type, tools(name))")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(5),
+    admin
+      .from("notes")
+      .select("title, summary, pinned, updated_at")
+      .eq("user_id", userId)
+      .order("pinned", { ascending: false })
+      .order("updated_at", { ascending: false })
+      .limit(5),
+  ]);
+
+  const plan = planRes.data;
+  const savedChunks = savedRes.data;
+  const notes = notesRes.data;
+
+  let currentStep: any = null;
+  let recentSteps: any[] = [];
+  if (plan) {
+    const { data: steps } = await admin
+      .from("learning_plan_steps")
+      .select("id, position, title, purpose, status, completed_at, tool_slug, step_kind")
+      .eq("plan_id", plan.id)
+      .order("position", { ascending: true });
+
+    if (steps) {
+      currentStep =
+        steps.find((s: any) => s.id === plan.current_step_id) ??
+        steps.find((s: any) => s.status === "available") ??
+        null;
+      recentSteps = steps.filter((s: any) => s.status === "done" || s.status === "skipped").slice(-3);
+    }
+  }
+
   let conversationId: string;
   let history: { role: string; content: string }[] = [];
 
