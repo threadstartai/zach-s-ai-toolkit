@@ -360,6 +360,13 @@ const StepFocus = () => {
                 </>
               )}
             </div>
+            {!justCompleted.isComplete && (
+              <AuditPanel
+                sessionId={sessionId!}
+                stepId={justCompleted.id}
+                compact={false}
+              />
+            )}
           </div>
         )}
 
