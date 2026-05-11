@@ -28,6 +28,7 @@ import BriefingMethod from "./pages/result/surfaces/BriefingMethod.tsx";
 import CheckBeforeTrust from "./pages/result/surfaces/CheckBeforeTrust.tsx";
 import Settings from "./pages/dashboard/Settings.tsx";
 import StepFocus from "./pages/dashboard/StepFocus.tsx";
+import Notes from "./pages/dashboard/Notes.tsx";
 
 const queryClient = new QueryClient();
 
