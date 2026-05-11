@@ -32,13 +32,12 @@ type RecentSave = {
 };
 
 type SectionsState = {
-  notes: boolean;
   stacks: boolean;
   saves: boolean;
 };
 
 const SECTIONS_KEY = "myaistack:dashboard-sections";
-const DEFAULT_SECTIONS: SectionsState = { notes: true, stacks: true, saves: false };
+const DEFAULT_SECTIONS: SectionsState = { stacks: true, saves: false };
 
 const formatDate = (iso: string) => {
   try {
