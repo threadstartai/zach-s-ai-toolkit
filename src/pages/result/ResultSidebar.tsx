@@ -61,6 +61,7 @@ export const ResultSidebar = ({
         items: [
           { label: "Briefing method", path: `${base}/briefing-method` },
           { label: "Check before trust", path: `${base}/check-before-trust` },
+          { label: "Relay map", path: `${base}/relay-map` },
         ],
       },
       {

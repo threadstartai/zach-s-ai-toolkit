@@ -29,6 +29,7 @@ import CheckBeforeTrust from "./pages/result/surfaces/CheckBeforeTrust.tsx";
 import Settings from "./pages/dashboard/Settings.tsx";
 import StepFocus from "./pages/dashboard/StepFocus.tsx";
 import Notes from "./pages/dashboard/Notes.tsx";
+import RelayMap from "./pages/result/surfaces/RelayMap.tsx";
 
 const queryClient = new QueryClient();
 
@@ -98,6 +99,7 @@ const App = () => (
                 <Route path="all-tools" element={<AllTools />} />
                 <Route path="briefing-method" element={<BriefingMethod />} />
                 <Route path="check-before-trust" element={<CheckBeforeTrust />} />
+                <Route path="relay-map" element={<RelayMap />} />
                 <Route path="foundations" element={<Foundations />} />
                 <Route path="work-with-zach" element={<WorkWithZach />} />
               </Route>
