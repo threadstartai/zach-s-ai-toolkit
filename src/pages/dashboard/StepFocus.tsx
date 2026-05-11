@@ -66,6 +66,8 @@ const StepFocus = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const cameFromOnboarding = searchParams.get("first") === "1";
 
   const [loading, setLoading] = useState(true);
   const [plan, setPlan] = useState<Plan | null>(null);
@@ -74,6 +76,12 @@ const StepFocus = () => {
   const [toolName, setToolName] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [profile, setProfile] = useState<{
+    q3_use_case: string | null;
+    q3_other_text: string | null;
+    onboarding_role: string | null;
+  } | null>(null);
+  const [showWelcome, setShowWelcome] = useState(cameFromOnboarding);
 
   const current = plan && steps.length > 0
     ? (steps.find((s) => s.id === plan.current_step_id) ||
