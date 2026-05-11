@@ -76,6 +76,14 @@ const StepFocus = () => {
   const [toolName, setToolName] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
+  const [waitingForPlan, setWaitingForPlan] = useState(false);
+  const [justCompleted, setJustCompleted] = useState<{
+    position: number;
+    title: string;
+    purpose: string;
+    isComplete: boolean;
+  } | null>(null);
   const [profile, setProfile] = useState<{
     q3_use_case: string | null;
     q3_other_text: string | null;
