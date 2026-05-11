@@ -291,9 +291,76 @@ const StepFocus = () => {
       </header>
 
       <main className="flex-1 max-w-[720px] mx-auto w-full px-5 sm:px-8 py-12 md:py-16">
-        {loading && <SkeletonHeroCard />}
+        {loading && !waitingForPlan && <SkeletonHeroCard />}
 
-        {!loading && allDone && (
+        {waitingForPlan && (
+          <div className="text-center">
+            <p className="font-mono text-[12px] tracking-[0.14em] uppercase text-navy">
+              Building your plan
+            </p>
+            <h1 className="mt-4 text-[28px] sm:text-[32px] font-bold text-foreground tracking-[-0.02em] leading-[1.15]">
+              One moment — picking your three tools.
+            </h1>
+            <p className="mt-4 text-[15px] text-foreground/70 leading-[1.6] max-w-[480px] mx-auto">
+              I'm reading your answers and choosing the tools that fit. This usually takes about 10 seconds.
+            </p>
+            <div className="mt-8 flex items-center justify-center">
+              <div className="h-2 w-48 rounded-full bg-navy-light overflow-hidden">
+                <div className="h-full w-1/3 bg-navy rounded-full animate-pulse" />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!loading && !waitingForPlan && justCompleted && (
+          <div className="text-center">
+            <p className="font-mono text-[12px] tracking-[0.14em] uppercase text-navy">
+              Step {justCompleted.position} done
+            </p>
+            <h1 className="mt-4 text-[36px] sm:text-[44px] font-bold text-foreground tracking-[-0.025em] leading-[1.1]">
+              {justCompleted.isComplete ? "Plan complete." : "Nicely done."}
+            </h1>
+            <p className="mt-5 text-[17px] text-foreground/80 leading-[1.65] max-w-[560px] mx-auto">
+              {justCompleted.purpose}
+            </p>
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-5">
+              {justCompleted.isComplete ? (
+                <>
+                  <Link
+                    to={`/dashboard/stacks/${sessionId}/my-stack`}
+                    className="inline-flex items-center justify-center bg-navy text-primary-foreground rounded-[8px] px-5 h-11 text-[15px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
+                  >
+                    Open your stack →
+                  </Link>
+                  <Link
+                    to="/dashboard"
+                    className="text-[14px] text-navy hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm"
+                  >
+                    Back to dashboard
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={continueToNext}
+                    className="inline-flex items-center justify-center bg-navy text-primary-foreground rounded-[8px] px-5 h-11 text-[15px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
+                  >
+                    Continue to step {justCompleted.position + 1} →
+                  </button>
+                  <Link
+                    to="/dashboard"
+                    className="text-[14px] text-navy hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm"
+                  >
+                    Take a break — back to dashboard
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {!loading && !waitingForPlan && !justCompleted && allDone && (
           <div className="text-center">
             <p className="font-mono text-[12px] tracking-[0.14em] uppercase text-navy">
               Plan complete
@@ -323,7 +390,7 @@ const StepFocus = () => {
           </div>
         )}
 
-        {!loading && !allDone && current && (
+        {!loading && !waitingForPlan && !justCompleted && !allDone && current && (
           <>
             {showWelcome && current.position === 1 && (
               <div className="mb-8 pb-6 border-b border-[hsl(var(--border))]/60">
