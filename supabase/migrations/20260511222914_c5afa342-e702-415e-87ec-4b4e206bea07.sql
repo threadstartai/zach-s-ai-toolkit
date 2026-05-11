@@ -1,0 +1,1 @@
+ALTER TYPE public.learning_event_type ADD VALUE IF NOT EXISTS 'audit_completed';

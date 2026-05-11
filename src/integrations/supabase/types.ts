@@ -805,6 +805,7 @@ export type Database = {
         | "note_added"
         | "resume_position_saved"
         | "plan_repaired"
+        | "audit_completed"
       learning_lane: "starting" | "comfortable"
       learning_step_status:
         | "locked"
@@ -948,6 +949,7 @@ export const Constants = {
         "note_added",
         "resume_position_saved",
         "plan_repaired",
+        "audit_completed",
       ],
       learning_lane: ["starting", "comfortable"],
       learning_step_status: [

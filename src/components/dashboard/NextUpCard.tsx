@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { SkeletonHeroCard } from "@/components/ui-primitives/Skeletons";
 import { splitFirstPrompt } from "@/pages/result/shared/chunks";
+import { AuditPanel } from "@/components/dashboard/AuditPanel";
 
 type Step = {
   id: string;
@@ -53,6 +54,7 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
   const [justCompleted, setJustCompleted] = useState<{
+    id: string;
     position: number;
     title: string;
     purpose: string;
@@ -212,6 +214,7 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
         return;
       }
       const completedSnapshot = {
+        id: current.id,
         position: current.position,
         title: current.title,
         purpose: current.purpose,
@@ -280,6 +283,13 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
             </button>
           )}
         </div>
+        {!justCompleted.isComplete && (
+          <AuditPanel
+            sessionId={sessionId}
+            stepId={justCompleted.id}
+            compact={true}
+          />
+        )}
       </div>
     );
   }
