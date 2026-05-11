@@ -260,7 +260,7 @@ export const AskDrawer = ({ open, onOpenChange, sessionId }: AskDrawerProps) => 
           ) : messages.length === 0 ? (
             <div>
               <p className="text-[14.5px] text-foreground/85 leading-[1.65]">
-                Ask anything about your stack. I'll use the Master Prompt Guide approach — clarifying questions first, then push back if I see it.
+                Ask AI anything about your stack. I'll use the Master Prompt Guide approach — clarifying questions first, then push back if I see it.
               </p>
               <div className="mt-5 flex flex-col gap-2">
                 {SUGGESTIONS.map((s) => (
