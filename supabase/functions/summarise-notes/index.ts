@@ -1,8 +1,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import { corsHeaders } from "../_shared/validation.ts";
+import { corsHeaders, isValidUuid } from "../_shared/validation.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
 const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
@@ -46,7 +47,26 @@ Deno.serve(async (req) => {
     return json({ error: "Invalid JSON" }, 400);
   }
 
-  const content = typeof body.content === "string" ? body.content.trim() : "";
+  const noteId = typeof body.note_id === "string" ? body.note_id : "";
+  if (!isValidUuid(noteId)) {
+    return json({ error: "Invalid note_id" }, 400);
+  }
+
+  // User-scoped client (auth header forwarded) so RLS gates the read + write.
+  const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    global: { headers: { Authorization: req.headers.get("Authorization")! } },
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+
+  const { data: note } = await userClient
+    .from("notes")
+    .select("id, content")
+    .eq("id", noteId)
+    .maybeSingle();
+
+  if (!note) return json({ error: "Note not found" }, 404);
+
+  const content = (note.content as string).replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
   if (content.length < 30 || content.length > 5000) {
     return json({ error: "Content must be 30–5000 characters" }, 400);
   }
@@ -99,38 +119,14 @@ Deno.serve(async (req) => {
   }
 
   const now = new Date().toISOString();
-  // Upsert pattern: if the row doesn't exist yet (user clicked Summarise before
-  // the 1s autosave debounce fired), insert with empty content. Otherwise update
-  // only the summary fields — content is managed by the frontend autosave and
-  // writing it here would race against the user's typing.
-  const { data: existing, error: lookupErr } = await admin
-    .from("user_notes")
-    .select("id")
-    .eq("user_id", userId)
-    .maybeSingle();
+  const { error: updErr } = await userClient
+    .from("notes")
+    .update({ summary, summary_updated_at: now })
+    .eq("id", noteId);
 
-  if (lookupErr) {
-    console.error("summarise-notes: lookup failed", lookupErr);
+  if (updErr) {
+    console.error("summarise-notes: update failed", updErr);
     return json({ error: "Failed to save summary" }, 500);
-  }
-
-  if (existing) {
-    const { error: updErr } = await admin
-      .from("user_notes")
-      .update({ summary, summary_updated_at: now })
-      .eq("user_id", userId);
-    if (updErr) {
-      console.error("summarise-notes: update failed", updErr);
-      return json({ error: "Failed to save summary" }, 500);
-    }
-  } else {
-    const { error: insErr } = await admin
-      .from("user_notes")
-      .insert({ user_id: userId, content: "", summary, summary_updated_at: now });
-    if (insErr) {
-      console.error("summarise-notes: insert failed", insErr);
-      return json({ error: "Failed to save summary" }, 500);
-    }
   }
 
   return json({ summary });

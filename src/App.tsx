@@ -28,6 +28,7 @@ import BriefingMethod from "./pages/result/surfaces/BriefingMethod.tsx";
 import CheckBeforeTrust from "./pages/result/surfaces/CheckBeforeTrust.tsx";
 import Settings from "./pages/dashboard/Settings.tsx";
 import StepFocus from "./pages/dashboard/StepFocus.tsx";
+import Notes from "./pages/dashboard/Notes.tsx";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +89,7 @@ const App = () => (
             >
               <Route index element={<DashboardIndex />} />
               <Route path="settings" element={<Settings />} />
+              <Route path="notes" element={<Notes />} />
               <Route path="stacks/:sessionId" element={<ResultLayout chrome="dashboard" />}>
                 <Route index element={<Navigate to="my-stack" replace />} />
                 <Route path="my-stack" element={<MyStack />} />

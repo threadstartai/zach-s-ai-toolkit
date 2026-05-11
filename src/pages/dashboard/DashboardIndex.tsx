@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,7 @@ import { audiencePhrase, useCasePhrase } from "@/pages/result/shared/phrases";
 import { caseStudyForRole } from "@/lib/caseStudies";
 import { SkeletonHeroCard, SkeletonStackCard } from "@/components/ui-primitives/Skeletons";
 import { NextUpCard } from "@/components/dashboard/NextUpCard";
+import NotesPreview from "@/components/dashboard/NotesPreview";
 
 type StackRow = {
   id: string;
@@ -31,13 +32,12 @@ type RecentSave = {
 };
 
 type SectionsState = {
-  notes: boolean;
   stacks: boolean;
   saves: boolean;
 };
 
 const SECTIONS_KEY = "myaistack:dashboard-sections";
-const DEFAULT_SECTIONS: SectionsState = { notes: true, stacks: true, saves: false };
+const DEFAULT_SECTIONS: SectionsState = { stacks: true, saves: false };
 
 const formatDate = (iso: string) => {
   try {
@@ -86,18 +86,7 @@ const DashboardIndex = () => {
   const [error, setError] = useState(false);
 
   const [sections, setSections] = useState<SectionsState>(DEFAULT_SECTIONS);
-
-
-  const [noteContent, setNoteContent] = useState("");
-  const [noteSummary, setNoteSummary] = useState<string | null>(null);
-  const [noteDirty, setNoteDirty] = useState(false);
-  const [noteSaving, setNoteSaving] = useState(false);
-  const [summarising, setSummarising] = useState(false);
-  const [summariseError, setSummariseError] = useState<string | null>(null);
-  const noteHydrated = useRef(false);
-
   const [recentSaves, setRecentSaves] = useState<RecentSave[]>([]);
-
   // Hydrate sections
   useEffect(() => {
     try {
@@ -136,40 +125,6 @@ const DashboardIndex = () => {
 
   const mostRecent = stacks[0] ?? null;
 
-  // Load notes
-  useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-    (async () => {
-      const { data } = await supabase
-        .from("user_notes")
-        .select("content, summary")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (cancelled) return;
-      if (data) {
-        setNoteContent(data.content ?? "");
-        setNoteSummary(data.summary ?? null);
-      }
-      noteHydrated.current = true;
-    })();
-    return () => { cancelled = true; };
-  }, [user]);
-
-  // Auto-save notes (debounced 1s)
-  useEffect(() => {
-    if (!user || !noteHydrated.current || !noteDirty) return;
-    const handle = setTimeout(async () => {
-      setNoteSaving(true);
-      await supabase
-        .from("user_notes")
-        .upsert({ user_id: user.id, content: noteContent }, { onConflict: "user_id" });
-      setNoteSaving(false);
-      setNoteDirty(false);
-    }, 1000);
-    return () => clearTimeout(handle);
-  }, [noteContent, noteDirty, user]);
-
   // Recent saves
   useEffect(() => {
     if (!user) return;
@@ -193,26 +148,6 @@ const DashboardIndex = () => {
     })();
     return () => { cancelled = true; };
   }, [user]);
-
-  const handleSummarise = async () => {
-    if (noteContent.trim().length < 30 || summarising) return;
-    setSummariseError(null);
-    setSummarising(true);
-    try {
-      const { data, error: err } = await supabase.functions.invoke("summarise-notes", {
-        body: { content: noteContent },
-      });
-      if (err || !data?.summary) {
-        setSummariseError(data?.error || "Couldn't summarise — try again");
-      } else {
-        setNoteSummary(data.summary);
-      }
-    } catch {
-      setSummariseError("Couldn't summarise — try again");
-    } finally {
-      setSummarising(false);
-    }
-  };
 
   const greetingName = useMemo(() => {
     const fromStack = mostRecent?.name?.trim();
@@ -282,42 +217,8 @@ const DashboardIndex = () => {
         <NextUpCard sessionId={recentId} />
       </section>
 
-      {/* Notes */}
-      <section className={`mt-6 ${divider} pt-2`}>
-        <SectionShell label="Notes" open={sections.notes} onOpenChange={(v) => setOpen("notes", v)}>
-          <div>
-            <textarea
-              value={noteContent}
-              onChange={(e) => { setNoteContent(e.target.value); setNoteDirty(true); }}
-              placeholder="Quick notes — what you're learning, prompts that worked, things to try…"
-              className="w-full min-h-[140px] bg-background border border-[hsl(var(--border))] rounded-[12px] px-4 py-3 text-[15px] leading-[1.6] text-foreground placeholder:text-foreground/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 resize-y"
-            />
-            <div className="mt-2 flex items-center justify-between gap-3">
-              <span className="text-[13px] italic text-foreground/55">
-                {noteSaving ? "Saving…" : noteDirty ? "Unsaved changes…" : "Saved automatically."}
-              </span>
-              <button
-                onClick={handleSummarise}
-                disabled={noteContent.trim().length < 30 || summarising}
-                className="inline-flex items-center justify-center bg-navy text-primary-foreground rounded-[8px] px-4 h-9 text-[13px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {summarising ? "Summarising…" : "Summarise"}
-              </button>
-            </div>
-            {summariseError && (
-              <p className="mt-2 text-[13px] text-destructive">{summariseError}</p>
-            )}
-            {noteSummary && (
-              <div className="mt-3 bg-navy-light/30 border border-navy-light/60 rounded-[10px] px-4 py-3">
-                <p className="font-mono text-[11px] tracking-[0.12em] uppercase text-navy">Summary</p>
-                <p className="mt-2 italic text-[14px] text-foreground/85 leading-[1.6]">
-                  {noteSummary}
-                </p>
-              </div>
-            )}
-          </div>
-        </SectionShell>
-      </section>
+      {/* Notes preview */}
+      <NotesPreview />
 
       {/* Your stacks */}
       <section className={`mt-6 ${divider} pt-2`}>
