@@ -67,6 +67,16 @@ const App = () => (
               }
             />
 
+            {/* Protected step focus (full-bleed, no dashboard chrome) */}
+            <Route
+              path="/dashboard/stacks/:sessionId/step"
+              element={
+                <ProtectedRoute>
+                  <StepFocus />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Protected dashboard */}
             <Route
               path="/dashboard"
