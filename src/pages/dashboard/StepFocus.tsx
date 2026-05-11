@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { SkeletonHeroCard } from "@/components/ui-primitives/Skeletons";
 import { splitFirstPrompt } from "@/pages/result/shared/chunks";
+import { AuditPanel } from "@/components/dashboard/AuditPanel";
 
 type Step = {
   id: string;
