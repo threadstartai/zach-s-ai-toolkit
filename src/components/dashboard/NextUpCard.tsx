@@ -250,6 +250,40 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
 
   if (loading) return <SkeletonHeroCard />;
 
+  if (justCompleted) {
+    return (
+      <div className={cardCls}>
+        <p className="font-mono text-[11px] tracking-[0.12em] uppercase text-navy">
+          Step {justCompleted.position} done
+        </p>
+        <h2 className="mt-3 text-[28px] sm:text-[32px] font-bold text-foreground tracking-[-0.02em] leading-[1.15]">
+          {justCompleted.isComplete ? "Plan complete." : "Nicely done."}
+        </h2>
+        <p className="mt-3 text-[15px] text-foreground/85 leading-[1.65]">
+          {justCompleted.purpose}
+        </p>
+        <div className="mt-5 flex flex-wrap items-center gap-4">
+          {justCompleted.isComplete ? (
+            <Link
+              to={`/dashboard/stacks/${sessionId}/my-stack`}
+              className="inline-flex items-center justify-center bg-navy text-primary-foreground rounded-[8px] px-4 h-10 text-[14px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
+            >
+              Open your stack →
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={continueToNext}
+              className="inline-flex items-center justify-center bg-navy text-primary-foreground rounded-[8px] px-4 h-10 text-[14px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
+            >
+              Continue to step {justCompleted.position + 1} →
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   // End-of-plan celebration
   const allDone =
     plan &&
