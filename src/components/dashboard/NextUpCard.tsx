@@ -283,6 +283,13 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
             </button>
           )}
         </div>
+        {!justCompleted.isComplete && (
+          <AuditPanel
+            sessionId={sessionId}
+            stepId={justCompleted.id}
+            compact={true}
+          />
+        )}
       </div>
     );
   }
