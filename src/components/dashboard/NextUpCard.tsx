@@ -51,6 +51,13 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
   const [fallback, setFallback] = useState<FallbackFocus | null>(null);
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
+  const [justCompleted, setJustCompleted] = useState<{
+    position: number;
+    title: string;
+    purpose: string;
+    isComplete: boolean;
+  } | null>(null);
 
   const current = plan && steps.length > 0
     ? (steps.find((s) => s.id === plan.current_step_id) ||
