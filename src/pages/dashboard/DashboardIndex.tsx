@@ -217,42 +217,8 @@ const DashboardIndex = () => {
         <NextUpCard sessionId={recentId} />
       </section>
 
-      {/* Notes */}
-      <section className={`mt-6 ${divider} pt-2`}>
-        <SectionShell label="Notes" open={sections.notes} onOpenChange={(v) => setOpen("notes", v)}>
-          <div>
-            <textarea
-              value={noteContent}
-              onChange={(e) => { setNoteContent(e.target.value); setNoteDirty(true); }}
-              placeholder="Quick notes — what you're learning, prompts that worked, things to try…"
-              className="w-full min-h-[140px] bg-background border border-[hsl(var(--border))] rounded-[12px] px-4 py-3 text-[15px] leading-[1.6] text-foreground placeholder:text-foreground/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 resize-y"
-            />
-            <div className="mt-2 flex items-center justify-between gap-3">
-              <span className="text-[13px] italic text-foreground/55">
-                {noteSaving ? "Saving…" : noteDirty ? "Unsaved changes…" : "Saved automatically."}
-              </span>
-              <button
-                onClick={handleSummarise}
-                disabled={noteContent.trim().length < 30 || summarising}
-                className="inline-flex items-center justify-center bg-navy text-primary-foreground rounded-[8px] px-4 h-9 text-[13px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {summarising ? "Summarising…" : "Summarise"}
-              </button>
-            </div>
-            {summariseError && (
-              <p className="mt-2 text-[13px] text-destructive">{summariseError}</p>
-            )}
-            {noteSummary && (
-              <div className="mt-3 bg-navy-light/30 border border-navy-light/60 rounded-[10px] px-4 py-3">
-                <p className="font-mono text-[11px] tracking-[0.12em] uppercase text-navy">Summary</p>
-                <p className="mt-2 italic text-[14px] text-foreground/85 leading-[1.6]">
-                  {noteSummary}
-                </p>
-              </div>
-            )}
-          </div>
-        </SectionShell>
-      </section>
+      {/* Notes preview */}
+      <NotesPreview />
 
       {/* Your stacks */}
       <section className={`mt-6 ${divider} pt-2`}>
