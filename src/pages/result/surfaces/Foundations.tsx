@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { SECTION_LABELS, groupChunks } from "../shared/chunks";
 import { ChunkBlock } from "../shared/ChunkBlock";
 import type { Chunk } from "../shared/types";
@@ -8,10 +10,10 @@ import { SkeletonGuideCard } from "@/components/ui-primitives/Skeletons";
 import { EmptyState } from "@/components/ui-primitives/EmptyState";
 import { ProcessDiagram } from "@/components/diagrams/ProcessDiagram";
 
-const FOUNDATIONAL_ORDER = [
+const FOUNDATION_ORDER = [
   "start-here",
-  "the-process",
   "why-i-made-this",
+  "the-process",
   "how-this-was-built",
   "building-things-overview",
   "power-ups",
@@ -26,11 +28,14 @@ type FoundationalTool = {
 };
 
 const Foundations = () => {
+  const { user } = useAuth();
   const [tools, setTools] = useState<FoundationalTool[]>([]);
   const [chunksByToolId, setChunksByToolId] = useState<Record<string, Chunk[]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [expandedSlug, setExpandedSlug] = useState<string | null>(null);
+  const [readSlugs, setReadSlugs] = useState<Set<string>>(new Set());
+  const [openSlug, setOpenSlug] = useState<string | null>(null);
+  const [userToggled, setUserToggled] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -71,16 +76,106 @@ const Foundations = () => {
     };
   }, []);
 
-  const ordered = FOUNDATIONAL_ORDER
-    .map((slug) => tools.find((t) => t.slug === slug))
-    .filter((t): t is FoundationalTool => Boolean(t));
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("foundation_progress")
+        .select("foundation_slug")
+        .eq("user_id", user.id);
+      if (!cancelled && data) {
+        setReadSlugs(new Set(data.map((r: { foundation_slug: string }) => r.foundation_slug)));
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  const ordered = useMemo(
+    () =>
+      FOUNDATION_ORDER.map((slug) => tools.find((t) => t.slug === slug)).filter(
+        (t): t is FoundationalTool => Boolean(t),
+      ),
+    [tools],
+  );
+
+  const nextUnreadSlug = useMemo(() => {
+    for (const f of ordered) {
+      if (!readSlugs.has(f.slug)) return f.slug;
+    }
+    return null;
+  }, [ordered, readSlugs]);
+
+  const totalCount = ordered.length;
+  const readCount = ordered.filter((f) => readSlugs.has(f.slug)).length;
+
+  // Auto-expand next unread until user manually toggles
+  useEffect(() => {
+    if (!userToggled && nextUnreadSlug) setOpenSlug(nextUnreadSlug);
+  }, [nextUnreadSlug, userToggled]);
+
+  const markRead = async (slug: string) => {
+    if (!user) return;
+    const prev = readSlugs;
+    const next = new Set(prev);
+    next.add(slug);
+    setReadSlugs(next);
+    setUserToggled(false); // allow auto-advance to next unread
+    setOpenSlug(null);
+    const { error: insErr } = await supabase
+      .from("foundation_progress")
+      .insert({ user_id: user.id, foundation_slug: slug });
+    if (insErr && insErr.code !== "23505") {
+      setReadSlugs(prev);
+      toast.error("Couldn't mark as read — try again");
+    }
+  };
+
+  const markUnread = async (slug: string) => {
+    if (!user) return;
+    const prev = readSlugs;
+    const next = new Set(prev);
+    next.delete(slug);
+    setReadSlugs(next);
+    const { error: delErr } = await supabase
+      .from("foundation_progress")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("foundation_slug", slug);
+    if (delErr) {
+      setReadSlugs(prev);
+      toast.error("Couldn't update — try again");
+    }
+  };
+
+  const handleToggle = (slug: string) => {
+    setUserToggled(true);
+    setOpenSlug((cur) => (cur === slug ? null : slug));
+  };
 
   return (
     <div>
-      <h3 className="text-[32px] font-bold tracking-[-0.02em]">Foundations</h3>
-      <p className="mt-3 italic text-[15px] text-foreground/70 max-w-[640px]">
-        Field guide. Background reading on how this stack came together and how to pass it on. The backbone of how to actually use AI well lives in Briefing method and Check before trust above.
-      </p>
+      <header className="mb-8">
+        <p className="font-mono text-[11px] tracking-[0.14em] uppercase text-navy">
+          Foundations · {readCount} of {totalCount} read
+        </p>
+        <h1 className="mt-3 text-[32px] sm:text-[36px] font-bold text-foreground tracking-[-0.02em] leading-[1.15]">
+          The thinking under the tools.
+        </h1>
+        <p className="mt-3 text-[15px] text-foreground/75 leading-[1.65] max-w-[640px]">
+          {totalCount > 0 && readCount === totalCount
+            ? "You've worked through every foundational. The tools above sit on top of these — come back when you want to refresh."
+            : "Work through these in order. Each one builds on the last. The tools on your stack will make more sense once you've read these."}
+        </p>
+        <div className="mt-4 h-1 w-full rounded-full bg-navy-light overflow-hidden">
+          <div
+            className="h-full bg-navy rounded-full transition-all duration-300 ease-out"
+            style={{ width: `${totalCount === 0 ? 0 : (readCount / totalCount) * 100}%` }}
+          />
+        </div>
+      </header>
 
       {loading && (
         <div className="mt-10 flex flex-col gap-4">
@@ -92,9 +187,10 @@ const Foundations = () => {
       )}
 
       {!loading && !error && (
-        <div className="mt-10 flex flex-col gap-4">
-          {ordered.map((t) => {
-            const isOpen = expandedSlug === t.slug;
+        <div className="mt-6 flex flex-col gap-4">
+          {ordered.map((t, i) => {
+            const isOpen = openSlug === t.slug;
+            const isRead = readSlugs.has(t.slug);
             const tChunks = chunksByToolId[t.id] ?? [];
             const grouped = groupChunks(tChunks);
             return (
@@ -104,12 +200,22 @@ const Foundations = () => {
               >
                 <button
                   type="button"
-                  onClick={() => setExpandedSlug(isOpen ? null : t.slug)}
+                  onClick={() => handleToggle(t.slug)}
                   className="w-full text-left flex items-start gap-4 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
                   aria-expanded={isOpen}
                 >
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-[20px] font-bold text-navy">{t.name}</h4>
+                    <p className="font-mono text-[11px] tracking-[0.12em] uppercase text-navy/60">
+                      {i + 1} of {totalCount}
+                    </p>
+                    <h4 className="mt-1.5 text-[20px] font-bold text-navy flex flex-wrap items-center gap-2">
+                      <span>{t.name}</span>
+                      {isRead && (
+                        <span className="inline-flex items-center bg-navy-light/40 text-navy text-[11px] font-mono uppercase tracking-[0.1em] rounded-[4px] px-1.5 py-0.5">
+                          ✓ Read
+                        </span>
+                      )}
+                    </h4>
                     {t.tagline && (
                       <p className="mt-2 text-[15px] text-foreground/80 leading-[1.6]">{t.tagline}</p>
                     )}
@@ -168,6 +274,31 @@ const Foundations = () => {
                             </div>
                           );
                         })}
+                      </div>
+                    )}
+
+                    {user && (
+                      <div className="mt-6 pt-5 border-t border-[hsl(var(--border))]/60 flex items-center justify-between gap-4">
+                        <span className="font-mono text-[11px] tracking-[0.12em] uppercase text-navy/60">
+                          {i + 1} of {totalCount}
+                        </span>
+                        {isRead ? (
+                          <button
+                            type="button"
+                            onClick={() => markUnread(t.slug)}
+                            className="text-[13px] text-foreground/60 hover:text-foreground/85 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 rounded-sm"
+                          >
+                            ✓ Read · Mark unread
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => markRead(t.slug)}
+                            className="inline-flex items-center justify-center bg-navy text-primary-foreground rounded-[8px] px-4 h-9 text-[13px] font-medium hover:bg-navy/90 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2"
+                          >
+                            Mark as read
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
