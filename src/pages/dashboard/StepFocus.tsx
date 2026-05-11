@@ -182,6 +182,7 @@ const StepFocus = () => {
   const complete = async (action: "done" | "skipped") => {
     if (busy || !current) return;
     setBusy(true);
+    setShowWelcome(false);
     try {
       const { data, error } = await supabase.functions.invoke("complete-step", {
         body: { step_id: current.id, action },
