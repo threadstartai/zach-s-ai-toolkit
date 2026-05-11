@@ -60,12 +60,22 @@ Deno.serve(async (req) => {
 
   const { data, error } = await supabase
     .from("sessions")
-    .select("name, q2_audience, q3_use_case, q3_other_text, q4_confidence, q5_learning_style, created_at, ai_picked_tools, ai_picked_at, ai_pick_reasoning, stack_label, onboarding_role, onboarding_time_budget, onboarding_existing_tools")
+    .select("name, q2_audience, q3_use_case, q3_other_text, q4_confidence, q5_learning_style, created_at, ai_picked_tools, ai_picked_at, ai_pick_reasoning, stack_label, onboarding_role, onboarding_time_budget, onboarding_existing_tools, user_id")
     .eq("id", sessionId)
     .maybeSingle();
 
   if (error) return json({ error: "Lookup failed" }, 500);
   if (!data) return json({ error: "Not found" }, 404);
 
-  return json({ session: data });
+  // Owned sessions require auth that matches user_id.
+  if ((data as any).user_id) {
+    const userId = await userIdFromAuthHeader(req);
+    if (!userId || userId !== (data as any).user_id) {
+      return json({ error: "Forbidden" }, 403);
+    }
+  }
+
+  // Strip user_id from response payload.
+  const { user_id: _omit, ...session } = data as any;
+  return json({ session });
 });
