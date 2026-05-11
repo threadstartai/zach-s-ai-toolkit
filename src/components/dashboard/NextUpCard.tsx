@@ -54,6 +54,7 @@ export const NextUpCard = ({ sessionId }: { sessionId: string }) => {
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
   const [justCompleted, setJustCompleted] = useState<{
+    id: string;
     position: number;
     title: string;
     purpose: string;
