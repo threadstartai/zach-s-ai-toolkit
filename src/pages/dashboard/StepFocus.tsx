@@ -31,6 +31,37 @@ type ChunkRow = { id: string; content: string; title: string | null };
 const claudeDeeplink = (prompt: string) =>
   `https://claude.ai/new?q=${encodeURIComponent(prompt)}`;
 
+const USE_CASE_LABELS: Record<string, string> = {
+  writing: "writing properly",
+  research: "researching a topic",
+  building: "building something",
+  notes: "note-taking and meetings",
+  images: "images and video",
+  admin: "admin and emails",
+};
+
+const ROLE_LABELS: Record<string, string> = {
+  founder: "founder / CEO",
+  solo: "solo / freelance",
+  "team-lead": "team lead",
+  ic: "individual contributor",
+  student: "student",
+  personal: "personal life",
+  retired: "exploring / retired",
+};
+
+const personalContextLine = (p: {
+  q3_use_case: string | null;
+  q3_other_text: string | null;
+  onboarding_role: string | null;
+}): string => {
+  const useText = p.q3_use_case === "other"
+    ? (p.q3_other_text || "something specific")
+    : (p.q3_use_case ? USE_CASE_LABELS[p.q3_use_case] ?? p.q3_use_case : "what you want help with");
+  const roleText = p.onboarding_role ? ROLE_LABELS[p.onboarding_role] ?? p.onboarding_role : null;
+  return roleText ? `${useText}, as a ${roleText}` : useText;
+};
+
 const StepFocus = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
