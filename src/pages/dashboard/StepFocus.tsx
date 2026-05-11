@@ -80,6 +80,7 @@ const StepFocus = () => {
   const busyRef = useRef(false);
   const [waitingForPlan, setWaitingForPlan] = useState(false);
   const [justCompleted, setJustCompleted] = useState<{
+    id: string;
     position: number;
     title: string;
     purpose: string;
