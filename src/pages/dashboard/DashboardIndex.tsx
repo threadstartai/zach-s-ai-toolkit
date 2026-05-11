@@ -125,40 +125,6 @@ const DashboardIndex = () => {
 
   const mostRecent = stacks[0] ?? null;
 
-  // Load notes
-  useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-    (async () => {
-      const { data } = await supabase
-        .from("user_notes")
-        .select("content, summary")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (cancelled) return;
-      if (data) {
-        setNoteContent(data.content ?? "");
-        setNoteSummary(data.summary ?? null);
-      }
-      noteHydrated.current = true;
-    })();
-    return () => { cancelled = true; };
-  }, [user]);
-
-  // Auto-save notes (debounced 1s)
-  useEffect(() => {
-    if (!user || !noteHydrated.current || !noteDirty) return;
-    const handle = setTimeout(async () => {
-      setNoteSaving(true);
-      await supabase
-        .from("user_notes")
-        .upsert({ user_id: user.id, content: noteContent }, { onConflict: "user_id" });
-      setNoteSaving(false);
-      setNoteDirty(false);
-    }, 1000);
-    return () => clearTimeout(handle);
-  }, [noteContent, noteDirty, user]);
-
   // Recent saves
   useEffect(() => {
     if (!user) return;
@@ -182,26 +148,6 @@ const DashboardIndex = () => {
     })();
     return () => { cancelled = true; };
   }, [user]);
-
-  const handleSummarise = async () => {
-    if (noteContent.trim().length < 30 || summarising) return;
-    setSummariseError(null);
-    setSummarising(true);
-    try {
-      const { data, error: err } = await supabase.functions.invoke("summarise-notes", {
-        body: { content: noteContent },
-      });
-      if (err || !data?.summary) {
-        setSummariseError(data?.error || "Couldn't summarise — try again");
-      } else {
-        setNoteSummary(data.summary);
-      }
-    } catch {
-      setSummariseError("Couldn't summarise — try again");
-    } finally {
-      setSummarising(false);
-    }
-  };
 
   const greetingName = useMemo(() => {
     const fromStack = mostRecent?.name?.trim();
