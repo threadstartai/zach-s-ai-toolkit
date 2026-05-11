@@ -20,10 +20,10 @@ const AuthCard = ({
         </Link>
       </header>
       <main className="flex-1 flex flex-col items-center justify-center px-5 py-12">
-        <div className="w-full max-w-[440px] bg-background border border-[hsl(var(--border))] rounded-[16px] p-10 md:p-12 shadow-[0_2px_12px_rgba(26,58,92,0.06)]">
-          <h1 className="text-3xl font-bold text-navy tracking-tight">{title}</h1>
-          {subtitle && <p className="mt-2 text-base text-foreground/65">{subtitle}</p>}
-          <div className="mt-10">{children}</div>
+        <div className="w-full max-w-[440px] bg-card border border-[hsl(var(--border))] rounded-[12px] p-10 md:p-12">
+          <h1 className="text-[28px] sm:text-[32px] font-bold text-foreground tracking-[-0.02em] leading-[1.15]">{title}</h1>
+          {subtitle && <p className="mt-3 text-[15px] text-foreground/70 leading-[1.6]">{subtitle}</p>}
+          <div className="mt-9">{children}</div>
         </div>
         {footer && (
           <div className="mt-8 text-sm text-foreground/65 text-center">
