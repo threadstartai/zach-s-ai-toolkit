@@ -115,6 +115,13 @@ const StepFocus = () => {
         .order("position", { ascending: true });
       if (cancelled) return;
 
+      const { data: sessionRow } = await supabase
+        .from("sessions")
+        .select("q3_use_case, q3_other_text, onboarding_role")
+        .eq("id", sessionId)
+        .maybeSingle();
+      if (!cancelled && sessionRow) setProfile(sessionRow);
+
       setPlan(planRow as Plan);
       setSteps((stepRows ?? []) as Step[]);
       setLoading(false);
