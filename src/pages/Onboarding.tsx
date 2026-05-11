@@ -46,6 +46,13 @@ const TOOL_OPTIONS = [
 
 const STEPS: QuizStep[] = ["intro", "q1", "q2", "role", "q3", "tools", "q4", "time"];
 
+const STEP_LABELS = ["Name", "Audience", "Role", "Goal", "Tools", "Confidence", "Time"];
+
+const laneFromConfidence = (c: string | null): "starting" | "comfortable" => {
+  if (c === "Use it weekly" || c === "Pretty confident") return "comfortable";
+  return "starting";
+};
+
 const Onboarding = () => {
   const navigate = useNavigate();
 
