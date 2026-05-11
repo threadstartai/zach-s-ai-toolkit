@@ -221,6 +221,7 @@ const StepFocus = () => {
         return;
       }
       const completedSnapshot = {
+        id: current.id,
         position: current.position,
         title: current.title,
         purpose: current.purpose,
