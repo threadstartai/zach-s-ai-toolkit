@@ -184,7 +184,7 @@ export const AskDrawer = ({ open, onOpenChange, sessionId }: AskDrawerProps) => 
       >
         {/* Header */}
         <div className="px-6 pt-6 pb-4 border-b border-[hsl(var(--border))]">
-          <h2 className="text-[20px] font-bold text-navy">Ask about your stack</h2>
+          <h2 className="text-[20px] font-bold text-navy">Ask AI</h2>
           <p className="mt-1 text-[13px] italic text-navy/65 leading-[1.5]">
             Trained on your three tools and your situation. Push back if it's being lazy.
           </p>
@@ -260,7 +260,7 @@ export const AskDrawer = ({ open, onOpenChange, sessionId }: AskDrawerProps) => 
           ) : messages.length === 0 ? (
             <div>
               <p className="text-[14.5px] text-foreground/85 leading-[1.65]">
-                Ask anything about your stack. I'll use the Master Prompt Guide approach — clarifying questions first, then push back if I see it.
+                Ask AI anything about your stack. I'll use the Master Prompt Guide approach — clarifying questions first, then push back if I see it.
               </p>
               <div className="mt-5 flex flex-col gap-2">
                 {SUGGESTIONS.map((s) => (
@@ -309,7 +309,7 @@ export const AskDrawer = ({ open, onOpenChange, sessionId }: AskDrawerProps) => 
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKey}
-              placeholder="Ask about your stack…"
+              placeholder="Ask AI…"
               rows={1}
               className="flex-1 resize-none border border-[hsl(var(--border))] focus:border-navy/50 focus:outline-none rounded-[8px] px-3 py-2 text-[14.5px] leading-[1.5] bg-background text-foreground"
               style={{ maxHeight: 200 }}
