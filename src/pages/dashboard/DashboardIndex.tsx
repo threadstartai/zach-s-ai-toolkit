@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,7 @@ import { audiencePhrase, useCasePhrase } from "@/pages/result/shared/phrases";
 import { caseStudyForRole } from "@/lib/caseStudies";
 import { SkeletonHeroCard, SkeletonStackCard } from "@/components/ui-primitives/Skeletons";
 import { NextUpCard } from "@/components/dashboard/NextUpCard";
+import NotesPreview from "@/components/dashboard/NotesPreview";
 
 type StackRow = {
   id: string;
