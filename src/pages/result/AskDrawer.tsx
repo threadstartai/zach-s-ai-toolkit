@@ -184,7 +184,7 @@ export const AskDrawer = ({ open, onOpenChange, sessionId }: AskDrawerProps) => 
       >
         {/* Header */}
         <div className="px-6 pt-6 pb-4 border-b border-[hsl(var(--border))]">
-          <h2 className="text-[20px] font-bold text-navy">Ask about your stack</h2>
+          <h2 className="text-[20px] font-bold text-navy">Ask AI</h2>
           <p className="mt-1 text-[13px] italic text-navy/65 leading-[1.5]">
             Trained on your three tools and your situation. Push back if it's being lazy.
           </p>
